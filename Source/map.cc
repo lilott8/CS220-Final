@@ -20,7 +20,7 @@ Map::Map(ProblemObject *po) {
     kWidth = po->get_width();
     initialize_map();
     set_blockages(po->get_blockers());
-    set_pins(po->get_connections());
+    //set_pins(po->get_connections());
 }
 
 void Map::set_blockages(vector<Blocker> b) {
@@ -64,6 +64,7 @@ void Map::set_pins(vector<Connection> c) {
         claim("Source: " + temp.coords_to_string(), kDebug);
         //kMap.at(temp.get_x()).at(temp.get_y())->set_type(LeeNode::NodeType::SOURCE);
         route.pStart = temp;
+        kPins.push_back(temp);
 
         // Declare the pin(s)
         temp = VNode(c.at(x).sink);
@@ -71,8 +72,8 @@ void Map::set_pins(vector<Connection> c) {
         claim("sink: " + temp.coords_to_string(), kDebug);
         //kMap.at(temp.get_x()).at(temp.get_y())->set_type(LeeNode::NodeType::SOURCE);
         route.pStop = temp;
+        kPins.push_back(temp);
 
-        kRoutes.push_back(route);
         kMap.at(route.pStart.get_x()).at(route.pStart.get_y())->set_type(VNode::Type::PIN);
         kMap.at(route.pStop.get_x()).at(route.pStop.get_y())->set_type(VNode::Type::PIN);
     }
@@ -114,7 +115,8 @@ void Map::print_map() {
             if(kMap.at(x).at(y)->get_type() == VNode::Type::BLOCKED ||
                     kMap.at(x).at(y)->get_type() == VNode::Type::PIN ||
                     kMap.at(x).at(y)->get_type() == VNode::Type::PATH ||
-                    kMap.at(x).at(y)->get_type() == VNode::Type::EDGE) {
+                    kMap.at(x).at(y)->get_type() == VNode::Type::EDGE ||
+                    kMap.at(x).at(y)->get_type() == VNode::Type::STEINER) {
                 output += VNode::type_to_string(kMap.at(x).at(y)->get_type()) + "\t";
             } else {
                 output += to_string(kMap.at(x).at(y)->get_output()) + "\t";

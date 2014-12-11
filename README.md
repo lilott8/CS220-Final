@@ -4,6 +4,8 @@ CS220 Project Framework
  
  - mapping is working
  - converted my child node class to fit this problem description
+ - added a controller to abstract and encapsulate the logic of my implementation
+ - laid the groundwork for the algorithms to be implemented
 
 ##TODO:
  - add error handling for inputs??

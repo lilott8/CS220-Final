@@ -13,7 +13,7 @@ namespace Flow {
 
     public:
         enum Direction {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST};
-        enum Type {PIN, BLOCKED, PATH, EDGE, NONE};
+        enum Type {PIN, BLOCKED, PATH, EDGE, NONE, STEINER};
 
         VNode();
         VNode(int, int, int cost = 0);

@@ -10,6 +10,11 @@ segmentgroup.cc
 problem_object.cc
 vnode.cc
 map.cc
+algorithm.cc
+controller.cc
+fortune.cc
+kruskal.cc
+spm.cc
 )
 
 add_library(SOURCE_LIB ${LIB_SOURCE})
@@ -18,6 +23,6 @@ set(MAIN_SRC
     main.cc
 )
 
-add_executable(grid_test ${MAIN_SRC})
-target_link_libraries(grid_test SOURCE_LIB)
-target_link_libraries(grid_test JSON_LIB)
+add_executable(flow ${MAIN_SRC})
+target_link_libraries(flow SOURCE_LIB)
+target_link_libraries(flow JSON_LIB)

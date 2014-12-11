@@ -8,6 +8,8 @@ path.cc
 pathsegment.cc
 segmentgroup.cc
 problem_object.cc
+vnode.cc
+map.cc
 )
 
 add_library(SOURCE_LIB ${LIB_SOURCE})

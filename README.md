@@ -2,9 +2,16 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - tdb
+ - mapping is working
+ - converted my child node class to fit this problem description
 
-
+##TODO:
+ - add error handling for inputs??
+ - Create a datastructure to hold a Voronoi sector
+ - build a basic Voronoi grapher
+ - Implement the nlogn Voronoi grapher
+ - Implement the n+hlogh Voronoi grapher
+ 
 ## Project Overview
 
 You will use this framework for the following projects:

@@ -4,6 +4,9 @@
 
 #include <iostream>
 
+
+Utilities::Node::Node(){}
+
 Utilities::Node::Node(int x, int y, int cost):coord(x,y){
       this->cost = cost;
 }

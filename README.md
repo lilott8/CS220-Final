@@ -7,13 +7,13 @@ CS220 Project Framework
  - added a controller to abstract and encapsulate the logic of my implementation
  - laid the groundwork for the algorithms to be implemented
  - controller framework is as I want it, beginning the fortune algorithm.
+ - added a Red/Black tree library that is under GPL v2.1
+ - had to retool a few things given my understanding of fortune's algorithm
 
 ##TODO:
  - add error handling for inputs??
  - Create a datastructure to hold a Voronoi sector
- - build a basic Voronoi grapher
  - Implement the nlogn Voronoi grapher
- - Implement the n+hlogh Voronoi grapher
  
 ## Project Overview
 

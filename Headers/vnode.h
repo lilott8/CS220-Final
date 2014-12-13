@@ -10,7 +10,6 @@ using namespace std;
 
 namespace Flow {
     class VNode : public Node {
-
     public:
         enum Direction {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST};
         enum Type {PIN, BLOCKED, PATH, EDGE, NONE, STEINER};
@@ -30,6 +29,7 @@ namespace Flow {
         string coords_to_string();
 
         int get_output();
+        int get_id();
     private:
         int id;
         int output;

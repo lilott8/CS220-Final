@@ -16,6 +16,7 @@ controller.cc
 fortune.cc
 kruskal.cc
 spm.cc
+rb.c
 )
 
 add_library(SOURCE_LIB ${LIB_SOURCE})

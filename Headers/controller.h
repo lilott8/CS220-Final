@@ -26,7 +26,7 @@ namespace Flow {
     private:
         Map *kMap;
         Algorithm::AlgoType kAlgo;
-        vector<VNode*> kPins;
+        priority_queue<VNode*, vector<VNode*>, CloserToOrigin> kPins;
         //Fortune *kFortune;
         //SPM *kSPM;
         // This allows me to keep all my algorithms in one container!

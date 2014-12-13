@@ -1,4 +1,4 @@
-#include "../Headers/VNode.h"
+#include "../Headers/vnode.h"
 #include "../Headers/problem_object.h"
 #include "../Headers/claim.h"
 #include "../Headers/map.h"
@@ -57,14 +57,14 @@ void Map::set_pins(vector<Connection> c) {
         */
         // Declare the pin(s)
         kMap.at(c.at(x).source.x).at(c.at(x).source.y)->set_type(VNode::Type::PIN);
-        kPins.push_back(kMap.at(c.at(x).source.x).at(c.at(x).source.y));
+        kPins.push(kMap.at(c.at(x).source.x).at(c.at(x).source.y));
 
         kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->set_type(VNode::Type::PIN);
-        kPins.push_back(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y));
+        kPins.push(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y));
     }
 }
 
-vector<VNode*> Map::get_pins() {
+priority_queue<VNode*, vector<VNode*>, CloserToOrigin> Map::get_pins() {
     return kPins;
 }
 
@@ -72,8 +72,7 @@ void Map::initialize_map() {
     for(int y = 0; y < kHeight; y++) {
         vector<VNode*> temp_row;
         for(int x = 0; x < kWidth; x++) {
-            VNode* new_node = new VNode(x,y, 0);
-            temp_row.push_back(new_node);
+            temp_row.push_back(new VNode(x,y,0));
         }
         this->kMap.push_back(temp_row);
     }

@@ -6,6 +6,8 @@
 #include <string>
 #include "vnode.h"
 #include "vpath.h"
+#include "comparators.h"
+#include <queue>
 
 using namespace Utilities;
 using namespace std;
@@ -28,6 +30,7 @@ namespace Flow {
     protected:
         vector<VNode*> kVertices;
         vector<VPath*> kEdges;
+        priority_queue<VNode*, vector<VNode*>, CompareNodesFortune> kQueue();
     };
 
 }

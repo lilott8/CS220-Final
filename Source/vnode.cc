@@ -65,3 +65,8 @@ string VNode::coords_to_string() {
     return "(" + std::to_string(this->get_x()) + ", "
             + std::to_string(this->get_y()) + ")";
 }
+
+int VNode::get_id() {
+    return this->id;
+}
+

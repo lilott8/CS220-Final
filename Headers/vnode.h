@@ -1,5 +1,5 @@
-#ifndef _VNode_H_
-#define _VNode_H_
+#ifndef _VNODE_H_
+#define _VNODE_H_
 
 #pragma once
 

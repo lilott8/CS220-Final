@@ -5,6 +5,8 @@
 
 #include "problem_object.h"
 #include "algorithm.h"
+#include "fortune.h"
+#include "spm.h"
 
 using namespace Utilities;
 
@@ -19,14 +21,17 @@ namespace Flow {
         void start();
         void set_algorithm(Algorithm::AlgoType);
         void set_optimization(Algorithm::Optimization);
+        void print_map();
 
     private:
         Map *kMap;
-        vector<VNode> kPins;
-        Algorithm* kAlgorithm;
+        Algorithm::AlgoType kAlgo;
+        vector<VNode*> kPins;
+        //Fortune *kFortune;
+        //SPM *kSPM;
+        // This allows me to keep all my algorithms in one container!
+        unique_ptr<Algorithm> kAlgorithm;
         Algorithm::Optimization kOpt;
-
-        void set_pins(ProblemObject*);
     };
 }
 #endif

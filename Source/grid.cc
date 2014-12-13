@@ -30,7 +30,7 @@ Utilities::Grid::~Grid() {
       int width = this->get_width();
       int height = this->get_height();
       for(int x = 0; x < width; x++) {
-            for(int y = 0; y < width; y++) {
+            for(int y = 0; y < height; y++) {
                   delete grid.at(y).at(x);
             }
       }

@@ -50,6 +50,7 @@ int main(int argc,char* argv[]) {
 	Utilities::ProblemObject* first_problem = new Utilities::ProblemObject(file);
 	Controller* controller = new Controller(first_problem, a_type, o_type);
 
+	controller->print_map();
 	controller->start();
 
 	delete controller;

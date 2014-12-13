@@ -9,6 +9,7 @@ pathsegment.cc
 segmentgroup.cc
 problem_object.cc
 vnode.cc
+vpath.cc
 map.cc
 algorithm.cc
 controller.cc

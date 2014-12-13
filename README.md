@@ -6,6 +6,7 @@ CS220 Project Framework
  - converted my child node class to fit this problem description
  - added a controller to abstract and encapsulate the logic of my implementation
  - laid the groundwork for the algorithms to be implemented
+ - controller framework is as I want it, beginning the fortune algorithm.
 
 ##TODO:
  - add error handling for inputs??

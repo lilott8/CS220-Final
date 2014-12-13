@@ -12,6 +12,7 @@ namespace Flow {
     public:
         Fortune();
         ~Fortune();
+        void start();
     private:
     };
 }

@@ -2,17 +2,20 @@
 #include "../Headers/kruskal.h"
 #include "../Headers/problem_object.h"
 #include <string>
+#include "../Headers/claim.h"
 
 using namespace Utilities;
 using namespace Flow;
 using namespace std;
 
 Algorithm::Algorithm() {
-
 }
 
 Algorithm::~Algorithm() {
+}
 
+void Algorithm::start() {
+    claim("A/Start: Starting the algorithm", kDebug);
 }
 
 string Algorithm::print_algo_type(AlgoType t) {

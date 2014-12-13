@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "node.h";
 #include "algorithm.h"
 
 using namespace Utilities;
@@ -13,7 +12,7 @@ namespace Flow {
     public:
         SPM();
         ~SPM();
-
+        void start();
     private:
 
     };

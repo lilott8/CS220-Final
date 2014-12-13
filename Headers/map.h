@@ -22,12 +22,13 @@ namespace Flow {
         ~Map();
 
         void print_map();
+        vector<VNode*> get_pins();
 
     private:
         int kHeight;
         int kWidth;
         int kDefaultSize = 10;
-        vector<VNode> kPins;
+        vector<VNode*> kPins;
         vector<vector<VNode*>> kMap;
 
         void initialize_map();

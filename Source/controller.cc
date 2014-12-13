@@ -16,67 +16,50 @@ Controller::Controller() {
 
 Controller::Controller(ProblemObject *po) {
     this->kMap = new Map(po);
-    //set_pins(po);
+    this->kPins = this->kMap->get_pins();
     kOpt = Algorithm::Optimization::DEFAULT;
-    kAlgorithm = new Fortune();
+    //kAlgorithm = new Fortune();
 }
 
 Controller::Controller(ProblemObject *po, Algorithm::AlgoType a, Algorithm::Optimization o) {
+    // init our map
     this->kMap = new Map(po);
+    // get the pins from the map.
+    this->kPins = this->kMap->get_pins();
+    // this will always be fortunes, this is the algorithm I'm implimenting
     this->set_algorithm(a);
+    // set the optimization we will be using
     kOpt = o;
 }
 
 Controller::~Controller() {
-    delete kAlgorithm;
 }
 
 void Controller::start() {
-    claim("Starting to run the controller!", kNote);
+    claim("C/start: starting the algorithm", kNote);
+    kAlgorithm->start();
 }
 
 void Controller::set_algorithm(Algorithm::AlgoType t) {
+    kAlgo = t;
     switch(t) {
         default:
         case Algorithm::AlgoType::FORTUNE:
-            claim("using fortune", kNote);
-            kAlgorithm = new Fortune();
+            claim("C/set_algorithm: using fortune", kNote);
+            //kFortune = new Fortune();
+            kAlgorithm = unique_ptr<Algorithm>(new Fortune());
             break;
         case Algorithm::AlgoType::SPM:
-            claim("using SPM", kNote);
-            kAlgorithm = new SPM();
+            claim("C/set_algorithm: using SPM", kNote);
+            //kSPM = new SPM();
+            kAlgorithm = unique_ptr<Algorithm>(new Fortune());
             break;
         case Algorithm::AlgoType::KRUSKAL:
-            claim("This shouldn't be kruskal!?", kWarning);
+            claim("C/set_algorithm: This shouldn't be kruskal!?", kWarning);
             break;
     }
 }
 
-void Controller::set_pins(ProblemObject *po) {
-    Route route;
-    int c = po->get_connections().size();
-
-    for(int x = 0;x < c; x++) {
-        /**
-        * TODO: add error handling for placing of pins
-        */
-        // Declare the pin(s)
-        VNode temp = VNode(po->get_connections().at(x).source);
-        temp.set_type(VNode::Type::PIN);
-        claim("Source: " + temp.coords_to_string(), kDebug);
-        //kMap.at(temp.get_x()).at(temp.get_y())->set_type(LeeNode::NodeType::SOURCE);
-        route.pStart = temp;
-        kPins.push_back(temp);
-
-        // Declare the pin(s)
-        temp = VNode(po->get_connections().at(x).sink);
-        temp.set_type(VNode::Type::PIN);
-        claim("sink: " + temp.coords_to_string(), kDebug);
-        //kMap.at(temp.get_x()).at(temp.get_y())->set_type(LeeNode::NodeType::SOURCE);
-        route.pStop = temp;
-        kPins.push_back(temp);
-
-        //kMap.at(route.pStart.get_x()).at(route.pStart.get_y())->set_type(VNode::Type::PIN);
-        //kMap.at(route.pStop.get_x()).at(route.pStop.get_y())->set_type(VNode::Type::PIN);
-    }
+void Controller::print_map() {
+    this->kMap->print_map();
 }

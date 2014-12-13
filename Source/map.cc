@@ -20,7 +20,7 @@ Map::Map(ProblemObject *po) {
     kWidth = po->get_width();
     initialize_map();
     set_blockages(po->get_blockers());
-    //set_pins(po->get_connections());
+    set_pins(po->get_connections());
 }
 
 void Map::set_blockages(vector<Blocker> b) {
@@ -34,7 +34,7 @@ void Map::set_blockages(vector<Blocker> b) {
         start = b.at(x).location;
 
         if(width + start.x > kWidth || height + start.y > kHeight) {
-            claim("We cannot create the map: invalid blockage size", kError);
+            claim("M/set_blockages: We cannot create the map: invalid blockage size", kError);
         }
 
         int h = 0;
@@ -51,32 +51,21 @@ void Map::set_blockages(vector<Blocker> b) {
 }
 
 void Map::set_pins(vector<Connection> c) {
-    int y, z;
-    Route route;
-
-    for(int x = 0;x < c.size(); x++) {
+    for(int x = 0;x < (int)c.size(); x++) {
         /**
         * TODO: add error handling for placing of pins
         */
         // Declare the pin(s)
-        VNode temp = VNode(c.at(x).source);
-        temp.set_type(VNode::Type::PIN);
-        claim("Source: " + temp.coords_to_string(), kDebug);
-        //kMap.at(temp.get_x()).at(temp.get_y())->set_type(LeeNode::NodeType::SOURCE);
-        route.pStart = temp;
-        kPins.push_back(temp);
+        kMap.at(c.at(x).source.x).at(c.at(x).source.y)->set_type(VNode::Type::PIN);
+        kPins.push_back(kMap.at(c.at(x).source.x).at(c.at(x).source.y));
 
-        // Declare the pin(s)
-        temp = VNode(c.at(x).sink);
-        temp.set_type(VNode::Type::PIN);
-        claim("sink: " + temp.coords_to_string(), kDebug);
-        //kMap.at(temp.get_x()).at(temp.get_y())->set_type(LeeNode::NodeType::SOURCE);
-        route.pStop = temp;
-        kPins.push_back(temp);
-
-        kMap.at(route.pStart.get_x()).at(route.pStart.get_y())->set_type(VNode::Type::PIN);
-        kMap.at(route.pStop.get_x()).at(route.pStop.get_y())->set_type(VNode::Type::PIN);
+        kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->set_type(VNode::Type::PIN);
+        kPins.push_back(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y));
     }
+}
+
+vector<VNode*> Map::get_pins() {
+    return kPins;
 }
 
 void Map::initialize_map() {

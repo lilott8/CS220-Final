@@ -4,7 +4,8 @@
 #pragma once
 
 #include <string>
-#include "node.h"
+#include "vnode.h"
+#include "vpath.h"
 
 using namespace Utilities;
 using namespace std;
@@ -15,13 +16,18 @@ namespace Flow {
         enum AlgoType {KRUSKAL, FORTUNE, SPM};
         enum Optimization {H_OPT, U_OPT, DEFAULT};
         Algorithm();
-        ~Algorithm();
+        virtual ~Algorithm();
 
         string print_algo_type(AlgoType);
         string print_optimization(Optimization);
-        // stuff
+
+        // Make this entire class abstract!
+        virtual void start()=0;
     private:
-        // stuff
+
+    protected:
+        vector<VNode*> kVertices;
+        vector<VPath*> kEdges;
     };
 
 }

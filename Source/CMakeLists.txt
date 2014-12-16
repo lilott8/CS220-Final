@@ -1,22 +1,25 @@
 set(LIB_SOURCE
+arc.cc
+binary_tree.cc
 claim.cc
+controller.cc
 edge.cc
+flow_algo.cc
+fortune.cc
 grid.cc
+kruskal.cc
+map.cc
 netlist.cc
 node.cc
 path.cc
+problem_object.cc
 pathsegment.cc
 segmentgroup.cc
-problem_object.cc
+spm.cc
+vedge.cc
+vevent.cc
 vnode.cc
 vpath.cc
-map.cc
-algorithm.cc
-controller.cc
-fortune.cc
-kruskal.cc
-spm.cc
-rb.c
 )
 
 add_library(SOURCE_LIB ${LIB_SOURCE})

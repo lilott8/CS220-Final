@@ -8,7 +8,7 @@
 using namespace Utilities;
 
 namespace Flow {
-    class Kruskal : public Algorithm {
+    class Kruskal : public FlowAlgorithm {
     public:
         Kruskal();
         ~Kruskal();

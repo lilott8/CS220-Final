@@ -2,6 +2,8 @@
 
 using Utilities::Node;
 
+Utilities::Edge::Edge(){}
+
 Utilities::Edge::Edge(Node* head, Node* tail) {
     this->head = head;
     this->tail = tail;

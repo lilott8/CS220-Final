@@ -3,16 +3,16 @@
 
 #pragma once
 
-#include "algorithm.h"
+#include "flow_algo.h"
 
 using namespace Utilities;
 
 namespace Flow {
-    class Fortune : public Algorithm {
+    class Fortune : public FlowAlgorithm {
     public:
         Fortune();
         ~Fortune();
-        void start();
+        void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
     private:
     };
 }

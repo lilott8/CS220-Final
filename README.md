@@ -2,18 +2,27 @@ CS220 Project Framework
 ===============
 #Changelog:
  
+ - had to retool a few things given my understanding of fortune's algorithm
+ - added a binary tree to control the beachline! (removed the rb tree, it sucked and was overkill)
+ - added structures for moving through the beachline, sites and edges
+ - have a full understanding of how to solve Fortune's algorithm, tomorrow is the big implementation day
+ - some of the todo's today I spent more time on than I'm willing to admit.
+  
+##Done:
+ 
  - mapping is working
  - converted my child node class to fit this problem description
  - added a controller to abstract and encapsulate the logic of my implementation
  - laid the groundwork for the algorithms to be implemented
  - controller framework is as I want it, beginning the fortune algorithm.
- - added a Red/Black tree library that is under GPL v2.1
- - had to retool a few things given my understanding of fortune's algorithm
+ 
 
 ##TODO:
- - add error handling for inputs??
  - Create a datastructure to hold a Voronoi sector
  - Implement the nlogn Voronoi grapher
+  - Either add all the appropriate .o files to the make file or convince Brian to use CMake!
+  - figure out why the map coords need to be switched in init!
+  - why can't vedge and arch have pointers to each other??
  
 ## Project Overview
 

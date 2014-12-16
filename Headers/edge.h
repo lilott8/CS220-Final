@@ -16,6 +16,7 @@ namespace Utilities {
         public:
             /* Constructors/Destructors */
             Edge(Node*, Node*);
+            Edge();
             ~Edge();
 
             /* Accessors */

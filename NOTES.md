@@ -8,5 +8,8 @@ kPins = sites (sorted PQ given x,y coordinates closest to the origin)
 
 ##TODO
 
- - add error handling for the placement of pins
  - Either add all the appropriate .o files to the make file or convince Brian to use CMake!
+ - derive a good compare function for the beachline rb-tree
+ - figure out why the map coords need to be switched in init!
+ - why can't vedge and arch have pointers to each other??
+ 

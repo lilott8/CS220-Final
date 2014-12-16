@@ -52,15 +52,22 @@ void Map::set_blockages(vector<Blocker> b) {
 
 void Map::set_pins(vector<Connection> c) {
     for(int x = 0;x < (int)c.size(); x++) {
-        /**
-        * TODO: add error handling for placing of pins
-        */
         // Declare the pin(s)
-        kMap.at(c.at(x).source.x).at(c.at(x).source.y)->set_type(VNode::Type::PIN);
-        kPins.push(kMap.at(c.at(x).source.x).at(c.at(x).source.y));
+        if(kMap.at(c.at(x).source.x).at(c.at(x).source.y)->get_type() == VNode::Type::NONE) {
+            kMap.at(c.at(x).source.x).at(c.at(x).source.y)->set_type(VNode::Type::PIN);
+            kPins.push(kMap.at(c.at(x).source.x).at(c.at(x).source.y));
+        } else {
+            claim("M/sp: We couldn't place: " + kMap.at(c.at(x).source.x).at(c.at(x).source.y)->coords_to_string()
+                    + " something was already there!", kWarning);
+        }
 
-        kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->set_type(VNode::Type::PIN);
-        kPins.push(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y));
+        if(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->get_type() == VNode::Type::NONE) {
+            kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->set_type(VNode::Type::PIN);
+            kPins.push(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y));
+        } else {
+            claim("M/sp: We couldn't place: " + kMap.at(c.at(x).source.x).at(c.at(x).source.y)->coords_to_string()
+                    + " something was already there!", kWarning);
+        }
     }
 }
 
@@ -72,7 +79,10 @@ void Map::initialize_map() {
     for(int y = 0; y < kHeight; y++) {
         vector<VNode*> temp_row;
         for(int x = 0; x < kWidth; x++) {
-            temp_row.push_back(new VNode(x,y,0));
+            /**
+            * TODO: it should be new Vnode(x,y,0);!?!?!?!?
+            */
+            temp_row.push_back(new VNode(y,x,0));
         }
         this->kMap.push_back(temp_row);
     }

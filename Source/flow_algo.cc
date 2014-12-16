@@ -1,24 +1,28 @@
-#include "../Headers/algorithm.h"
+#include "../Headers/flow_algo.h"
 #include "../Headers/kruskal.h"
 #include "../Headers/problem_object.h"
 #include <string>
 #include "../Headers/claim.h"
+#include "../Headers/binary_tree.h"
+#include "../Headers/vevent.h"
 
 using namespace Utilities;
 using namespace Flow;
 using namespace std;
 
-Algorithm::Algorithm() {
+FlowAlgorithm::FlowAlgorithm() {
+    kTree = BinaryTree();
 }
 
-Algorithm::~Algorithm() {
+FlowAlgorithm::~FlowAlgorithm() {
 }
 
-void Algorithm::start() {
+void FlowAlgorithm::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> k) {
+
     claim("A/Start: Starting the algorithm", kDebug);
 }
 
-string Algorithm::print_algo_type(AlgoType t) {
+string FlowAlgorithm::print_algo_type(AlgoType t) {
     string s = "";
     switch(t) {
         case KRUSKAL:
@@ -35,7 +39,7 @@ string Algorithm::print_algo_type(AlgoType t) {
     return s;
 }
 
-string Algorithm::print_optimization(Optimization t) {
+string FlowAlgorithm::print_optimization(Optimization t) {
     string s = "";
     switch (t) {
         case H_OPT:

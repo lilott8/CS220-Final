@@ -4,6 +4,9 @@
 #pragma once
 
 #include "vnode.h"
+#include <cmath>
+#include "claim.h"
+#include "vevent.h"
 
 using namespace Flow;
 
@@ -16,8 +19,25 @@ public:
 
 class CloserToOrigin {
 public:
+    // Calculate the euclidean distance for our comparisons
     bool operator()(VNode *a, VNode *b) {
-        return a->get_x() >= b->get_x() && a->get_y() >= b->get_y();
+        double a_dist = sqrt(((0 - a->get_x()) * (0 - a->get_x())) + ((0 - a->get_y()) * (0 - a->get_y())));
+        double b_dist = sqrt(((0 - b->get_x()) * (0 - b->get_x())) + ((0 - b->get_y()) * (0 - b->get_y())));
+        //return a_dist >= b_dist;
+        return a->get_x() > b->get_x();
+    }
+    bool operator()(VEvent *a, VEvent *b) {
+
+    }
+};
+
+/**
+* TODO: figure out a good compare method for this
+*/
+class CompareBeachLine {
+public:
+    bool operator()(VNode *a, VNode *b) {
+        return true;
     }
 };
 

@@ -1,5 +1,5 @@
-#ifndef _ALGORITHM_H_
-#define _ALGORITHM_H_
+#ifndef _FLOW_ALGO_H_
+#define _FLOW_ALGO_H_
 
 #pragma once
 
@@ -8,29 +8,31 @@
 #include "vpath.h"
 #include "comparators.h"
 #include <queue>
+#include "binary_tree.h"
+#include <list>
 
 using namespace Utilities;
 using namespace std;
 
 namespace Flow {
-    class Algorithm {
+    class FlowAlgorithm {
     public:
         enum AlgoType {KRUSKAL, FORTUNE, SPM};
         enum Optimization {H_OPT, U_OPT, DEFAULT};
-        Algorithm();
-        virtual ~Algorithm();
+        FlowAlgorithm();
+        virtual ~FlowAlgorithm();
 
         string print_algo_type(AlgoType);
         string print_optimization(Optimization);
 
         // Make this entire class abstract!
-        virtual void start()=0;
+        virtual void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
     private:
 
     protected:
-        vector<VNode*> kVertices;
-        vector<VPath*> kEdges;
-        priority_queue<VNode*, vector<VNode*>, CompareNodesFortune> kQueue();
+        list<VNode*> kVertices;
+        list<VPath*> kEdges;
+        BinaryTree kTree;
     };
 
 }

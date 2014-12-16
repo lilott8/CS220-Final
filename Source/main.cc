@@ -3,7 +3,7 @@
 #include "../Headers/problem_object.h"
 #include "../Headers/map.h"
 #include "../Headers/controller.h"
-#include "../Headers/algorithm.h"
+#include "../Headers/flow_algo.h"
 #include "../Headers/claim.h"
 #include <time.h>
 #include <cstdlib>
@@ -16,8 +16,8 @@ using std::endl;
 using namespace Flow;
 using namespace Utilities;
 
-Algorithm::AlgoType resolve_algorithm(string);
-Algorithm::Optimization resolve_optimization(string);
+FlowAlgorithm::AlgoType resolve_algorithm(string);
+FlowAlgorithm::Optimization resolve_optimization(string);
 
 int main(int argc,char* argv[]) {
 
@@ -33,8 +33,8 @@ int main(int argc,char* argv[]) {
 
 	//Controller* controller = new Controller(first_problem);
 
-	Algorithm::AlgoType a_type = Algorithm::AlgoType::FORTUNE;
-	Algorithm::Optimization  o_type = Algorithm::Optimization::DEFAULT;
+	FlowAlgorithm::AlgoType a_type = FlowAlgorithm::AlgoType::FORTUNE;
+	FlowAlgorithm::Optimization  o_type = FlowAlgorithm::Optimization::DEFAULT;
 	string file = "../Tests/debug_small.json";
 
 	switch(argc) {
@@ -59,22 +59,22 @@ int main(int argc,char* argv[]) {
 	return 0;
 }
 
-Algorithm::AlgoType resolve_algorithm(string s) {
-	Algorithm::AlgoType result = Algorithm::AlgoType::FORTUNE;
+FlowAlgorithm::AlgoType resolve_algorithm(string s) {
+	FlowAlgorithm::AlgoType result = FlowAlgorithm::AlgoType::FORTUNE;
 	if(s.compare("fortune") == 0) {
-		result = Algorithm::AlgoType::FORTUNE;
+		result = FlowAlgorithm::AlgoType::FORTUNE;
 	} else if(s.compare("spm") == 0) {
-		result = Algorithm::AlgoType::SPM;
+		result = FlowAlgorithm::AlgoType::SPM;
 	}
 	return result;
 }
 
-Algorithm::Optimization resolve_optimization(string s) {
-	Algorithm::Optimization result = Algorithm::Optimization::DEFAULT;
+FlowAlgorithm::Optimization resolve_optimization(string s) {
+	FlowAlgorithm::Optimization result = FlowAlgorithm::Optimization::DEFAULT;
 	if(s.compare("h") == 0) {
-		result = Algorithm::Optimization::H_OPT;
+		result = FlowAlgorithm::Optimization::H_OPT;
 	} else if(s.compare("u") == 0) {
-		result = Algorithm::Optimization::U_OPT;
+		result = FlowAlgorithm::Optimization::U_OPT;
 	}
 	return result;
 }

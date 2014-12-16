@@ -4,7 +4,7 @@
 #pragma once
 
 #include "problem_object.h"
-#include "algorithm.h"
+#include "flow_algo.h"
 #include "fortune.h"
 #include "spm.h"
 
@@ -15,23 +15,24 @@ namespace Flow {
     public:
         Controller();
         Controller(ProblemObject*);
-        Controller(ProblemObject*, Algorithm::AlgoType, Algorithm::Optimization);
+        Controller(ProblemObject*, FlowAlgorithm::AlgoType, FlowAlgorithm::Optimization);
         ~Controller();
 
         void start();
-        void set_algorithm(Algorithm::AlgoType);
-        void set_optimization(Algorithm::Optimization);
+        void set_algorithm(FlowAlgorithm::AlgoType);
+        void set_optimization(FlowAlgorithm::Optimization);
         void print_map();
 
     private:
         Map *kMap;
-        Algorithm::AlgoType kAlgo;
+        FlowAlgorithm::AlgoType kAlgo;
         priority_queue<VNode*, vector<VNode*>, CloserToOrigin> kPins;
         //Fortune *kFortune;
         //SPM *kSPM;
         // This allows me to keep all my algorithms in one container!
-        unique_ptr<Algorithm> kAlgorithm;
-        Algorithm::Optimization kOpt;
+        unique_ptr<FlowAlgorithm> kAlgorithm;
+        FlowAlgorithm::Optimization kOpt;
+
     };
 }
 #endif

@@ -2,11 +2,13 @@ CS220 Project Framework
 ===============
 #Changelog:
  
+ - retooled my binary tree to be more dynamic.  This was a static class.  This is now an object that moves freely
+ - began converting the generic fortunes algorithm into this framework
  - had to retool a few things given my understanding of fortune's algorithm
  - added a binary tree to control the beachline! (removed the rb tree, it sucked and was overkill)
  - added structures for moving through the beachline, sites and edges
  - have a full understanding of how to solve Fortune's algorithm, tomorrow is the big implementation day
- - some of the todo's today I spent more time on than I'm willing to admit.
+ - some of the todo's today I spent more time on than I'm willing to admit
   
 ##Done:
  
@@ -14,7 +16,7 @@ CS220 Project Framework
  - converted my child node class to fit this problem description
  - added a controller to abstract and encapsulate the logic of my implementation
  - laid the groundwork for the algorithms to be implemented
- - controller framework is as I want it, beginning the fortune algorithm.
+ - controller framework is as I want it, beginning the fortune algorithm
  
 
 ##TODO:

@@ -32,7 +32,7 @@ namespace Flow {
     protected:
         list<VNode*> kVertices;
         list<VPath*> kEdges;
-        BinaryTree kTree;
+        void clear_all();
     };
 
 }

@@ -11,7 +11,6 @@ using namespace Flow;
 using namespace std;
 
 FlowAlgorithm::FlowAlgorithm() {
-    kTree = BinaryTree();
 }
 
 FlowAlgorithm::~FlowAlgorithm() {
@@ -20,6 +19,7 @@ FlowAlgorithm::~FlowAlgorithm() {
 void FlowAlgorithm::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> k) {
 
     claim("A/Start: Starting the algorithm", kDebug);
+    clear_all();
 }
 
 string FlowAlgorithm::print_algo_type(AlgoType t) {
@@ -54,4 +54,9 @@ string FlowAlgorithm::print_optimization(Optimization t) {
             break;
     }
     return s;
+}
+
+void FlowAlgorithm::clear_all() {
+    kEdges.clear();
+    kVertices.clear();
 }

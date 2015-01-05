@@ -7,30 +7,45 @@
 
 namespace Flow {
 
-    struct node {
-        Arc *arc;
-        node *left;
-        node *right;
-        bool is_traversable;
-    };
-
     class BinaryTree {
-
     public:
         BinaryTree();
+        BinaryTree(VEvent*);
         ~BinaryTree();
 
-        void insert(Arc*);
-        Arc* search(Arc*);
-        void destroy_tree();
-        node* get_root();
+        void insert(BinaryTree*);
+        void search(BinaryTree*);
+        void destroy_tree(BinaryTree*);
+
+        BinaryTree* get_left_leaf();
+        BinaryTree* get_right_leaf();
+        void set_left_leaf(BinaryTree*);
+        void set_right_leaf(BinaryTree*);
+        void set_leaf_status(bool);
+        void set_kedge(VEdge*);
+        VEdge* get_kedge();
+        bool is_leaf();
+        VEvent* get_parabola_focus();
 
     private:
+        // Flag for root or not
+        bool kIsRoot;
 
-        void destroy_tree(node*);
-        void insert(Arc*, node*);
-        node* search(Arc*, node*);
-        node* kRoot;
+        // Who is the leaf's parent?
+        BinaryTree* kParent;
+
+        // Who is the leaf's decendents?
+        BinaryTree* kLeftLeaf;
+        BinaryTree* kRightLeaf;
+
+        // Focus point of our parabola
+        VEvent* kParabolaFocus;
+
+        // Where is the edge at?
+        VEdge* kEdge;
+
+        // Where did the parabola's intersect?
+        VNode* kCircleEvent;
     };
 }
 #endif

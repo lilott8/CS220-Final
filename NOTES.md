@@ -1,5 +1,7 @@
 ##NOTES
 
+Retooled my binary tree.  It was too difficult to incorporate a static structure, so I created a more dynamic structure which is housed in the fortunes class, instead of siloed in it's own class.  I am beginning to convert some of the generic fortune's algorithm into this framework.  The functions are declared, but not implemented.
+
 The controller will be how we abstract the logic from the main and thus the entire framework.
 
 The flow of the program will then be: main->controller->map & algorithm

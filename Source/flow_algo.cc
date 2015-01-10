@@ -1,9 +1,8 @@
+#include <string>
 #include "../Headers/flow_algo.h"
 #include "../Headers/kruskal.h"
 #include "../Headers/problem_object.h"
-#include <string>
 #include "../Headers/claim.h"
-#include "../Headers/binary_tree.h"
 #include "../Headers/vevent.h"
 
 using namespace Utilities;
@@ -14,6 +13,7 @@ FlowAlgorithm::FlowAlgorithm() {
 }
 
 FlowAlgorithm::~FlowAlgorithm() {
+    clear_all();
 }
 
 void FlowAlgorithm::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> k) {
@@ -56,7 +56,23 @@ string FlowAlgorithm::print_optimization(Optimization t) {
     return s;
 }
 
+void FlowAlgorithm::set_map_size(int x, int y) {
+    kHeight = x;
+    kWidth = y;
+}
+
 void FlowAlgorithm::clear_all() {
+    for(list<VNode*>::iterator i = kPoints.begin(); i != kPoints.end(); ++i) {
+        delete (*i);
+    }
+    for(list<VEdge*>::iterator i = kEdges.begin(); i != kEdges.end(); ++i) {
+        delete (*i);
+    }
+    for(list<VNode*>::iterator i = kPlaces.begin(); i != kPlaces.end(); ++i) {
+        delete (*i);
+    }
+
+    kPlaces.clear();
     kEdges.clear();
-    kVertices.clear();
+    kPoints.clear();
 }

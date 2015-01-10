@@ -1,6 +1,5 @@
 set(LIB_SOURCE
 arc.cc
-binary_tree.cc
 claim.cc
 controller.cc
 edge.cc
@@ -17,9 +16,9 @@ pathsegment.cc
 segmentgroup.cc
 spm.cc
 vedge.cc
-vevent.cc
 vnode.cc
 vpath.cc
+vparabola.cc
 )
 
 add_library(SOURCE_LIB ${LIB_SOURCE})

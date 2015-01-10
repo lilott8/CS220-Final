@@ -5,27 +5,27 @@
 
 #include "vnode.h"
 #include "arc.h"
+#include "vparabola.h"
 
 namespace Flow {
     class VEvent {
     public:
-        VEvent(VNode*);
-        ~VEvent();
+        VNode* point;       // the point at which an event occurs (top circle point for cirlces, focus point for place)
+        bool pe;            // whether it is a place event
+        double y;           // y coordinate of the "point"
+        VParabola* arch;    // if it is a PE, then there is an arch above the event
 
-        VNode* get_node();
-        bool get_place_event();
-    private:
-        VNode* kNode;
         /**
-        * TODO: figure out why we can't have circular pointers...
+        *   Constructor for the class
+        *   p: point, at which the event occurs
+        *   pev: whether it is a place event or not
         */
-        //Arc* kArc;
-
-        // There are two types of events, a placed event, eg. a net or a place,
-        // and a generated event from an intersection of parabolas.
-        // If the kPlaceEvent is true, then it denotes a net or place,
-        // If the kPlaceEvent is false, then it denotes an edge generation.
-        bool kPlaceEvent;
+        VEvent(VNode* p, bool pev) {
+            point	= p;
+            pe		= pev;
+            y		= p->get_y();
+            arch	= 0;
+        }
     };
 }
 #endif

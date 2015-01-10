@@ -4,12 +4,12 @@
 #pragma once
 
 #include <string>
+#include <queue>
+#include <list>
 #include "vnode.h"
 #include "vpath.h"
 #include "comparators.h"
-#include <queue>
-#include "binary_tree.h"
-#include <list>
+#include "vparabola.h"
 
 using namespace Utilities;
 using namespace std;
@@ -25,14 +25,23 @@ namespace Flow {
         string print_algo_type(AlgoType);
         string print_optimization(Optimization);
 
-        // Make this entire class abstract!
+        void set_map_size(int, int);
+
         virtual void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
     private:
 
     protected:
-        list<VNode*> kVertices;
-        list<VPath*> kEdges;
+        list<VNode*> kPlaces;       // list of vertices that exist
+        list<VNode*> kPoints;       // Newly discovered points from the algorithm
+        list<VEdge*> kEdges;        // generated edges
+
+        VParabola* kRoot;           // Root of the beachline BTree
+
+        int kWidth;                 // Width of our map
+        int kHeight;                // height of our map
+
         void clear_all();
+
     };
 
 }

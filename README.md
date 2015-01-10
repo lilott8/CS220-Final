@@ -2,13 +2,7 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - retooled my binary tree to be more dynamic.  This was a static class.  This is now an object that moves freely
- - began converting the generic fortunes algorithm into this framework
- - had to retool a few things given my understanding of fortune's algorithm
- - added a binary tree to control the beachline! (removed the rb tree, it sucked and was overkill)
- - added structures for moving through the beachline, sites and edges
- - have a full understanding of how to solve Fortune's algorithm, tomorrow is the big implementation day
- - some of the todo's today I spent more time on than I'm willing to admit
+ - Fortune's is almost completely implemented.  There are just a few outlying problems, see TODO
   
 ##Done:
  
@@ -20,11 +14,13 @@ CS220 Project Framework
  
 
 ##TODO:
- - Create a datastructure to hold a Voronoi sector
- - Implement the nlogn Voronoi grapher
+  - Figure out why my VEvent class is being called ambiguous
   - Either add all the appropriate .o files to the make file or convince Brian to use CMake!
   - figure out why the map coords need to be switched in init!
-  - why can't vedge and arch have pointers to each other??
+  - Implement the nlogn Voronoi grapher
+  - Create a datastructure to hold a Voronoi sector *(Resolved)*
+  - derive a good compare function for the beachline rb-tree *(Resolved)*
+  - why can't vedge and arch have pointers to each other?? *(Resolved)*
  
 ## Project Overview
 

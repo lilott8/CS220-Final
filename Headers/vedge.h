@@ -15,15 +15,15 @@ namespace Flow {
         VEdge(VNode*, VNode*, VNode*);
         ~VEdge();
 
-    private:
         VNode* kStart;
         VNode* kEnd;
         VNode* kLeft;
         VNode* kRight;
-
         VEdge* kNeighbor;
+        VNode* kDirection;
 
-
+        double kF;
+        double kG;
     };
 }
 

@@ -124,3 +124,11 @@ void Map::print_map() {
     }
     claim("\n" + output, kDebug);
 }
+
+int Map::get_x() {
+    return kHeight;
+}
+
+int Map::get_y() {
+    return kWidth;
+}

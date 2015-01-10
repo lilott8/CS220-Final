@@ -6,6 +6,7 @@
 #include "flow_algo.h"
 #include "binary_tree.h"
 #include <set>
+#include "vparabola.h"
 
 using namespace Utilities;
 using namespace std;
@@ -20,32 +21,26 @@ namespace Flow {
         // interface with the private methods.
         void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
     private:
-        list<VNode*> kNodes;        // Vertices
-        list<VEdge*> kEdges;        // Edges
-        BinaryTree* kRoot;          // Root of the BTree
-        int kLastX;                 // Last position of our x
+        set<VEvent*> kDeleted;      // false events, used for reference because of inability to delete from PQ
         set<VEvent*> kFalseEvent;   // False events
-        list<VNode*> kPoints;       // Newly discovered points from the algorithm
-        int kWidth;
-        int kHeight;
 
-        // deprecated in favor of wrapping the datastructure into the parent class
-        //priority_queue<VNode*, vector<VNode*>, CloserToOrigin> kQueue; //events to process
+        int kLastY;                 // Last position of our y
 
-        // process the place
-        void generate_parabola(VEvent*);
-        // process the circle
-        void delete_parabola(VEvent *);
-        // make sure we have visited everything on the map, if not, visit it!
-        void finish_beachline(BinaryTree*);
-        // return the x-coordinate at which two parabola's intersect
-        double get_parabola_intersection(BinaryTree*, double);
-        // get the parabola that is "below" this point
-        BinaryTree get_parabola_under_x_coordinate(double);
-        // Find when the circle event of Fortune's occur!
-        void check_circle(BinaryTree*);
+        priority_queue<VEvent*, std::vector<VEvent *>, CompareEvent> queue; // PQ with events to process
 
-        void get_intersection(VEdge*, VEdge*);
+        list<VEdge*> get_edges(list<VNode*>);               // helper function to start the VD generation
+
+        VParabola* get_parabola_by_x(double xx);            // get the parabola that is nearest the "y" in the beachline
+
+        VNode* get_edge_intersection(VEdge* a, VEdge* b);   // find the intersection between two edges
+
+        double get_x_of_edge(VParabola* par, double y);     // return the x position of an interestion of parabolas
+        double get_y(VNode * p, double x);                  // get the y coordinate of the given input
+
+        void insert_parabola(VNode* p);                     // process the place event
+        void remove_parabola(VEvent* e);                    // process the circle event
+        void finish_edge(VParabola* n);                     // process any unfinished edges in the tree
+        void check_circle(VParabola* b);                    // checks for a disappearing parabola
 
     };
 }

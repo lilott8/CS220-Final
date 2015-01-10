@@ -26,6 +26,9 @@ namespace Flow {
         void print_map();
         priority_queue<VNode*, vector<VNode*>, CloserToOrigin> get_pins();
 
+        int get_x();
+        int get_y();
+
     private:
         int kHeight;
         int kWidth;

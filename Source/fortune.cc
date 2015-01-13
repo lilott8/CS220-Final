@@ -6,13 +6,13 @@
 using namespace Flow;
 
 Fortune::Fortune() {
-    kRoot = 0;
+    kRoot = NULL;
     kWidth = 10;
     kHeight = 10;
 }
 
 Fortune::Fortune(int h, int w) {
-    kRoot = 0;
+    kRoot = NULL;
     kWidth = w;
     kHeight = h;
 }
@@ -37,37 +37,54 @@ void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue
 
     claim("F/start: We have: " + to_string(edges.size()) + " edges", kNote);
 
+    VEdge* e;
+    while(!edges.empty()) {
+        e = edges.front();
+        edges.pop_front();
+
+        claim("F/start: Edge: Start: (" + to_string(e->kStart->get_x()) + ", " + to_string(e->kStart->get_y())
+                + ") End: ("+ to_string(e->kEnd->get_x()) + ", " + to_string(e->kEnd->get_y()) + ")", kNote);
+    }
+
 }
 
 list<VEdge*> Fortune::get_edges(list<VNode*> v) {
     kPlaces = v;
-    kRoot = 0;
+    kRoot = NULL;
 
     for(list<VNode*>::iterator i = kPlaces.begin(); i!=kPlaces.end(); ++i) {
         // take the place and create an event from it
         queue.push(new VEvent(*i, true));
     }
 
+    int counter = 0;
+
     VEvent* e;
-    while(!queue.empty())
-    {
+    while(!queue.empty()) {
+        claim("F/get_edges: Starting work on object: " + to_string(counter), kDebug);
         e = queue.top();
         queue.pop();
         kLastY = e->kPoint->get_y();
-        
+
+        // if this is in the deleted list, remove it from the calculations
         if(kDeleted.find(e) != kDeleted.end()) {
-            delete(e);
             kDeleted.erase(e);
+            delete(e);
             continue;
         }
-        
+
+        // if this is a place event, we want to generate a parabola around it
+        // otherwise, it was some other event that shouldn't be taken into account
         if(e->kPlaceEvent) {
             insert_parabola(e->kPoint);
         } else {
             remove_parabola(e);
         }
-        
+        // done working with the object
         delete(e);
+        claim("F/get_edges: Done working with object: " + to_string(counter), kDebug);
+        claim("F/get_edges: ====================", kDebug);
+        counter++;
     }
 
     finish_edge(kRoot);
@@ -83,21 +100,24 @@ list<VEdge*> Fortune::get_edges(list<VNode*> v) {
 }
 
 void Fortune::insert_parabola(VNode* p) {
+    // If we don't have a root node, create it and then move onto the next element
     if(!kRoot){
-        kRoot = new VParabola(p); return;
+        kRoot = new VParabola(p);
+        return;
     }
 
     if(kRoot->kIsLeaf && kRoot->kSite->get_y() - p->get_y() < 1) {
         VNode* fp = kRoot->kSite;
         kRoot->kIsLeaf = false;
-        kRoot->set_left( new VParabola(fp) );
-        kRoot->set_right(new VParabola(p)  );
+        kRoot->set_left(new VParabola(fp));
+        kRoot->set_right(new VParabola(p));
         VNode* s = new VNode((p->get_x() + fp->get_x())/2, kHeight);
         kPoints.push_back(s);
 
         if(p->get_x() > fp->get_x()){
             kRoot->kEdge = new VEdge(s, fp, p);
         } else {
+            claim("here!", kNote);
             kRoot->kEdge = new VEdge(s, p, fp);
         }
 

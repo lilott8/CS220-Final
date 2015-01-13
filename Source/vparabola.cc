@@ -2,41 +2,36 @@
 
 using namespace Flow;
 
-VParabola::VParabola()
-{
-    kSite	= 0;
-    kIsLeaf	= false;
-    kCEvent	= 0;
-    kEdge	= 0;
-    kParent	= 0;
+VParabola::VParabola() {
+    kSite = NULL;
+    kIsLeaf= false;
+    kCEvent = NULL;
+    kEdge = NULL;
+    kParent = NULL;
 }
 
-VParabola::VParabola(VNode* s)
-{
-    kSite	= s;
-    kIsLeaf	= true;
-    kCEvent	= 0;
-    kEdge	= 0;
-    kParent	= 0;
+VParabola::VParabola(VNode* s, bool status) {
+    kSite= s;
+    kIsLeaf = status;
+    kCEvent = NULL;
+    kEdge = NULL;
+    kParent = NULL;
 }
 
 /*
 	Tree operations (described in the header file)
 */
 
-VParabola* VParabola::get_left(VParabola * p)
-{
+VParabola* VParabola::get_left(VParabola * p) {
     return get_left_child(get_left_parent(p));
 }
 
 
-VParabola* VParabola::get_right(VParabola * p)
-{
+VParabola* VParabola::get_right(VParabola * p) {
     return get_right_child(get_right_parent(p));
 }
 
-VParabola* VParabola::get_left_parent	(VParabola * p)
-{
+VParabola* VParabola::get_left_parent	(VParabola * p) {
     VParabola * par		= p->kParent;
     VParabola * pLast	= p;
     while(par->left() == pLast)
@@ -48,8 +43,7 @@ VParabola* VParabola::get_left_parent	(VParabola * p)
     return par;
 }
 
-VParabola* VParabola::get_right_parent(VParabola * p)
-{
+VParabola* VParabola::get_right_parent(VParabola * p) {
     VParabola * par		= p->kParent;
     VParabola * pLast	= p;
     while(par->right() == pLast)
@@ -60,16 +54,14 @@ VParabola* VParabola::get_right_parent(VParabola * p)
     return par;
 }
 
-VParabola* VParabola::get_left_child(VParabola * p)
-{
+VParabola* VParabola::get_left_child(VParabola * p) {
     if(!p) return 0;
     VParabola * par = p->left();
     while(!par->kIsLeaf) par = par->right();
     return par;
 }
 
-VParabola* VParabola::get_right_child(VParabola * p)
-{
+VParabola* VParabola::get_right_child(VParabola * p) {
     if(!p) return 0;
     VParabola * par = p->right();
     while(!par->kIsLeaf) par = par->left();

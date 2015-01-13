@@ -42,7 +42,7 @@ namespace Flow {
     */
 
         VParabola();
-        VParabola(VNode *s);
+        VParabola(VNode *s, bool = true);
 
         /*
             Access to the children (in tree).

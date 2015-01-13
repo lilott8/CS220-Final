@@ -1,31 +1,24 @@
-#ifndef _EVENT_H_
-#define _EVENT_H_
+#ifndef _VEVENT_H_
+#define _VEVENT_H_
 
 #pragma once
 
 #include "vnode.h"
-#include "arc.h"
 #include "vparabola.h"
+
+namespace Flow{
+    class VParabola;
+}
 
 namespace Flow {
     class VEvent {
     public:
-        VNode* point;       // the point at which an event occurs (top circle point for cirlces, focus point for place)
-        bool pe;            // whether it is a place event
-        double y;           // y coordinate of the "point"
-        VParabola* arch;    // if it is a PE, then there is an arch above the event
+        VEvent(VNode*, bool);   // constructor
 
-        /**
-        *   Constructor for the class
-        *   p: point, at which the event occurs
-        *   pev: whether it is a place event or not
-        */
-        VEvent(VNode* p, bool pev) {
-            point	= p;
-            pe		= pev;
-            y		= p->get_y();
-            arch	= 0;
-        }
+        VNode* kPoint;       // the point at which an event occurs (top circle point for circles, focus point for place)
+        bool kPlaceEvent;    // whether it is a place event
+        double kYCoord;      // y coordinate of the "point"
+        VParabola* kArch;    // if it is a PE, then there is an arch above the event
     };
 }
 #endif

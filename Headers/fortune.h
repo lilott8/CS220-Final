@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include "flow_algo.h"
-#include "binary_tree.h"
 #include <set>
+#include "flow_algo.h"
 #include "vparabola.h"
+#include "vevent.h"
 
 using namespace Utilities;
 using namespace std;
@@ -41,7 +41,6 @@ namespace Flow {
         void remove_parabola(VEvent* e);                    // process the circle event
         void finish_edge(VParabola* n);                     // process any unfinished edges in the tree
         void check_circle(VParabola* b);                    // checks for a disappearing parabola
-
     };
 }
 

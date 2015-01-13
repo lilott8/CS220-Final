@@ -1,20 +1,23 @@
-#ifndef VParabola_h
-#define VParabola_h
+#ifndef _VPARABOLA_H_
+#define _VPARABOLA_H_
 
+#pragma once
+
+#include "vevent.h"
 #include "vnode.h"
 #include "vedge.h"
-#include "vevent.h"
 
 /*
-	Parabolas and events have pointers to each other, so we declare class VEvent, which will be defined later.
+Parabolas and events have pointers to each other, so we declare class VEvent, which will be defined later.
 */
-
-class VEvent;
+namespace Flow {
+    class VEvent;
+}
 
 /*
 	A class that stores information about an item in beachline sequence (see Fortune's algorithm).
 	It can represent an arch of parabola or an intersection between two archs (which defines an edge).
-	In my implementation I build a binary tree with them (internal nodes are edges, leaves are archs).
+	internal nodes are edges, leaves are archs.
 */
 namespace Flow {
     class VParabola {
@@ -26,7 +29,7 @@ namespace Flow {
         edge		: pointer to the edge (when it is an edge)
         cEvent		: pointer to the event, when the arch disappears (circle event)
         parent		: pointer to the parent node in tree
-    */
+        */
 
         bool kIsLeaf;
         VNode *kSite;
@@ -42,27 +45,12 @@ namespace Flow {
         VParabola(VNode *s);
 
         /*
-        Access to the children (in tree).
-    */
-
-        void set_left(VParabola* p) {
-            kLeft = p;
-            p->kParent = this;
-        }
-
-        void set_right(VParabola* p) {
-            kRight = p;
-            p->kParent = this;
-        }
-
-        VParabola* left() {
-            return kLeft;
-        }
-
-        VParabola* right() {
-            return kRight;
-        }
-
+            Access to the children (in tree).
+        */
+        void set_left(VParabola* p);
+        void set_right(VParabola* p);
+        VParabola* left();
+        VParabola* right();
         /*
         Some useful tree operations
 

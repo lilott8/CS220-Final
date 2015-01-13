@@ -10,6 +10,7 @@
 #include "vpath.h"
 #include "comparators.h"
 #include "vparabola.h"
+#include "vevent.h"
 
 using namespace Utilities;
 using namespace std;
@@ -17,17 +18,17 @@ using namespace std;
 namespace Flow {
     class FlowAlgorithm {
     public:
-        enum AlgoType {KRUSKAL, FORTUNE, SPM};
-        enum Optimization {H_OPT, U_OPT, DEFAULT};
-        FlowAlgorithm();
-        virtual ~FlowAlgorithm();
+        enum AlgoType {KRUSKAL, FORTUNE, SPM};      // algorithm enum
+        enum Optimization {H_OPT, U_OPT, DEFAULT};  // kruskal's optimization enum
+        FlowAlgorithm();                            // constructor
+        virtual ~FlowAlgorithm();                   // virtual destructor
 
-        string print_algo_type(AlgoType);
-        string print_optimization(Optimization);
+        string print_algo_type(AlgoType);           // debugging for which algorithm is being used
+        string print_optimization(Optimization);    // debugging to let us know what we kruskals opt is used
 
-        void set_map_size(int, int);
+        void set_map_size(int, int);                // Alert our class of the sizes of the map
 
-        virtual void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
+        virtual void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>); // run the algo
     private:
 
     protected:
@@ -40,7 +41,7 @@ namespace Flow {
         int kWidth;                 // Width of our map
         int kHeight;                // height of our map
 
-        void clear_all();
+        void clear_all();           // clear the lists
 
     };
 

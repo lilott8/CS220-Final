@@ -75,3 +75,21 @@ VParabola* VParabola::get_right_child(VParabola * p)
     while(!par->kIsLeaf) par = par->left();
     return par;
 }
+
+void VParabola::set_left(VParabola* p) {
+    kLeft = p;
+    p->kParent = this;
+}
+
+void VParabola::set_right(VParabola* p) {
+    kRight = p;
+    p->kParent = this;
+}
+
+VParabola* VParabola::left() {
+    return kLeft;
+}
+
+VParabola* VParabola::right() {
+    return kRight;
+}

@@ -1,7 +1,7 @@
 #include "../Headers/claim.h"
 #include "../Headers/fortune.h"
 #include "../Headers/vevent.h"
-#include "../Headers/arc.h"
+#include "../Headers/vparabola.h"
 
 using namespace Flow;
 
@@ -53,7 +53,7 @@ list<VEdge*> Fortune::get_edges(list<VNode*> v) {
     {
         e = queue.top();
         queue.pop();
-        kLastY = e->point->get_y();
+        kLastY = e->kPoint->get_y();
         
         if(kDeleted.find(e) != kDeleted.end()) {
             delete(e);
@@ -61,8 +61,8 @@ list<VEdge*> Fortune::get_edges(list<VNode*> v) {
             continue;
         }
         
-        if(e->pe) {
-            insert_parabola(e->point);
+        if(e->kPlaceEvent) {
+            insert_parabola(e->kPoint);
         } else {
             remove_parabola(e);
         }
@@ -141,7 +141,7 @@ void Fortune::insert_parabola(VNode* p) {
 
 void Fortune::remove_parabola(VEvent* e)
 {
-    VParabola* p1 = e->arch;
+    VParabola* p1 = e->kArch;
 
     VParabola* xl = VParabola::get_left_parent(p1);
     VParabola* xr = VParabola::get_right_parent(p1);
@@ -160,7 +160,7 @@ void Fortune::remove_parabola(VEvent* e)
         kDeleted.insert(p2->kCEvent); p2->kCEvent = 0;
     }
 
-    VNode* p = new VNode(e->point->get_x(), get_y(p1->kSite, e->point->get_x()));
+    VNode* p = new VNode(e->kPoint->get_x(), get_y(p1->kSite, e->kPoint->get_x()));
     kPoints.push_back(p);
 
     xl->kEdge->kEnd = p;
@@ -271,22 +271,27 @@ double Fortune::get_y(VNode* p, double x) {
 }
 
 void Fortune::check_circle(VParabola* b) {
+    // Get the parent and child parabolas.  This allows us to
+    // get the exact size and perspective of the potential circle event
     VParabola* lp = VParabola::get_left_parent (b);
     VParabola* rp = VParabola::get_right_parent(b);
 
     VParabola* a  = VParabola::get_left_child (lp);
     VParabola* c  = VParabola::get_right_child(rp);
 
+    // if we don't have childrent or sites in those childrens, return
     if(!a || !c || a->kSite == c->kSite){
         return;
     }
 
     VNode* s = 0;
     s = get_edge_intersection(lp->kEdge, rp->kEdge);
+    // if we don't have an edge that intersects, return
     if(s == 0){
         return;
     }
 
+    // calculate the deltas from the left child and the edge
     double dx = a->kSite->get_x() - s->get_x();
     double dy = a->kSite->get_y() - s->get_y();
 
@@ -297,9 +302,9 @@ void Fortune::check_circle(VParabola* b) {
     }
 
     VEvent* e = new VEvent(new VNode(s->get_x(), s->get_y() - d), false);
-    kPoints.push_back(e->point);
+    kPoints.push_back(e->kPoint);
     b->kCEvent = e;
-    e->arch = b;
+    e->kArch = b;
     queue.push(e);
 }
 

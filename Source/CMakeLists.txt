@@ -1,5 +1,4 @@
 set(LIB_SOURCE
-arc.cc
 claim.cc
 controller.cc
 edge.cc
@@ -19,6 +18,7 @@ vedge.cc
 vnode.cc
 vpath.cc
 vparabola.cc
+vevent.cc
 )
 
 add_library(SOURCE_LIB ${LIB_SOURCE})

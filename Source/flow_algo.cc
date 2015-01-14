@@ -3,7 +3,6 @@
 #include "../Headers/kruskal.h"
 #include "../Headers/problem_object.h"
 #include "../Headers/claim.h"
-#include "../Headers/vevent.h"
 
 using namespace Utilities;
 using namespace Flow;
@@ -56,16 +55,13 @@ string FlowAlgorithm::print_optimization(Optimization t) {
     return s;
 }
 
-void FlowAlgorithm::set_map_size(int x, int y) {
+void FlowAlgorithm::set_map_size(double x, double y) {
     kHeight = x;
     kWidth = y;
 }
 
 void FlowAlgorithm::clear_all() {
     for(list<VNode*>::iterator i = kPoints.begin(); i != kPoints.end(); ++i) {
-        delete (*i);
-    }
-    for(list<VEdge*>::iterator i = kEdges.begin(); i != kEdges.end(); ++i) {
         delete (*i);
     }
     for(list<VNode*>::iterator i = kPlaces.begin(); i != kPlaces.end(); ++i) {

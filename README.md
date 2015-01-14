@@ -2,22 +2,23 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - Fortune's is almost completely implemented.  There are just a few outlying problems, see TODO
+ - Fortune's is completely implemented
   
 ##Done:
  
+ - Fortune's is done
  - mapping is working
  - converted my child node class to fit this problem description
  - added a controller to abstract and encapsulate the logic of my implementation
  - laid the groundwork for the algorithms to be implemented
  - controller framework is as I want it, beginning the fortune algorithm
- 
 
 ##TODO:
-  - Figure out why my VEvent class is being called ambiguous
+
+  - Use the output from the voronoi to draw on the graph
   - Either add all the appropriate .o files to the make file or convince Brian to use CMake!
   - figure out why the map coords need to be switched in init!
-  - Implement the nlogn Voronoi grapher
+  - Implement the nlogn Voronoi grapher *(Resolved)*
   - Create a datastructure to hold a Voronoi sector *(Resolved)*
   - derive a good compare function for the beachline rb-tree *(Resolved)*
   - why can't vedge and arch have pointers to each other?? *(Resolved)*

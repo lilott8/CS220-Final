@@ -22,6 +22,10 @@ namespace Flow {
         VEdge* kNeighbor;
         VNode* kDirection;
 
+        /**
+        * Directional coefficients satisfying the equation:
+        * y = f * x + g
+        */
         double kF;
         double kG;
     };

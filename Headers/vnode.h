@@ -15,7 +15,7 @@ namespace Flow {
         enum Type {PIN, BLOCKED, PATH, EDGE, NONE, STEINER};
 
         VNode();
-        VNode(int, int, int cost = 0);
+        VNode(double, double, int cost = 0);
         VNode(Point, int cost = 0);
         ~VNode();
 
@@ -30,12 +30,17 @@ namespace Flow {
 
         int get_output();
         int get_id();
+
+        double get_dx();
+        double get_dy();
+
     private:
-        int id;
-        int output;
+        int kId;
+        int kOutput;
+        double kDoubleX;
+        double kDoubleY;
 
         Type kType = Type::NONE;
-
     };
 }
 #endif

@@ -17,8 +17,6 @@ spm.cc
 vedge.cc
 vnode.cc
 vpath.cc
-vparabola.cc
-vevent.cc
 )
 
 add_library(SOURCE_LIB ${LIB_SOURCE})

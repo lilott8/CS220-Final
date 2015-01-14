@@ -8,18 +8,20 @@ VNode::VNode() {
 
 }
 
-VNode::VNode(int x, int y, int cost) {
-    Node::set_x_coord(x);
-    Node::set_y_coord(y);
+VNode::VNode(double x, double y, int cost) {
+    Node::set_x_coord((int)x);
+    Node::set_y_coord((int)y);
     Node::set_cost(cost);
-    this->output = 0;
+    this->kDoubleX = x;
+    this->kDoubleY = y;
+    this->kOutput = 0;
     this->kType = VNode::NONE;
 }
 
 VNode::VNode(Point p, int cost) {
     Node::set_coord(p);
     Node::set_cost(cost);
-    this->output = 0;
+    this->kOutput = 0;
     this->kType = VNode::NONE;
 }
 
@@ -31,7 +33,7 @@ VNode::Type VNode::get_type() {
 }
 
 int VNode::get_output() {
-    return this->output;
+    return this->kOutput;
 }
 
 void VNode::set_type(Type t) {
@@ -67,6 +69,14 @@ string VNode::coords_to_string() {
 }
 
 int VNode::get_id() {
-    return this->id;
+    return this->kId;
+}
+
+double VNode::get_dx() {
+    return this->kDoubleX;
+}
+
+double VNode::get_dy() {
+    return this->kDoubleY;
 }
 

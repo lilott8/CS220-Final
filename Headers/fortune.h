@@ -5,43 +5,183 @@
 
 #include <set>
 #include "flow_algo.h"
-#include "vparabola.h"
-#include "vevent.h"
 
 using namespace Utilities;
 using namespace std;
 
+#ifndef NULL
+#define NULL 0
+#endif
+#define DELETED -2
+
+#define le 0
+#define re 1
+
 namespace Flow {
+    struct Freenode {
+        struct Freenode *nextfree;
+    };
+
+    struct FreeNodeArrayList {
+        struct Freenode *memory;
+        struct FreeNodeArrayList *next;
+
+    };
+
+    struct Freelist {
+        struct Freenode *head;
+        int nodesize;
+    };
+
+    struct VoronoiPoint {
+        float x, y;
+    };
+
+// structure used both for sites and for vertices
+    struct Site {
+        struct VoronoiPoint coord;
+        int sitenbr;
+        int refcnt;
+    };
+
+
+    struct VoronoiEdge {
+        float a, b, c;
+        struct Site *ep[2];
+        struct Site *reg[2];
+        int edgenbr;
+
+    };
+
+    struct GraphEdge {
+        float x1, y1, x2, y2;
+        struct GraphEdge *next;
+    };
+
+
+    struct Halfedge {
+        struct Halfedge *ELleft, *ELright;
+        struct VoronoiEdge *ELedge;
+        int ELrefcnt;
+        char ELpm;
+        struct Site *vertex;
+        float ystar;
+        struct Halfedge *PQnext;
+    };
+
     class Fortune : public FlowAlgorithm {
     public:
         Fortune();
-        Fortune(int, int);
+        Fortune(double, double);
         ~Fortune();
         // Run the algorithm, this will actually generate the edges and
         // interface with the private methods.
         void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
+
+        void reset_iterator();
+
+        bool get_next(float &, float &, float &, float &);
+
+        bool generate_voronoi(float *xValues, float *yValues, int numPoints, float minX, float maxX, float minY, float maxY, float minDist = 0);
+
     private:
-        set<VEvent*> kDeleted;      // false events, used for reference because of inability to delete from PQ
-        set<VEvent*> kFalseEvent;   // False events
+        /**
+        * Methods
+        */
+        void generate_voronoi(float, float, int, float, float, float, float, float);
+        void clean_up();
+        void clean_up_edges();
+        void free_init(struct Freelist *fl, int size);
+        void make_free(struct Freenode *curr, struct Freelist *fl);
+        void init_geom();
+        void init_plot();
+        bool voronoi(int triangulate);
+        void ref(struct Site *v);
+        void deref(struct Site *v);
+        void end_point(struct VoronoiEdge *e, int lr, struct Site *s);
+        void delete_el(struct Halfedge *he);
+        void make_vertex(struct Site *v);
+        void out_triple(struct Site *s1, struct Site *s2, struct Site *s3);
+        void insert_pq(struct Halfedge *he, struct Site *v, float offset);
+        void delete_pq(struct Halfedge *he);
+        bool initialize_el();
+        void insert_el(struct Halfedge *lb, struct Halfedge *newHe);
+        void out_site(struct Site *s);
+        void out_bisector(struct VoronoiEdge *e);
+        void out_ep(struct VoronoiEdge *e);
+        void out_vertex(struct Site *v);
+        void clip_line(struct VoronoiEdge *e);
+        void push_graph_edge(float x1, float y1, float x2, float y2);
+        void open_pl();
+        void line(float x1, float y1, float x2, float y2);
+        void circle(float x, float y, float radius);
+        void range(float minX, float minY, float maxX, float maxY);
 
-        int kLastY;                 // Last position of our y
+        char * get_free(struct Freelist *fl);
+        char * my_alloc(unsigned n);
 
-        priority_queue<VEvent*, std::vector<VEvent *>, CompareEvent> queue; // PQ with events to process
+        struct VoronoiPoint min_pq();
 
-        list<VEdge*> get_edges(list<VNode*>);               // helper function to start the VD generation
+        struct Halfedge ** ELhash;
+        struct Halfedge * create_he(), *ELleft(), *ELright(), *ELleftbnd();
+        struct Halfedge * create_he(struct VoronoiEdge *e, int pm);
+        struct Halfedge * find_pq();
+        struct Halfedge * extract_min_pq();
+        struct Halfedge * left_bound_el(struct VoronoiPoint *p);
+        struct Halfedge * right_el(struct Halfedge *he);
+        struct Halfedge * get_hash_el(int b);
+        struct Halfedge * left_el(struct Halfedge *he);
 
-        VParabola* get_parabola_by_x(double xx);            // get the parabola that is nearest the "y" in the beachline
+        struct VoronoiEdge * bisect(struct Site *s1, struct Site *s2);
+        struct Site * intersect(struct Halfedge *el1, struct Halfedge *el2, struct VoronoiPoint *p = 0);
+        struct Site * next_one();
+        struct Site * right_reg(struct Halfedge *he);
+        struct Site * left_reg(struct Halfedge *he);
 
-        VNode* get_edge_intersection(VEdge* a, VEdge* b);   // find the intersection between two edges
+        int is_pq_empty();
+        int bucket_pq(struct Halfedge *he);
+        int right_of(struct Halfedge *el, struct VoronoiPoint *p);
 
-        double get_x_of_edge(VParabola* par, double y);     // return the x position of an interestion of parabolas
-        double get_y(VNode * p, double x);                  // get the y coordinate of the given input
+        float dist(struct Site *s, struct Site *t);
 
-        void insert_parabola(VNode* p);                     // process the place event
-        void remove_parabola(VEvent* e);                    // process the circle event
-        void finish_edge(VParabola* n);                     // process any unfinished edges in the tree
-        void check_circle(VParabola* b);                    // checks for a disappearing parabola
+        /**
+        * Variables
+        */
+        bool initialize_pq();
+
+        struct Freelist kHFL;
+        struct Freelist kSFL;
+        struct Freelist kEFL;
+        struct Site *kSites;
+        struct Site *kBottomSite;
+        struct Halfedge *kELLeftEnd, *kELRightEnd;
+        struct Halfedge *kPQHash;
+
+        int kNEdges;
+        int kNVertices;
+        int kELHashSize;
+        int kTriangulate, kSorted, kPlot, kIsDebug;
+        int kNSites;
+        int kSiteIdx;
+        int kSqrtNSites;
+        int kPQHashSize;
+        int kPQCount;
+        int kPQMin;
+        int kNtry, kTotalSearch;
+        int kTotalAlloc;
+
+        float kPXMin, kPXMax, kPYMin, kPYMax, kCRadius;
+        float kXMin, kXMax, kYMin, kYMax, kDeltaX, kDeltaY;
+        float kBorderMinX, kBorderMaxX, kBorderMinY, kBorderMaxY;
+        float kMinDistanceBetweenSites;
+
+        FreeNodeArrayList *kAllMemoryList;
+        FreeNodeArrayList *kCurrentMemoryBlock;
+
+        GraphEdge *kAllEdges;
+        GraphEdge *kIteratorEdges;
     };
 }
+int scomp(const void *p1, const void *p2);
 
 #endif

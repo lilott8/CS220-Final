@@ -31,7 +31,7 @@ Controller::Controller(ProblemObject *po, FlowAlgorithm::AlgoType a, FlowAlgorit
     // set the optimization we will be using
     kOpt = o;
     // Make sure the size of the map is known to the algorithm classes
-    kAlgorithm->set_map_size(this->kMap->get_x(), this->kMap->get_y());
+    kAlgorithm->set_map_size((double)this->kMap->get_x(), (double)this->kMap->get_y());
 }
 
 Controller::~Controller() {

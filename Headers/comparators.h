@@ -6,7 +6,6 @@
 #include <cmath>
 #include "vnode.h"
 #include "claim.h"
-#include "vevent.h"
 
 namespace Flow {
     class CompareNodesFortune {
@@ -23,11 +22,7 @@ namespace Flow {
             //double a_dist = sqrt(((0 - a->get_x()) * (0 - a->get_x())) + ((0 - a->get_y()) * (0 - a->get_y())));
             //double b_dist = sqrt(((0 - b->get_x()) * (0 - b->get_x())) + ((0 - b->get_y()) * (0 - b->get_y())));
             //return a_dist >= b_dist;
-            return a->get_x() > b->get_x();
-        }
-
-        bool operator()(VEvent *a, VEvent *b) {
-
+            return a->get_y() < b->get_y();
         }
     };
 
@@ -38,14 +33,6 @@ namespace Flow {
     public:
         bool operator()(VNode *a, VNode *b) {
             return true;
-        }
-    };
-
-    class CompareEvent {
-        //: public std::binary_function<VEvent*, VEvent*, bool>
-    public:
-        bool operator()(const VEvent *l, const VEvent *r) const {
-            return (l->kPoint->get_y() < r->kPoint->get_y());
         }
     };
 }

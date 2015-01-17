@@ -7,6 +7,7 @@
 #include "flow_algo.h"
 #include "fortune.h"
 #include "spm.h"
+#include "kruskal.h"
 
 using namespace Utilities;
 
@@ -31,6 +32,7 @@ namespace Flow {
         //SPM *kSPM;
         // This allows me to keep all my algorithms in one container!
         unique_ptr<FlowAlgorithm> kAlgorithm;
+        Kruskal kKruskal;
         FlowAlgorithm::Optimization kOpt;
 
     };

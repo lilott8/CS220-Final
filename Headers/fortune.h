@@ -72,7 +72,6 @@ namespace Flow {
     class Fortune : public FlowAlgorithm {
     public:
         Fortune();
-        Fortune(double, double);
         ~Fortune();
         // Run the algorithm, this will actually generate the edges and
         // interface with the private methods.
@@ -82,13 +81,12 @@ namespace Flow {
 
         bool get_next(float &, float &, float &, float &);
 
-        bool generate_voronoi(float *xValues, float *yValues, int numPoints, float minX, float maxX, float minY, float maxY, float minDist = 0);
-
     private:
+
         /**
         * Methods
         */
-        void generate_voronoi(float, float, int, float, float, float, float, float);
+        bool generate_voronoi(int = 0);
         void clean_up();
         void clean_up_edges();
         void free_init(struct Freelist *fl, int size);

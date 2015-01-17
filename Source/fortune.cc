@@ -16,11 +16,6 @@ Fortune::Fortune() {
     kMinDistanceBetweenSites = 0;
 }
 
-Fortune::Fortune(double h, double w) {
-    kWidth = w;
-    kHeight = h;
-}
-
 Fortune::~Fortune() {
     clean_up();
     clean_up_edges();
@@ -36,19 +31,29 @@ void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue
     float xValues[10] = {0, 9, 0, 9, 4, 5, 5, 3, 2, 7};
     float yValues[10] = {0, 9, 9, 0, 4, 6, 2, 8, 3, 3};
 
-    this->generate_voronoi(xValues, yValues, 10, 0, 10, 0, 10, 0);
+    this->generate_voronoi();
 
+    // these variables are populated byt the get_next_line method
     float x1,y1,x2,y2;
 
+    // Must be called to iterate over the edges
     this->reset_iterator();
 
     printf("\n-------------------------------\n");
     int x = 0;
 
+    VEdge* v;
     while(get_next(x1,y1,x2,y2)) {
-        printf("GOT Line #%d (%f,%f)->(%f,%f)\n",x, x1,y1,x2, y2);
+        claim("F/start: GOT Line #" + to_string(x) + "\t(" + to_string(x1) + ", "
+                + to_string(y1) + ")->(" + to_string(x2) + ", " + to_string(y2) + ")", kDebug);
+
+        v = new VEdge();
+        v->kStart = new VNode(x1, y1);
+        v->kEnd = new VNode(x2, y2);
+        kEdges.push_back(v);
         x++;
     }
+    claim("F/start: Done printing", kDebug);
 }
 
 void Fortune::reset_iterator() {
@@ -73,14 +78,15 @@ bool Fortune::get_next(float &x1, float &y1, float &x2, float &y2) {
 /**
 *
 */
-bool Fortune::generate_voronoi(float *xValues, float *yValues, int numPoints, float minX, float maxX, float minY, float maxY, float minDist) {
+bool Fortune::generate_voronoi(int minDist) {
     clean_up();
     clean_up_edges();
-    int i;
 
+    // This was parameterized, but I could see no gain from setting this greater than 0
     kMinDistanceBetweenSites = minDist;
 
-    kNSites=numPoints;
+    // Set the number of sizes to be processed
+    kNSites=(int)kPins.size();
     kPlot = 0;
     kTriangulate = 0;
     kIsDebug = 1;
@@ -93,51 +99,38 @@ bool Fortune::generate_voronoi(float *xValues, float *yValues, int numPoints, fl
         return false;
     }
 
-    kXMin = xValues[0];
-    kYMin = yValues[0];
-    kXMax = xValues[0];
-    kYMax = yValues[0];
+    kXMin = kPins.front()->get_x();
+    kYMin = kPins.front()->get_y();
+    kXMax = kPins.back()->get_x();
+    kYMax = kPins.back()->get_y();
 
-    for(i = 0; i< kNSites; i++) {
-        kSites[i].coord.x = xValues[i];
-        kSites[i].coord.y = yValues[i];
+    double pin_x, pin_y;
+    for(int i = 0;i< kPins.size();i++) {
+        kSites[i].coord.x = kPins.at(i)->get_x();
+        kSites[i].coord.y = kPins.at(i)->get_y();
         kSites[i].sitenbr = i;
         kSites[i].refcnt = 0;
 
-        if (xValues[i] < kXMin) {
-            kXMin = xValues[i];
-        } else if (xValues[i] > kXMax) {
-            kXMax = xValues[i];
-        }
+        pin_x = kPins.at(i)->get_dx();
+        pin_y = kPins.at(i)->get_dy();
 
-        if (yValues[i] < kYMin) {
-            kYMin = yValues[i];
-        } else if (yValues[i] > kYMax) {
-            kYMax = yValues[i];
-        }
+        // make sure we have the best possible answer here!
+        kXMax = pin_x > kXMax ? pin_x : kXMax;
+        kXMin = pin_x < kXMin ? pin_x : kXMin;
+        kYMax = pin_y > kYMax ? pin_y : kYMax;
+        kYMin = pin_y < kYMin ? pin_y : kYMin;
     }
 
+    // we will still use this, because it orders by both x and y
     qsort(kSites, kNSites, sizeof (*kSites), scomp);
 
     kSiteIdx = 0;
     init_geom();
-    float temp = 0;
-    if(minX > maxX) {
-        temp = minX;
-        minX = maxX;
-        maxX = temp;
-    }
 
-    if(minY > maxY) {
-        temp = minY;
-        minY = maxY;
-        maxY = temp;
-    }
-
-    kBorderMinX = minX;
-    kBorderMinY = minY;
-    kBorderMaxX = maxX;
-    kBorderMaxY = maxY;
+    kBorderMinX = kMinHeight;
+    kBorderMinY = kMinWidth;
+    kBorderMaxX = kMaxHeight;
+    kBorderMaxY = kMaxWidth;
 
     kSiteIdx = 0;
     voronoi(kTriangulate);

@@ -2,7 +2,7 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - Fortune's is completely implemented
+ - Laying the ground work for Kruskal's algorithm first, then I'll double back and implement the Steiner selection.
   
 ##Done:
  

@@ -5,7 +5,9 @@
 #include "../Headers/problem_object.h"
 #include "../Headers/claim.h"
 #include "../Headers/fortune.h"
-#include "flow_algo.h"
+#include "../Headers/flow_algo.h"
+#include "../Headers/kruskal.h"
+
 
 using namespace Utilities;
 using namespace Flow;
@@ -39,6 +41,7 @@ Controller::~Controller() {
 
 void Controller::start() {
     kAlgorithm->start(this->kMap->get_pins());
+    //kKruskal.start();
 }
 
 void Controller::set_algorithm(FlowAlgorithm::AlgoType t) {
@@ -57,6 +60,7 @@ void Controller::set_algorithm(FlowAlgorithm::AlgoType t) {
             break;
         case FlowAlgorithm::AlgoType::KRUSKAL:
             claim("C/set_algorithm: This shouldn't be kruskal!?", kWarning);
+            kKruskal = Kruskal();
             break;
     }
 }

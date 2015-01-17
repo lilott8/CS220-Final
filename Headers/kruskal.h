@@ -3,7 +3,11 @@
 
 #pragma once
 
-#include "node.h"
+#include <queue>
+#include <vector>
+#include "vnode.h"
+#include "comparators.h"
+#include "flow_algo.h"
 
 using namespace Utilities;
 
@@ -12,6 +16,8 @@ namespace Flow {
     public:
         Kruskal();
         ~Kruskal();
+
+        void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
 
     private:
 

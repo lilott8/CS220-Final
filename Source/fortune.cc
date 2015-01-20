@@ -49,8 +49,8 @@ void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue
 
     VEdge* v;
     while(get_next(x1,y1,x2,y2)) {
-        //claim("F/start: GOT Line #" + to_string(x) + "\t(" + to_string(x1) + ", "
-        //        + to_string(y1) + ")->(" + to_string(x2) + ", " + to_string(y2) + ")", kDebug);
+        claim("F/start: GOT Line #" + to_string(x) + "\t(" + to_string(x1) + ", "
+                + to_string(y1) + ")->(" + to_string(x2) + ", " + to_string(y2) + ")", kDebug);
 
         //claim("F/start: AKA Line #" + to_string(x) + "\t(" + to_string(kAnswerKey.at(x)->x1) + ", "
         //+ to_string(kAnswerKey.at(x)->y1) + ")->(" + to_string(kAnswerKey.at(x)->x2) + ", "
@@ -63,6 +63,8 @@ void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue
         kEdges.push_back(v);
         x++;
     }
+
+    generate_rectilinear_graph();
 
     if(!verify_debug_answers()) {
         claim("F/Start: The answer key and the answer don't match!", kError);
@@ -1221,4 +1223,10 @@ void Fortune::init_answer_key() {
     kAnswerKey.push_back(new GraphEdge(2.772727,0.318182,3.500000,2.500000));
     kAnswerKey.push_back(new GraphEdge(2.900000,0.000000,2.772727,0.318182));
     kAnswerKey.push_back(new GraphEdge(6.500000,0.000000,6.875000,0.750000));
+}
+
+void Fortune::generate_rectilinear_graph() {
+    for(int x = 0;x<kEdges.size();x++) {
+
+    }
 }

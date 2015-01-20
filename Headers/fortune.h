@@ -92,14 +92,17 @@ namespace Flow {
         /**
         * Methods
         */
+        // entrance for building our voronoi graph
         bool generate_voronoi(int = 0);
+        // clean up outsanding pointers
         void clean_up();
         void clean_up_edges();
+        // free up any other memory that can be
         void free_init(struct Freelist *fl, int size);
         void make_free(struct Freenode *curr, struct Freelist *fl);
+        // build the geometry for the voronoi
         void init_geom();
         void init_plot();
-        bool voronoi(int triangulate);
         void ref(struct Site *v);
         void deref(struct Site *v);
         void end_point(struct VoronoiEdge *e, int lr, struct Site *s);
@@ -108,7 +111,6 @@ namespace Flow {
         void out_triple(struct Site *s1, struct Site *s2, struct Site *s3);
         void insert_pq(struct Halfedge *he, struct Site *v, float offset);
         void delete_pq(struct Halfedge *he);
-        bool initialize_el();
         void insert_el(struct Halfedge *lb, struct Halfedge *newHe);
         void out_site(struct Site *s);
         void out_bisector(struct VoronoiEdge *e);
@@ -118,16 +120,25 @@ namespace Flow {
         void push_graph_edge(float x1, float y1, float x2, float y2);
         void open_pl();
         void line(float x1, float y1, float x2, float y2);
+        // checks for and creates circle events
         void circle(float x, float y, float radius);
         void range(float minX, float minY, float maxX, float maxY);
+        // strictly for debugging, verifies answer
         void init_answer_key();
+        // voronoi returns floats, we need to adjust the output to fit on a graph
+        void generate_rectilinear_graph();
 
         char * get_free(struct Freelist *fl);
         char * my_alloc(unsigned n);
 
-        struct VoronoiPoint min_pq();
+        // the logic that controls the voronoi graph creation
+        bool voronoi(int triangulate);
+        //
+        bool initialize_el();
+        bool initialize_pq();
 
         struct Halfedge ** ELhash;
+        struct VoronoiPoint min_pq();
         struct Halfedge * create_he(), *ELleft(), *ELright(), *ELleftbnd();
         struct Halfedge * create_he(struct VoronoiEdge *e, int pm);
         struct Halfedge * find_pq();
@@ -152,8 +163,6 @@ namespace Flow {
         /**
         * Variables
         */
-        bool initialize_pq();
-
         struct Freelist kHFL;
         struct Freelist kSFL;
         struct Freelist kEFL;

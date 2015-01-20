@@ -54,6 +54,11 @@ namespace Flow {
     };
 
     struct GraphEdge {
+        GraphEdge(float a, float b, float c, float d) {
+            x1 = a; x2 = c; y1 = b; y2 = d;
+        }
+        GraphEdge(){}
+
         float x1, y1, x2, y2;
         struct GraphEdge *next;
     };
@@ -80,6 +85,7 @@ namespace Flow {
         void reset_iterator();
 
         bool get_next(float &, float &, float &, float &);
+        bool verify_debug_answers(int flag = 0);
 
     private:
 
@@ -114,6 +120,7 @@ namespace Flow {
         void line(float x1, float y1, float x2, float y2);
         void circle(float x, float y, float radius);
         void range(float minX, float minY, float maxX, float maxY);
+        void init_answer_key();
 
         char * get_free(struct Freelist *fl);
         char * my_alloc(unsigned n);
@@ -172,12 +179,15 @@ namespace Flow {
         float kXMin, kXMax, kYMin, kYMax, kDeltaX, kDeltaY;
         float kBorderMinX, kBorderMaxX, kBorderMinY, kBorderMaxY;
         float kMinDistanceBetweenSites;
+        float const kEpsilon = .01;
 
         FreeNodeArrayList *kAllMemoryList;
         FreeNodeArrayList *kCurrentMemoryBlock;
 
         GraphEdge *kAllEdges;
         GraphEdge *kIteratorEdges;
+
+        vector<GraphEdge*> kAnswerKey;
     };
 }
 int scomp(const void *p1, const void *p2);

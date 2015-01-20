@@ -1,3 +1,4 @@
+#include <math.h>
 #include "../Headers/node.h"
 #include "../Headers/VNode.h"
 
@@ -9,8 +10,8 @@ VNode::VNode() {
 }
 
 VNode::VNode(double x, double y, int cost) {
-    Node::set_x_coord((int)x);
-    Node::set_y_coord((int)y);
+    Node::set_x_coord(round(x));
+    Node::set_y_coord(round(y));
     Node::set_cost(cost);
     this->kDoubleX = x;
     this->kDoubleY = y;

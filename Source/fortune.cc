@@ -26,6 +26,7 @@ Fortune::~Fortune() {
 
 void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue) {
     FlowAlgorithm::start(queue);
+
     claim("F/start: Starting Fortunes!", kDebug);
 
     float xValues[10] = {0, 9, 0, 9, 4, 5, 5, 3, 2, 7};
@@ -42,10 +43,19 @@ void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue
     printf("\n-------------------------------\n");
     int x = 0;
 
+    if(kAnswerKey.size() < 1) {
+        init_answer_key();
+    }
+
     VEdge* v;
     while(get_next(x1,y1,x2,y2)) {
-        claim("F/start: GOT Line #" + to_string(x) + "\t(" + to_string(x1) + ", "
-                + to_string(y1) + ")->(" + to_string(x2) + ", " + to_string(y2) + ")", kDebug);
+        //claim("F/start: GOT Line #" + to_string(x) + "\t(" + to_string(x1) + ", "
+        //        + to_string(y1) + ")->(" + to_string(x2) + ", " + to_string(y2) + ")", kDebug);
+
+        //claim("F/start: AKA Line #" + to_string(x) + "\t(" + to_string(kAnswerKey.at(x)->x1) + ", "
+        //+ to_string(kAnswerKey.at(x)->y1) + ")->(" + to_string(kAnswerKey.at(x)->x2) + ", "
+        //+ to_string(kAnswerKey.at(x)->y2) + ")", kDebug);
+        //claim("=========================", kDebug);
 
         v = new VEdge();
         v->kStart = new VNode(x1, y1);
@@ -53,6 +63,11 @@ void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue
         kEdges.push_back(v);
         x++;
     }
+
+    if(!verify_debug_answers()) {
+        claim("F/Start: The answer key and the answer don't match!", kError);
+    }
+
     claim("F/start: Done printing", kDebug);
 }
 
@@ -735,6 +750,11 @@ void Fortune::clean_up() {
         delete current;
     }
 
+    for(int x = 0; x<kAnswerKey.size();x++) {
+        delete(kAnswerKey.at(x));
+    }
+    kAnswerKey.clear();
+
     kAllMemoryList = new FreeNodeArrayList;
     kAllMemoryList->next = 0;
     kAllMemoryList->memory = 0;
@@ -1116,4 +1136,89 @@ struct Site * Fortune::next_one() {
     } else {
         return ((struct Site *) NULL);
     }
+}
+
+bool Fortune::verify_debug_answers(int flag) {
+    // Check the answers both as ints or as floats
+    switch(flag) {
+        // as floats
+        default:
+        case 0:
+            for(int x = 0;x<kEdges.size();x++) {
+                if((abs(kEdges.at(x)->kStart->get_dx() - kAnswerKey.at(x)->x1) < kEpsilon) &&
+                                (abs(kEdges.at(x)->kStart->get_dy() - kAnswerKey.at(x)->y1) < kEpsilon) &&
+                                (abs(kEdges.at(x)->kEnd->get_dx() - kAnswerKey.at(x)->x2) < kEpsilon) &&
+                                (abs(kEdges.at(x)->kEnd->get_dy() - kAnswerKey.at(x)->y2) < kEpsilon)) {
+                    continue;
+                } else {
+                    claim("F/verify_debug_answers: Comparing floats: ("
+                            + to_string(kEdges.at(x)->kStart->get_dx()) + ", "
+                            + to_string(kAnswerKey.at(x)->x1) + ")->(" + to_string(kEdges.at(x)->kStart->get_dy())
+                            + ", " + to_string(kAnswerKey.at(x)->y1) + ")", kDebug);
+
+                    claim("F/verify_debug_answer: Comparing floats: ("
+                            + to_string(kEdges.at(x)->kEnd->get_dx()) + ", "
+                            + to_string(kAnswerKey.at(x)->x2) + ")->("
+                            + to_string(kEdges.at(x)->kEnd->get_dy()) + ", "
+                            + to_string(kAnswerKey.at(x)->y2) + ")", kDebug);
+                    claim("F/verify_debug_answers: There is a problem with record: " + to_string(x), kWarning);
+                    return false;
+                }
+            }
+            return true;
+            break;
+        // as ints
+        case 1:
+            for(int x = 0;x<kEdges.size();x++) {
+                if(kEdges.at(x)->kStart->get_x() == round(kAnswerKey.at(x)->x1) &&
+                        kEdges.at(x)->kStart->get_y() == round(kAnswerKey.at(x)->y1) &&
+                        kEdges.at(x)->kEnd->get_x() == round(kAnswerKey.at(x)->x2) &&
+                        kEdges.at(x)->kEnd->get_y() == round(kAnswerKey.at(x)->y2)) {
+                    continue;
+                } else {
+                    claim("F/verify_debug_answers: Comparing ints: (" +
+                            to_string(kEdges.at(x)->kStart->get_x()) + ", " +
+                            to_string(round(kAnswerKey.at(x)->x1)) + ")->(" +
+                            to_string(kEdges.at(x)->kStart->get_y()) + ", " +
+                            to_string((kAnswerKey.at(x)->y1)) + ")", kDebug);
+
+
+                    claim("F/verify_debug_answer: Comparing ints: (" +
+                            to_string(kEdges.at(x)->kEnd->get_x()) + ", " +
+                            to_string(round(kAnswerKey.at(x)->x2)) + ")->(" +
+                            to_string(kEdges.at(x)->kEnd->get_y()) + ", " +
+                            to_string(round(kAnswerKey.at(x)->y2)) + ")", kDebug);
+                    claim("F/verify_debug_answers: There is a problem with record: " + to_string(x), kWarning);
+                    return false;
+                }
+            }
+            return true;
+            break;
+    }
+}
+
+void Fortune::init_answer_key() {
+    kAnswerKey.push_back(new GraphEdge(4.500000, 0.000000, 4.500000, 0.000000));
+    kAnswerKey.push_back(new GraphEdge(10.000000, 4.500000, 10.000000, 4.500000));
+    kAnswerKey.push_back(new GraphEdge(4.500000, 10.000000, 4.500000, 10.000000));
+    kAnswerKey.push_back(new GraphEdge(0.000000, 4.500000, 0.000000, 4.500000));
+    kAnswerKey.push_back(new GraphEdge(5.928571,8.928572,5.750000,10.000000));
+    kAnswerKey.push_back(new GraphEdge(0.625000,5.875000,2.000000,10.000000));
+    kAnswerKey.push_back(new GraphEdge(8.166666,5.944445,5.928571,8.928572));
+    kAnswerKey.push_back(new GraphEdge(2.833333,5.833333,5.928571,8.928572));
+    kAnswerKey.push_back(new GraphEdge(6.875000,0.750001,10.000000,2.833334));
+    kAnswerKey.push_back(new GraphEdge(8.166667,5.944445,10.000000,5.333333));
+    kAnswerKey.push_back(new GraphEdge(0.000000,5.666667,0.625000,5.875000));
+    kAnswerKey.push_back(new GraphEdge(0.000000,2.166667,2.772727,0.318182));
+    kAnswerKey.push_back(new GraphEdge(5.785715,4.357143,8.166667,5.944445));
+    kAnswerKey.push_back(new GraphEdge(0.625000,5.875000,1.944444,5.611111));
+    kAnswerKey.push_back(new GraphEdge(1.944444,5.611111,2.833333,5.833333));
+    kAnswerKey.push_back(new GraphEdge(3.500000,2.500000,1.944444,5.611111));
+    kAnswerKey.push_back(new GraphEdge(2.833333,5.833333,5.785715,4.357142));
+    kAnswerKey.push_back(new GraphEdge(5.500000,3.500000,5.785715,4.357143));
+    kAnswerKey.push_back(new GraphEdge(6.875000,0.750000,5.500000,3.500000));
+    kAnswerKey.push_back(new GraphEdge(3.500000,2.500000,5.500000,3.500000));
+    kAnswerKey.push_back(new GraphEdge(2.772727,0.318182,3.500000,2.500000));
+    kAnswerKey.push_back(new GraphEdge(2.900000,0.000000,2.772727,0.318182));
+    kAnswerKey.push_back(new GraphEdge(6.500000,0.000000,6.875000,0.750000));
 }

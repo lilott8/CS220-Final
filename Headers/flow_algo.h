@@ -29,6 +29,9 @@ namespace Flow {
         void set_map_size(double, double, double=0, double=0);  // Alert our class of the sizes of the map
 
         virtual void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>); // run the algo
+        void set_euclidean(bool);
+
+        vector<VEdge*> get_edges();
     private:
 
     protected:
@@ -40,9 +43,9 @@ namespace Flow {
         double kMaxWidth;           // Max width of our map
         double kMinWidth;           // Min width of our map
         double kMinHeight;          // Min height of map
+        bool kIsEuclidean;          // Euclidean or Rectilinear space
 
         void clear_all();           // clear the lists
-
     };
 }
 

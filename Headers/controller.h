@@ -28,12 +28,13 @@ namespace Flow {
         Map *kMap;
         FlowAlgorithm::AlgoType kAlgo;
         priority_queue<VNode*, vector<VNode*>, CloserToOrigin> kPins;
-        //Fortune *kFortune;
-        //SPM *kSPM;
         // This allows me to keep all my algorithms in one container!
         unique_ptr<FlowAlgorithm> kAlgorithm;
         Kruskal kKruskal;
         FlowAlgorithm::Optimization kOpt;
+
+        void project_edges_on_map(vector<VEdge*>);
+
 
     };
 }

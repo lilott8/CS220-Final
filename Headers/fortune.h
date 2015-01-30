@@ -17,6 +17,75 @@ using namespace std;
 #define le 0
 #define re 1
 
+/************************************************
+*
+* Fortune:
+* This class is what defines fortune's algorithm
+* Fortune's algorithm, on a high level, runs:
+*   -A sweep line looks for sites
+*   -As new sites are found, new parabolas are
+*       generated with the site as the focus
+*       (This is the beachline)
+*   -As the parabolas grow they create breakpoints,
+*       there are always 2 breakpoints generated,
+*       which comprise an edge
+*   -As parabolas on the beachline begin to
+*       disappear, this creates the vertices
+*   -Circle events are a form of vertice
+*       discovery
+*   -Once the sweepline crosses the clip-line,
+*       the algorithm is done
+*
+* This algorithm uses 2 main datastructures to
+* keep track of the data moving through its
+* perspective: a Binary Tree and priority queue.
+*
+* The BTree maintains the beachline.  Each leaf
+* is a site that defines an arc on the beach line.
+* The interal structure is 2 nodes that store 2 sites
+* that define the actual breakline.
+*
+* The priority queue stores the events, both circle
+* and sites.  It always keeps it ordered such that
+* the next event is always closest to the sweepline.
+*
+* There are 6 main ideas here:
+*
+* Sweepline:
+*   This line is what moves through the euclidean
+*   space by either the x or y coordinate.
+*   It is responsible for detecting site-events
+*
+* Beachline:
+*   A piecewise set of parabolas that sits behind
+*   the sweepline and is responsible for drawing
+*   the actual voronoi diagram
+*
+* Site Event:
+*   A site event is a point on the euclidean
+*   space in which is required for calculating
+*   distance between 2 site events (eg. The pins
+*   on the breadboard).
+*
+* Circle Event:
+*   This is a special event, in which 2 parabolas
+*   encapsulate another parabola.  This is
+*   important because it is what is responsible
+*   for destroying "old" parabolas.  At the center,
+*   this is a vertex for an intersection of 3 edges
+*
+* Voronoi Diagram Edge:
+*   This is drawn where there is an intersection
+*   of 2 parabolas, or rather the breakpoints.
+*
+* Clip line:
+*   The clip line is so our algorithm knows where
+*   the max-x/y ends.  This forces us to finish
+*   the parabolic/circle calculations once our
+*   sweepline crosses our clipped-line.
+*
+************************************************/
+
 namespace Flow {
     struct Freenode {
         struct Freenode *nextfree;
@@ -103,49 +172,56 @@ namespace Flow {
         // build the geometry for the voronoi
         void init_geom();
         void init_plot();
+
         void ref(struct Site *v);
         void deref(struct Site *v);
+        // Vertex discovery
         void end_point(struct VoronoiEdge *e, int lr, struct Site *s);
-        void delete_el(struct Halfedge *he);
         void make_vertex(struct Site *v);
         void out_triple(struct Site *s1, struct Site *s2, struct Site *s3);
+        // Binary Tree maintenance
+        void open_pl();
+        void delete_el(struct Halfedge *he);
         void insert_pq(struct Halfedge *he, struct Site *v, float offset);
         void delete_pq(struct Halfedge *he);
         void insert_el(struct Halfedge *lb, struct Halfedge *newHe);
+
         void out_site(struct Site *s);
         void out_bisector(struct VoronoiEdge *e);
         void out_ep(struct VoronoiEdge *e);
         void out_vertex(struct Site *v);
+        // Clips the line to the bounding box
         void clip_line(struct VoronoiEdge *e);
         void push_graph_edge(float x1, float y1, float x2, float y2);
-        void open_pl();
         void line(float x1, float y1, float x2, float y2);
         // checks for and creates circle events
         void circle(float x, float y, float radius);
         void range(float minX, float minY, float maxX, float maxY);
         // strictly for debugging, verifies answer
         void init_answer_key();
-        // voronoi returns floats, we need to adjust the output to fit on a graph
-        void generate_rectilinear_graph();
 
         char * get_free(struct Freelist *fl);
         char * my_alloc(unsigned n);
 
         // the logic that controls the voronoi graph creation
         bool voronoi(int triangulate);
-        //
+
+        // binary tree maintenance
         bool initialize_el();
+        // priority queue maintenance
         bool initialize_pq();
 
-        struct Halfedge ** ELhash;
-        struct VoronoiPoint min_pq();
-        struct Halfedge * create_he(), *ELleft(), *ELright(), *ELleftbnd();
-        struct Halfedge * create_he(struct VoronoiEdge *e, int pm);
+        // priority queue stuff
         struct Halfedge * find_pq();
+        struct Halfedge * create_he(), *ELleft(), *ELright(), *ELleftbnd();
+
+        // Most of this is all for binary tree maintenance
+        struct VoronoiPoint min_pq();
+        struct Halfedge * create_he(struct VoronoiEdge *e, int pm);
         struct Halfedge * extract_min_pq();
+        struct Halfedge * get_hash_el(int b);
         struct Halfedge * left_bound_el(struct VoronoiPoint *p);
         struct Halfedge * right_el(struct Halfedge *he);
-        struct Halfedge * get_hash_el(int b);
         struct Halfedge * left_el(struct Halfedge *he);
 
         struct VoronoiEdge * bisect(struct Site *s1, struct Site *s2);
@@ -154,8 +230,10 @@ namespace Flow {
         struct Site * right_reg(struct Halfedge *he);
         struct Site * left_reg(struct Halfedge *he);
 
+        // priority queue stuff
         int is_pq_empty();
         int bucket_pq(struct Halfedge *he);
+
         int right_of(struct Halfedge *el, struct VoronoiPoint *p);
 
         float dist(struct Site *s, struct Site *t);
@@ -170,6 +248,7 @@ namespace Flow {
         struct Site *kBottomSite;
         struct Halfedge *kELLeftEnd, *kELRightEnd;
         struct Halfedge *kPQHash;
+        struct Halfedge ** ELhash;
 
         int kNEdges;
         int kNVertices;

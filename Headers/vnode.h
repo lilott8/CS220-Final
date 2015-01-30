@@ -34,6 +34,8 @@ namespace Flow {
         double get_dx();
         double get_dy();
 
+        string vnode_to_string();
+
     private:
         int kId;
         int kOutput;

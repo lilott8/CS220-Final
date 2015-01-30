@@ -17,17 +17,9 @@ namespace Flow {
 
         VNode* kStart;
         VNode* kEnd;
-        VNode* kLeft;
-        VNode* kRight;
-        VEdge* kNeighbor;
         VNode* kDirection;
 
-        /**
-        * Directional coefficients satisfying the equation:
-        * y = f * x + g
-        */
-        double kF;
-        double kG;
+        string vedge_to_string();
     };
 }
 

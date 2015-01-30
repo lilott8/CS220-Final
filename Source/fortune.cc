@@ -49,8 +49,9 @@ void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue
 
     VEdge* v;
     while(get_next(x1,y1,x2,y2)) {
-        claim("F/start: GOT Line #" + to_string(x) + "\t(" + to_string(x1) + ", "
-                + to_string(y1) + ")->(" + to_string(x2) + ", " + to_string(y2) + ")", kDebug);
+        claim("F/start: GOT Line #" + to_string(x) + "\t(" + to_string(round(x1)) + ", "
+                + to_string(round(y1)) + ")->(" + to_string(round(x2)) + ", "
+                + to_string(round(y2)) + ")", kDebug);
 
         //claim("F/start: AKA Line #" + to_string(x) + "\t(" + to_string(kAnswerKey.at(x)->x1) + ", "
         //+ to_string(kAnswerKey.at(x)->y1) + ")->(" + to_string(kAnswerKey.at(x)->x2) + ", "
@@ -64,7 +65,7 @@ void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue
         x++;
     }
 
-    generate_rectilinear_graph();
+    //generate_rectilinear_graph();
 
     if(!verify_debug_answers()) {
         claim("F/Start: The answer key and the answer don't match!", kError);
@@ -93,7 +94,10 @@ bool Fortune::get_next(float &x1, float &y1, float &x2, float &y2) {
 }
 
 /**
+* Generates the Voronoi diagram using Fortune's algorithm.
 *
+* @param   minimum distance between voronoi edges
+* @return  because everything is true!
 */
 bool Fortune::generate_voronoi(int minDist) {
     clean_up();
@@ -349,7 +353,32 @@ void Fortune::init_geom() {
 }
 
 /**
+* Constructs the bisector between two sites, as a line with equation ax + by = cParam.
 *
+* The midpoint of the line is (s1 + s2)/2.
+*
+* For a line changing more in Y than in X, we seek a formula for the bisector of the form
+* ax + y = cParam, and for a line changing more in X than in Y, we seek a formula for the
+* bisector of the form x + by = cParam.
+*
+* For |dy|>|dx|, the slope of the bisector is -dx/dy, and so the equation of the line is
+*
+* y - (yPos1+yPos2)/2 = (-dx/dy)[x - (xPos1+xPos2)/2]
+* (dx/dy)x + y = [(dx/dy)(xPos1+xPos2) + (yPos1+yPos2)]/2
+* (dx/dy)x + y = [((xPos2-xPos1)(xPos1+xPos2)/(yPos2-yPos1)) + (yPos1+yPos2)]/2
+* (dx/dy)x + y = [xPos2^2 - xPos1^2 + yPos2^2 - yPos1^2] / 2dy
+*
+* For |dx|>|dy|, the y-x slope of the bisector is -dy/dx, and so the equation of the line
+* is
+*
+* x - (xPos1+xPos2)/2 = (-dy/dx)[y - (yPos1+yPos2)/2]
+* x + (dy/dx)y = [(dy/dx)(yPos1+yPos2) + (xPos1+xPos2)]/2
+* x + (dy/dx)y = [((yPos2-yPos1)/(xPos2-xPos1))(yPos1+yPos2) + (xPos1+xPos2)]/2
+* x + (dy/dx)y = [xPos2^2 - xPos1^2 + yPos2^2 - yPos1^2] / 2dx
+*
+* @param   site1  the first site
+* @param   site2  the second site
+* @return  the bisector
 */
 struct VoronoiEdge * Fortune::bisect(struct Site *s1, struct Site *s2) {
     float dx,dy,adx,ady;
@@ -388,9 +417,12 @@ struct VoronoiEdge * Fortune::bisect(struct Site *s1, struct Site *s2) {
 }
 
 /**
+* Creates a new site where the HalfEdges el1 and el2 intersect.
 *
+* @param   el1  edge 1
+* @param   el2  edge 2
+* @return  site at which the points intersect
 */
-//create a new site where the HalfEdges el1 and el2 intersect - note that the Point in the argument list is not used, don't know why it's there
 struct Site * Fortune::intersect(struct Halfedge *el1, struct Halfedge *el2, struct VoronoiPoint *p) {
     struct VoronoiEdge *e1,*e2, *e;
     struct Halfedge *el;
@@ -491,8 +523,8 @@ int Fortune::right_of(struct Halfedge *el, struct VoronoiPoint *p) {
             }
         }
     } else {
-    /*e->b==1.0 */
-    	yl = e->c - e->a*p->x;
+        /*e->b==1.0 */
+        yl = e->c - e->a*p->x;
         t1 = p->y - yl;
         t2 = p->x - topsite->coord.x;
         t3 = yl - topsite->coord.y;
@@ -519,13 +551,24 @@ void Fortune::end_point(struct VoronoiEdge *e, int lr, struct Site * s) {
 }
 
 /**
+* Computes the distance between two sites.
 *
+* @param   site1  the first site
+* @param   site2  the second site
+* @return  the distance between the sites
 */
 float Fortune::dist(struct Site *s, struct Site *t) {
-    float dx,dy;
-    dx = s->coord.x - t->coord.x;
-    dy = s->coord.y - t->coord.y;
-    return (float)(sqrt(dx*dx + dy*dy));
+    if(kIsEuclidean) {
+        float dx, dy;
+        dx = s->coord.x - t->coord.x;
+        dy = s->coord.y - t->coord.y;
+        return (float) (sqrt(dx * dx + dy * dy));
+    } else {
+        int dx, dy;
+        dx = abs(round(s->coord.x) - round(t->coord.x));
+        dy = abs(round(s->coord.y) - round(t->coord.y));
+        return (dx + dy);
+    }
 }
 
 /**
@@ -809,6 +852,7 @@ char * Fortune::my_alloc(unsigned n) {
 /* for those who don't have Cherry's kPlot */
 /* #include <kPlot.h> */
 void Fortune::open_pl(){}
+
 void Fortune::line(float x1, float y1, float x2, float y2) {
     push_graph_edge(x1,y1,x2,y2);
 
@@ -864,7 +908,9 @@ void Fortune::init_plot() {
 }
 
 /**
+* Clips a line to the bounding box.
 *
+* @param  edge  the edge to clip
 */
 void Fortune::clip_line(struct VoronoiEdge *e) {
     struct Site *s1, *s2;
@@ -923,19 +969,23 @@ void Fortune::clip_line(struct VoronoiEdge *e) {
             return;
         }
         if(x1> kPXMax) {
-            x1 = kPXMax; y1 = (e->c - x1)/e->b;
+            x1 = kPXMax;
+            y1 = (e->c - x1)/e->b;
         }
 
         if(x1<kPXMin) {
-            x1 = kPXMin; y1 = (e->c - x1)/e->b;
+            x1 = kPXMin;
+            y1 = (e->c - x1)/e->b;
         }
 
         if(x2>kPXMax) {
-            x2 = kPXMax; y2 = (e->c - x2)/e->b;
+            x2 = kPXMax;
+            y2 = (e->c - x2)/e->b;
         }
 
         if(x2<kPXMin) {
-            x2 = kPXMin; y2 = (e->c - x2)/e->b;
+            x2 = kPXMin;
+            y2 = (e->c - x2)/e->b;
         }
     } else {
         x1 = kPXMin;
@@ -967,19 +1017,23 @@ void Fortune::clip_line(struct VoronoiEdge *e) {
         }
 
         if(y1> kPYMax) {
-            y1 = kPYMax; x1 = (e -> c - y1)/e -> a;
+            y1 = kPYMax;
+            x1 = (e -> c - y1)/e -> a;
         }
 
         if(y1<kPYMin) {
-            y1 = kPYMin; x1 = (e -> c - y1)/e -> a;
+            y1 = kPYMin;
+            x1 = (e -> c - y1)/e -> a;
         }
 
         if(y2>kPYMax) {
-            y2 = kPYMax; x2 = (e -> c - y2)/e -> a;
+            y2 = kPYMax;
+            x2 = (e -> c - y2)/e -> a;
         }
 
         if(y2<kPYMin) {
-            y2 = kPYMin; x2 = (e -> c - y2)/e -> a;
+            y2 = kPYMin;
+            x2 = (e -> c - y2)/e -> a;
         }
     }
 
@@ -1035,7 +1089,7 @@ bool Fortune::voronoi(int triangulate) {
             //if the new bisector intersects with the left edge, remove the left edge's vertex, and put in the new one
             if ((p = intersect(lbnd, bisector)) != (struct Site *) NULL) {
                 delete_pq(lbnd);
-                insert_pq(lbnd, p, dist(p,newsite));
+                insert_pq(lbnd, p, dist(p, newsite));
             }
 
             lbnd = bisector;
@@ -1044,7 +1098,7 @@ bool Fortune::voronoi(int triangulate) {
 
             // if this new bisector intersects with the
             if ((p = intersect(bisector, rbnd)) != (struct Site *) NULL) {
-                insert_pq(bisector, p, dist(p,newsite)); // push the HE into the ordered linked list of vertices
+                insert_pq(bisector, p, dist(p, newsite)); // push the HE into the ordered linked list of vertices
             }
             newsite = next_one();
         } else if (!is_pq_empty()) { /* intersection is smallest - this is a vector event */
@@ -1086,12 +1140,12 @@ bool Fortune::voronoi(int triangulate) {
             // if left HE and the new bisector don't intersect, then delete the left HE, and reinsert it
             if((p = intersect(llbnd, bisector)) != (struct Site *) NULL) {
                 delete_pq(llbnd);
-                insert_pq(llbnd, p, dist(p,bot));
+                insert_pq(llbnd, p, dist(p, bot));
             }
 
             // if right HE and the new bisector don't intersect, then reinsert it
             if ((p = intersect(bisector, rrbnd)) != (struct Site *) NULL) {
-                insert_pq(bisector, p, dist(p,bot));
+                insert_pq(bisector, p, dist(p, bot));
             }
         } else {
             break;
@@ -1148,9 +1202,9 @@ bool Fortune::verify_debug_answers(int flag) {
         case 0:
             for(int x = 0;x<kEdges.size();x++) {
                 if((abs(kEdges.at(x)->kStart->get_dx() - kAnswerKey.at(x)->x1) < kEpsilon) &&
-                                (abs(kEdges.at(x)->kStart->get_dy() - kAnswerKey.at(x)->y1) < kEpsilon) &&
-                                (abs(kEdges.at(x)->kEnd->get_dx() - kAnswerKey.at(x)->x2) < kEpsilon) &&
-                                (abs(kEdges.at(x)->kEnd->get_dy() - kAnswerKey.at(x)->y2) < kEpsilon)) {
+                        (abs(kEdges.at(x)->kStart->get_dy() - kAnswerKey.at(x)->y1) < kEpsilon) &&
+                        (abs(kEdges.at(x)->kEnd->get_dx() - kAnswerKey.at(x)->x2) < kEpsilon) &&
+                        (abs(kEdges.at(x)->kEnd->get_dy() - kAnswerKey.at(x)->y2) < kEpsilon)) {
                     continue;
                 } else {
                     claim("F/verify_debug_answers: Comparing floats: ("
@@ -1169,7 +1223,7 @@ bool Fortune::verify_debug_answers(int flag) {
             }
             return true;
             break;
-        // as ints
+            // as ints
         case 1:
             for(int x = 0;x<kEdges.size();x++) {
                 if(kEdges.at(x)->kStart->get_x() == round(kAnswerKey.at(x)->x1) &&
@@ -1200,33 +1254,57 @@ bool Fortune::verify_debug_answers(int flag) {
 }
 
 void Fortune::init_answer_key() {
-    kAnswerKey.push_back(new GraphEdge(4.500000, 0.000000, 4.500000, 0.000000));
-    kAnswerKey.push_back(new GraphEdge(10.000000, 4.500000, 10.000000, 4.500000));
-    kAnswerKey.push_back(new GraphEdge(4.500000, 10.000000, 4.500000, 10.000000));
-    kAnswerKey.push_back(new GraphEdge(0.000000, 4.500000, 0.000000, 4.500000));
-    kAnswerKey.push_back(new GraphEdge(5.928571,8.928572,5.750000,10.000000));
-    kAnswerKey.push_back(new GraphEdge(0.625000,5.875000,2.000000,10.000000));
-    kAnswerKey.push_back(new GraphEdge(8.166666,5.944445,5.928571,8.928572));
-    kAnswerKey.push_back(new GraphEdge(2.833333,5.833333,5.928571,8.928572));
-    kAnswerKey.push_back(new GraphEdge(6.875000,0.750001,10.000000,2.833334));
-    kAnswerKey.push_back(new GraphEdge(8.166667,5.944445,10.000000,5.333333));
-    kAnswerKey.push_back(new GraphEdge(0.000000,5.666667,0.625000,5.875000));
-    kAnswerKey.push_back(new GraphEdge(0.000000,2.166667,2.772727,0.318182));
-    kAnswerKey.push_back(new GraphEdge(5.785715,4.357143,8.166667,5.944445));
-    kAnswerKey.push_back(new GraphEdge(0.625000,5.875000,1.944444,5.611111));
-    kAnswerKey.push_back(new GraphEdge(1.944444,5.611111,2.833333,5.833333));
-    kAnswerKey.push_back(new GraphEdge(3.500000,2.500000,1.944444,5.611111));
-    kAnswerKey.push_back(new GraphEdge(2.833333,5.833333,5.785715,4.357142));
-    kAnswerKey.push_back(new GraphEdge(5.500000,3.500000,5.785715,4.357143));
-    kAnswerKey.push_back(new GraphEdge(6.875000,0.750000,5.500000,3.500000));
-    kAnswerKey.push_back(new GraphEdge(3.500000,2.500000,5.500000,3.500000));
-    kAnswerKey.push_back(new GraphEdge(2.772727,0.318182,3.500000,2.500000));
-    kAnswerKey.push_back(new GraphEdge(2.900000,0.000000,2.772727,0.318182));
-    kAnswerKey.push_back(new GraphEdge(6.500000,0.000000,6.875000,0.750000));
-}
+    /** Size of n **/
+    if(kMaxWidth == 10) {
+        kAnswerKey.push_back(new GraphEdge(4.500000, 0.000000, 4.500000, 0.000000));
+        kAnswerKey.push_back(new GraphEdge(9.000000, 4.500000, 9.000000, 4.500000));
+        kAnswerKey.push_back(new GraphEdge(4.500000, 9.000000, 4.500000, 9.000000));
+        kAnswerKey.push_back(new GraphEdge(0.000000, 4.500000, 0.000000, 4.500000));
+        kAnswerKey.push_back(new GraphEdge(5.928571, 8.928572, 5.750000, 9.000000));
+        kAnswerKey.push_back(new GraphEdge(0.625000, 5.875000, 2.000000, 9.000000));
+        kAnswerKey.push_back(new GraphEdge(8.166666, 5.944445, 5.928571, 8.928572));
+        kAnswerKey.push_back(new GraphEdge(2.833333, 5.833333, 5.928571, 8.928572));
+        kAnswerKey.push_back(new GraphEdge(6.875000, 0.750001, 9.000000, 2.833334));
+        kAnswerKey.push_back(new GraphEdge(8.166667, 5.944445, 9.000000, 5.333333));
+        kAnswerKey.push_back(new GraphEdge(0.000000, 5.666667, 0.625000, 5.875000));
+        kAnswerKey.push_back(new GraphEdge(0.000000, 2.166667, 2.772727, 0.318182));
+        kAnswerKey.push_back(new GraphEdge(5.785715, 4.357143, 8.166667, 5.944445));
+        kAnswerKey.push_back(new GraphEdge(0.625000, 5.875000, 1.944444, 5.611111));
+        kAnswerKey.push_back(new GraphEdge(1.944444, 5.611111, 2.833333, 5.833333));
+        kAnswerKey.push_back(new GraphEdge(3.500000, 2.500000, 1.944444, 5.611111));
+        kAnswerKey.push_back(new GraphEdge(2.833333, 5.833333, 5.785715, 4.357142));
+        kAnswerKey.push_back(new GraphEdge(5.500000, 3.500000, 5.785715, 4.357143));
+        kAnswerKey.push_back(new GraphEdge(6.875000, 0.750000, 5.500000, 3.500000));
+        kAnswerKey.push_back(new GraphEdge(3.500000, 2.500000, 5.500000, 3.500000));
+        kAnswerKey.push_back(new GraphEdge(2.772727, 0.318182, 3.500000, 2.500000));
+        kAnswerKey.push_back(new GraphEdge(2.900000, 0.000000, 2.772727, 0.318182));
+        kAnswerKey.push_back(new GraphEdge(6.500000, 0.000000, 6.875000, 0.750000));
+    }
 
-void Fortune::generate_rectilinear_graph() {
-    for(int x = 0;x<kEdges.size();x++) {
-
+    /** Size of n-1 **/
+    if(kMaxWidth == 9) {
+        kAnswerKey.push_back(new GraphEdge(4.500000, 0.000000, 4.500000, 0.000000));
+        kAnswerKey.push_back(new GraphEdge(9.000000, 4.500000, 9.000000, 4.500000));
+        kAnswerKey.push_back(new GraphEdge(4.500000, 9.000000, 4.500000, 9.000000));
+        kAnswerKey.push_back(new GraphEdge(0.000000, 4.500000, 0.000000, 4.500000));
+        kAnswerKey.push_back(new GraphEdge(5.928571, 8.928572, 5.916667, 9.000000));
+        kAnswerKey.push_back(new GraphEdge(0.625000, 5.875000, 1.666667, 9.000000));
+        kAnswerKey.push_back(new GraphEdge(8.166666, 5.944445, 5.928571, 8.928572));
+        kAnswerKey.push_back(new GraphEdge(2.833333, 5.833333, 5.928571, 8.928572));
+        kAnswerKey.push_back(new GraphEdge(6.875000, 0.750001, 9.000000, 2.166667));
+        kAnswerKey.push_back(new GraphEdge(8.166667, 5.944445, 9.000000, 5.666667));
+        kAnswerKey.push_back(new GraphEdge(0.000000, 5.666667, 0.625000, 5.875000));
+        kAnswerKey.push_back(new GraphEdge(0.000000, 2.166667, 2.772727, 0.318182));
+        kAnswerKey.push_back(new GraphEdge(5.785715, 4.357143, 8.166667, 5.944445));
+        kAnswerKey.push_back(new GraphEdge(0.625000, 5.875000, 1.944444, 5.611111));
+        kAnswerKey.push_back(new GraphEdge(1.944444, 5.611111, 2.833333, 5.833333));
+        kAnswerKey.push_back(new GraphEdge(3.500000, 2.500000, 1.944444, 5.611111));
+        kAnswerKey.push_back(new GraphEdge(2.833333, 5.833333, 5.785715, 4.357142));
+        kAnswerKey.push_back(new GraphEdge(5.500000, 3.500000, 5.785715, 4.357143));
+        kAnswerKey.push_back(new GraphEdge(6.875000, 0.750000, 5.500000, 3.500000));
+        kAnswerKey.push_back(new GraphEdge(3.500000, 2.500000, 5.500000, 3.500000));
+        kAnswerKey.push_back(new GraphEdge(2.772727, 0.318182, 3.500000, 2.500000));
+        kAnswerKey.push_back(new GraphEdge(2.900000, 0.000000, 2.772727, 0.318182));
+        kAnswerKey.push_back(new GraphEdge(6.500000, 0.000000, 6.875000, 0.750000));
     }
 }

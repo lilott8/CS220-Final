@@ -63,12 +63,12 @@ string FlowAlgorithm::print_optimization(Optimization t) {
 }
 
 void FlowAlgorithm::set_map_size(double maxx, double maxy, double minx, double miny) {
-    kMaxHeight = maxx;
-    kMaxWidth = maxy;
+    kMaxHeight = maxx-1;
+    kMaxWidth = maxy-1;
     kMinWidth = miny;
     kMinHeight = minx;
-    claim("FA/set_map_size: max_height: " + to_string(maxx), kDebug);
-    claim("FA/set_map_size: max_width: " + to_string(maxy), kDebug);
+    claim("FA/set_map_size: max_height: " + to_string(maxx-1), kDebug);
+    claim("FA/set_map_size: max_width: " + to_string(maxy-1), kDebug);
     claim("FA/set_map_size: min_height: " + to_string(minx), kDebug);
     claim("FA/set_map_size: min_width: " + to_string(miny), kDebug);
 }
@@ -79,4 +79,12 @@ void FlowAlgorithm::clear_all() {
     }
     kPins.clear();
     kEdges.clear();
+}
+
+vector<VEdge*> FlowAlgorithm::get_edges() {
+    return kEdges;
+}
+
+void FlowAlgorithm::set_euclidean(bool b) {
+    kIsEuclidean = b;
 }

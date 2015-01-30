@@ -81,3 +81,8 @@ double VNode::get_dy() {
     return this->kDoubleY;
 }
 
+string VNode::vnode_to_string() {
+    string ret = "(" + to_string(get_x()) + ", " + to_string(get_y()) + ")";
+    return ret;
+}
+

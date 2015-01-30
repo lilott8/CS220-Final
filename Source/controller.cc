@@ -40,7 +40,9 @@ Controller::~Controller() {
 }
 
 void Controller::start() {
+    kAlgorithm->set_euclidean(false);
     kAlgorithm->start(this->kMap->get_pins());
+    project_edges_on_map(kAlgorithm->get_edges());
     //kKruskal.start();
 }
 
@@ -67,4 +69,23 @@ void Controller::set_algorithm(FlowAlgorithm::AlgoType t) {
 
 void Controller::print_map() {
     this->kMap->print_map();
+}
+
+void Controller::project_edges_on_map(vector<VEdge*> edges) {
+    bool which_x, which_y;
+    int start_x, start_y, end_x, end_y;
+
+    VEdge* edge;
+    for(int x = 0;x<edges.size();x++) {
+        edge = edges.at(x);
+        which_x = (edge->kStart->get_x() < edge->kEnd->get_x());
+        which_y = (edge->kStart->get_y() < edge->kEnd->get_y());
+
+        start_x = which_x ? edge->kStart->get_x() : edge->kEnd->get_x();
+        start_y = which_x ? edge->kStart->get_y() : edge->kEnd->get_y();
+
+        end_x = !which_x ? edge->kStart->get_x() : edge->kEnd->get_x();
+        end_y = !which_x ? edge->kStart->get_y() : edge->kEnd->get_y();
+
+    }
 }

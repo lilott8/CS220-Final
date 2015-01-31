@@ -150,6 +150,7 @@ namespace Flow {
         // Run the algorithm, this will actually generate the edges and
         // interface with the private methods.
         void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
+        void use_boost_voronoi(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
 
         void reset_iterator();
 
@@ -182,9 +183,10 @@ namespace Flow {
         // Binary Tree maintenance
         void open_pl();
         void delete_el(struct Halfedge *he);
+        void insert_el(struct Halfedge *lb, struct Halfedge *newHe);
+        // Priority queue maintenance
         void insert_pq(struct Halfedge *he, struct Site *v, float offset);
         void delete_pq(struct Halfedge *he);
-        void insert_el(struct Halfedge *lb, struct Halfedge *newHe);
 
         void out_site(struct Site *s);
         void out_bisector(struct VoronoiEdge *e);
@@ -213,22 +215,23 @@ namespace Flow {
 
         // priority queue stuff
         struct Halfedge * find_pq();
-        struct Halfedge * create_he(), *ELleft(), *ELright(), *ELleftbnd();
-
-        // Most of this is all for binary tree maintenance
         struct VoronoiPoint min_pq();
-        struct Halfedge * create_he(struct VoronoiEdge *e, int pm);
         struct Halfedge * extract_min_pq();
+
+        // Binary tree maintenance
+        struct Halfedge * create_he(struct VoronoiEdge *e, int pm);
+        struct Halfedge * create_he(), *ELleft(), *ELright(), *ELleftbnd();
         struct Halfedge * get_hash_el(int b);
         struct Halfedge * left_bound_el(struct VoronoiPoint *p);
         struct Halfedge * right_el(struct Halfedge *he);
+        struct Site * left_reg(struct Halfedge *he);
+        struct Site * right_reg(struct Halfedge *he);
         struct Halfedge * left_el(struct Halfedge *he);
-
+        // Calculating beach line events
         struct VoronoiEdge * bisect(struct Site *s1, struct Site *s2);
         struct Site * intersect(struct Halfedge *el1, struct Halfedge *el2, struct VoronoiPoint *p = 0);
+        // get the next site to process
         struct Site * next_one();
-        struct Site * right_reg(struct Halfedge *he);
-        struct Site * left_reg(struct Halfedge *he);
 
         // priority queue stuff
         int is_pq_empty();

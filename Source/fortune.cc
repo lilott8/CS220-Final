@@ -1,6 +1,9 @@
 #include "../Headers/claim.h"
 #include "../Headers/fortune.h"
+//#include "boost/polygon/voronoi.hpp"
 
+//using boost::polygon::voronoi_builder;
+//using boost::polygon::voronoi_diagram;
 using namespace Flow;
 
 Fortune::Fortune() {
@@ -72,6 +75,16 @@ void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue
     }
 
     claim("F/start: Done printing", kDebug);
+}
+
+
+/**
+* http://www.boost.org/doc/libs/1_55_0/libs/polygon/doc/voronoi_basic_tutorial.htm
+* http://stackoverflow.com/questions/6646405/how-do-you-add-boost-libraries-in-cmakelists-txt
+* https://github.com/WilstonOreo/Voronoi
+*/
+void Fortune::use_boost_voronoi(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue) {
+
 }
 
 void Fortune::reset_iterator() {

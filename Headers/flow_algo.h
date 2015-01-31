@@ -38,7 +38,6 @@ namespace Flow {
         vector<VNode*> kPins;       // Pins that are placed and need to be routed
         vector<VEdge*> kEdges;      // generated edges
 
-
         double kMaxHeight;          // Max height of our map
         double kMaxWidth;           // Max width of our map
         double kMinWidth;           // Min width of our map

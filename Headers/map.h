@@ -3,8 +3,15 @@
 
 #include "vnode.h"
 #include "problem_object.h"
+#include "vedge.h"
 #include <queue>
 #include "comparators.h"
+
+#define plot_(X,Y,D) do{ rgb_color f_;				\
+  f_.red = r; f_.green = g; f_.blue = b;			\
+  _dla_plot(img, (X), (Y), &f_, (D)) ; }while(0)
+
+#define swap_(a, b) do{ __typeof__(a) tmp;  tmp = a; a = b; b = tmp; }while(0)
 
 using namespace Utilities;
 using namespace std;
@@ -24,6 +31,7 @@ namespace Flow {
         ~Map();
 
         void print_map();
+        void draw_voronoi_edges(vector<VEdge*>);
         priority_queue<VNode*, vector<VNode*>, CloserToOrigin> get_pins();
 
         int get_x();
@@ -33,12 +41,15 @@ namespace Flow {
         int kHeight;
         int kWidth;
         int kDefaultSize = 10;
+        bool kIsEuclidean;
         priority_queue<VNode*, vector<VNode*>, CloserToOrigin> kPins;
         vector<vector<VNode*>> kMap;
 
         void initialize_map();
         void set_pins(vector<Connection>);
         void set_blockages(vector<Blocker>);
+        void draw_xiaolin_wu_lines(vector<VEdge*>);
+        void draw_bresenham_lines(vector<VEdge*>);
     };
 }
 

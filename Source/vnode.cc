@@ -58,7 +58,7 @@ string VNode::type_to_string(Type t) {
             break;
         case NONE:
         default:
-            output = "0";
+            output = " ";
             break;
     }
     return output;

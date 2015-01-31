@@ -2,26 +2,29 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - Laying the ground work for Kruskal's algorithm first, then I'll double back and implement the Steiner selection.
+ - Got line drawing done, but it doesn't collow a complete rectilinear fashion
+ - implementing boost's voronoi diagram generator
   
 ##Done:
  
+ - aliased line drawing
  - Fortune's is done
  - mapping is working
  - converted my child node class to fit this problem description
  - added a controller to abstract and encapsulate the logic of my implementation
  - laid the groundwork for the algorithms to be implemented
  - controller framework is as I want it, beginning the fortune algorithm
+ - Use the output from the voronoi to draw on the graph
 
 ##TODO:
 
-  - Use the output from the voronoi to draw on the graph
-  - Either add all the appropriate .o files to the make file or convince Brian to use CMake!
-  - figure out why the map coords need to be switched in init!
-  - Implement the nlogn Voronoi grapher *(Resolved)*
-  - Create a datastructure to hold a Voronoi sector *(Resolved)*
-  - derive a good compare function for the beachline rb-tree *(Resolved)*
-  - why can't vedge and arch have pointers to each other?? *(Resolved)*
+ - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
+ - Either add all the appropriate .o files to the make file or convince Brian to use CMake!
+ - figure out why the map coords need to be switched in init!
+ - Implement the nlogn Voronoi grapher *(Resolved)*
+ - Create a datastructure to hold a Voronoi sector *(Resolved)*
+ - derive a good compare function for the beachline rb-tree *(Resolved)*
+ - why can't vedge and arch have pointers to each other?? *(Resolved)*
  
 ## Project Overview
 

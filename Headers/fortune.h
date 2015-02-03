@@ -149,7 +149,7 @@ namespace Flow {
         ~Fortune();
         // Run the algorithm, this will actually generate the edges and
         // interface with the private methods.
-        void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
+        void start(vector<VNode*>);
         void use_boost_voronoi(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
 
         void reset_iterator();

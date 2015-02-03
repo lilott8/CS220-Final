@@ -28,7 +28,7 @@ namespace Flow {
 
         void set_map_size(double, double, double=0, double=0);  // Alert our class of the sizes of the map
 
-        virtual void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>); // run the algo
+        virtual void start(vector<VNode*>); // run the algo
         void set_euclidean(bool);
 
         vector<VEdge*> get_edges();

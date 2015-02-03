@@ -14,7 +14,7 @@ SPM::~SPM() {
 
 }
 
-void SPM::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> pq) {
+void SPM::start(vector<VNode*> pq) {
     FlowAlgorithm::start(pq);
     claim("S/start: Starting SPM!", kDebug);
 }

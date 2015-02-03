@@ -1,9 +1,6 @@
 #include "../Headers/claim.h"
 #include "../Headers/fortune.h"
-//#include "boost/polygon/voronoi.hpp"
 
-//using boost::polygon::voronoi_builder;
-//using boost::polygon::voronoi_diagram;
 using namespace Flow;
 
 Fortune::Fortune() {
@@ -27,7 +24,8 @@ Fortune::~Fortune() {
         delete kAllMemoryList;
 }
 
-void Fortune::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue) {
+
+void Fortune::start(vector<VNode*> queue) {
     FlowAlgorithm::start(queue);
 
     claim("F/start: Starting Fortunes!", kDebug);

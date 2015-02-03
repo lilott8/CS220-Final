@@ -60,7 +60,7 @@ void Map::set_pins(vector<Connection> c) {
         // Declare the pin(s)
         if(kMap.at(c.at(x).source.x).at(c.at(x).source.y)->get_type() == VNode::Type::NONE) {
             kMap.at(c.at(x).source.x).at(c.at(x).source.y)->set_type(VNode::Type::PIN);
-            kPins.push(kMap.at(c.at(x).source.x).at(c.at(x).source.y));
+            kPins.push_back(kMap.at(c.at(x).source.x).at(c.at(x).source.y));
         } else {
             claim("M/sp: We couldn't place: " + kMap.at(c.at(x).source.x).at(c.at(x).source.y)->coords_to_string()
                     + " something was already there!", kWarning);
@@ -68,7 +68,7 @@ void Map::set_pins(vector<Connection> c) {
 
         if(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->get_type() == VNode::Type::NONE) {
             kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->set_type(VNode::Type::PIN);
-            kPins.push(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y));
+            kPins.push_back(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y));
         } else {
             claim("M/sp: We couldn't place: " + kMap.at(c.at(x).source.x).at(c.at(x).source.y)->coords_to_string()
                     + " something was already there!", kWarning);
@@ -76,7 +76,7 @@ void Map::set_pins(vector<Connection> c) {
     }
 }
 
-priority_queue<VNode*, vector<VNode*>, CloserToOrigin> Map::get_pins() {
+vector<VNode*> Map::get_pins() {
     return kPins;
 }
 

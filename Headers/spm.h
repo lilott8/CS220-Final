@@ -12,7 +12,7 @@ namespace Flow {
     public:
         SPM();
         ~SPM();
-        void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
+        void start(vector<VNode*>);
     private:
 
     };

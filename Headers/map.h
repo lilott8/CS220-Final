@@ -32,7 +32,7 @@ namespace Flow {
 
         void print_map();
         void draw_voronoi_edges(vector<VEdge*>);
-        priority_queue<VNode*, vector<VNode*>, CloserToOrigin> get_pins();
+        vector<VNode*> get_pins();
 
         int get_x();
         int get_y();
@@ -42,7 +42,7 @@ namespace Flow {
         int kWidth;
         int kDefaultSize = 10;
         bool kIsEuclidean;
-        priority_queue<VNode*, vector<VNode*>, CloserToOrigin> kPins;
+        vector<VNode*> kPins;
         vector<vector<VNode*>> kMap;
 
         void initialize_map();

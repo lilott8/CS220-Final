@@ -16,14 +16,11 @@ FlowAlgorithm::~FlowAlgorithm() {
     clear_all();
 }
 
-void FlowAlgorithm::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> k) {
+void FlowAlgorithm::start(vector<VNode*> k) {
     // Clear the lists first!
     clear_all();
 
-    while(!k.empty()) {
-        kPins.push_back(k.top());
-        k.pop();
-    }
+    kPins = k;
 
     claim("A/Start: Starting the algorithm", kDebug);
 }

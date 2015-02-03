@@ -2,6 +2,7 @@ CS220 Project Framework
 ===============
 #Changelog:
  
+ - Boost::Polygon::Voronoi has been "implimented".  This is a loose implementation
  - Got line drawing done, but it doesn't collow a complete rectilinear fashion
  - implementing boost's voronoi diagram generator
   
@@ -18,6 +19,8 @@ CS220 Project Framework
 
 ##TODO:
 
+ - Figure out what, exactly the output means and make it useful
+ - Implement my datastructures with the Boost::Voronoi algorithm 
  - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
  - Either add all the appropriate .o files to the make file or convince Brian to use CMake!
  - figure out why the map coords need to be switched in init!

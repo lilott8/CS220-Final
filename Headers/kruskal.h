@@ -17,7 +17,7 @@ namespace Flow {
         Kruskal();
         ~Kruskal();
 
-        void start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
+        void start(vector<VNode*>);
 
     private:
 

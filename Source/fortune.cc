@@ -1,7 +1,16 @@
 #include "../Headers/claim.h"
-#include "../Headers/fortune.h"
+#include "fortune.h"
+#include <boost/polygon/voronoi.hpp>
+//#include <boost/polygon/voronoi_visual_utils.hpp>
 
 using namespace Flow;
+using boost::polygon::voronoi_builder;
+using boost::polygon::voronoi_diagram;
+using boost::polygon::x;
+using boost::polygon::y;
+using boost::polygon::low;
+using boost::polygon::high;
+
 
 Fortune::Fortune() {
     kSiteIdx = 0;
@@ -27,6 +36,9 @@ Fortune::~Fortune() {
 
 void Fortune::start(vector<VNode*> queue) {
     FlowAlgorithm::start(queue);
+
+    use_boost_voronoi(queue);
+    return;
 
     claim("F/start: Starting Fortunes!", kDebug);
 
@@ -81,9 +93,168 @@ void Fortune::start(vector<VNode*> queue) {
 * http://stackoverflow.com/questions/6646405/how-do-you-add-boost-libraries-in-cmakelists-txt
 * https://github.com/WilstonOreo/Voronoi
 */
-void Fortune::use_boost_voronoi(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue) {
+void Fortune::use_boost_voronoi(vector<VNode*> k) {
+    vector<BPoint> points;
+    vector<BSegment> segments;
 
+    for(int x = 0; x < k.size(); x++) {
+        points.push_back(BPoint(k.at(x)->get_x(), k.at(x)->get_y()));
+    }
+
+    voronoi_diagram<double> vd;
+    construct_voronoi(points.begin(), points.end(), segments.begin(), segments.end(), &vd);
+
+    // Traversing Voronoi Graph.
+    {
+        printf("Traversing Voronoi graph.\n");
+        printf("Number of visited primary edges using edge iterator: %d\n",
+                iterate_primary_edges1(vd));
+        printf("Number of visited primary edges using cell iterator: %d\n",
+                iterate_primary_edges2(vd));
+        printf("Number of visited primary edges using vertex iterator: %d\n",
+                iterate_primary_edges3(vd));
+        printf("\n");
+    }
+
+    // Using color member of the Voronoi primitives to store the average number
+    // of edges around each cell (including secondary edges).
+    {
+        printf("Number of edges (including secondary) around the Voronoi cells:\n");
+        for (voronoi_diagram<double>::const_edge_iterator it = vd.edges().begin();
+             it != vd.edges().end(); ++it) {
+            std::size_t cnt = it->cell()->color();
+            it->cell()->color(cnt + 1);
+        }
+        for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
+             it != vd.cells().end(); ++it) {
+            printf("%lu ", it->color());
+        }
+        printf("\n");
+        printf("\n");
+    }
+
+    // Linking Voronoi cells with input geometries.
+    {
+        unsigned int cell_index = 0;
+        for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
+             it != vd.cells().end(); ++it) {
+            if (it->contains_point()) {
+                std::size_t index = it->source_index();
+                BPoint p = points[index];
+                printf("Cell #%ud contains a point: (%d, %d).\n",
+                        cell_index, x(p), y(p));
+            } else {
+                std::size_t index = it->source_index() - points.size();
+                BPoint p0 = low(segments[index]);
+                BPoint p1 = high(segments[index]);
+                if (it->source_category() ==
+                        boost::polygon::SOURCE_CATEGORY_SEGMENT_START_POINT) {
+                    printf("Cell #%ud contains segment start point: (%d, %d).\n",
+                            cell_index, x(p0), y(p0));
+                } else if (it->source_category() ==
+                        boost::polygon::SOURCE_CATEGORY_SEGMENT_END_POINT) {
+                    printf("Cell #%ud contains segment end point: (%d, %d).\n",
+                            cell_index, x(p0), y(p0));
+                } else {
+                    printf("Cell #%ud contains a segment: ((%d, %d), (%d, %d)). \n",
+                            cell_index, x(p0), y(p0), x(p1), y(p1));
+                }
+            }
+            ++cell_index;
+        }
+    }
+
+    //iterate_primary_edges1(vd);
+    //iterate_primary_edges2(vd);
+    //iterate_primary_edges3(vd);
 }
+
+
+// Traversing Voronoi edges using edge iterator.
+int Fortune::iterate_primary_edges1(const voronoi_diagram<double>& vd) {
+    int result = 0;
+    for (voronoi_diagram<double>::const_edge_iterator it = vd.edges().begin();
+         it != vd.edges().end(); ++it) {
+        if (it->is_primary())
+            ++result;
+    }
+    return result;
+}
+
+// Traversing Voronoi edges using cell iterator.
+int Fortune::iterate_primary_edges2(const voronoi_diagram<double> &vd) {
+    int result = 0;
+    for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
+         it != vd.cells().end(); ++it) {
+        const voronoi_diagram<double>::cell_type& cell = *it;
+        const voronoi_diagram<double>::edge_type* edge = cell.incident_edge();
+        // This is convenient way to iterate edges around Voronoi cell.
+        do {
+            if (edge->is_primary())
+                ++result;
+            edge = edge->next();
+        } while (edge != cell.incident_edge());
+    }
+    return result;
+}
+
+// Traversing Voronoi edges using vertex iterator.
+// As opposite to the above two functions this one will not iterate through
+// edges without finite endpoints and will iterate only once through edges
+// with single finite endpoint.
+int Fortune::iterate_primary_edges3(const voronoi_diagram<double> &vd) {
+    int result = 0;
+    for (voronoi_diagram<double>::const_vertex_iterator it =
+            vd.vertices().begin(); it != vd.vertices().end(); ++it) {
+        const voronoi_diagram<double>::vertex_type& vertex = *it;
+        const voronoi_diagram<double>::edge_type* edge = vertex.incident_edge();
+        // This is convenient way to iterate edges around Voronoi vertex.
+        do {
+            if (edge->is_primary())
+                ++result;
+            edge = edge->rot_next();
+        } while (edge != vertex.incident_edge());
+    }
+    return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void Fortune::reset_iterator() {
     kIteratorEdges = kAllEdges;

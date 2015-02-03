@@ -4,7 +4,7 @@
 #include "../Headers/node.h"
 #include "../Headers/problem_object.h"
 #include "../Headers/claim.h"
-#include "../Headers/fortune.h"
+#include "fortune.h"
 #include "../Headers/flow_algo.h"
 #include "../Headers/kruskal.h"
 

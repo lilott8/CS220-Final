@@ -4,10 +4,17 @@
 #pragma once
 
 #include <set>
+#include <boost/polygon/voronoi.hpp>
 #include "flow_algo.h"
 
 using namespace Utilities;
 using namespace std;
+using boost::polygon::voronoi_builder;
+using boost::polygon::voronoi_diagram;
+using boost::polygon::x;
+using boost::polygon::y;
+using boost::polygon::low;
+using boost::polygon::high;
 
 #ifndef NULL
 #define NULL 0
@@ -86,7 +93,28 @@ using namespace std;
 *
 ************************************************/
 
+
+
+
+
+
+
 namespace Flow {
+
+    struct BPoint {
+        int a;
+        int b;
+        BPoint(int x, int y) : a(x), b(y) {}
+    };
+
+    struct BSegment {
+        BPoint p0;
+        BPoint p1;
+        BSegment(int x1, int y1, int x2, int y2) : p0(x1, y1), p1(x2, y2) {}
+    };
+
+
+
     struct Freenode {
         struct Freenode *nextfree;
     };
@@ -150,7 +178,16 @@ namespace Flow {
         // Run the algorithm, this will actually generate the edges and
         // interface with the private methods.
         void start(vector<VNode*>);
-        void use_boost_voronoi(priority_queue<VNode*, vector<VNode*>, CloserToOrigin>);
+
+
+
+
+
+        void use_boost_voronoi(vector<VNode*>);
+        int iterate_primary_edges1(const voronoi_diagram<double>& vd);
+        int iterate_primary_edges2(const voronoi_diagram<double>& vd);
+        int iterate_primary_edges3(const voronoi_diagram<double>& vd);
+
 
         void reset_iterator();
 
@@ -282,5 +319,42 @@ namespace Flow {
     };
 }
 int scomp(const void *p1, const void *p2);
+
+namespace boost {
+    namespace polygon {
+
+        using namespace Flow;
+
+        template <>
+        struct geometry_concept<BPoint> {
+            typedef point_concept type;
+        };
+
+        template <>
+        struct point_traits<BPoint> {
+            typedef int coordinate_type;
+
+            static inline coordinate_type get(
+                    const BPoint& point, orientation_2d orient) {
+                return (orient == HORIZONTAL) ? point.a : point.b;
+            }
+        };
+
+        template <>
+        struct geometry_concept<BSegment> {
+            typedef segment_concept type;
+        };
+
+        template <>
+        struct segment_traits<BSegment> {
+            typedef int coordinate_type;
+            typedef BPoint point_type;
+
+            static inline point_type get(const BSegment& segment, direction_1d dir) {
+                return dir.to_int() ? segment.p1 : segment.p0;
+            }
+        };
+    }  // polygon
+}  // boost
 
 #endif

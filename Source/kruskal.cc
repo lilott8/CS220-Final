@@ -6,4 +6,4 @@ Kruskal::Kruskal() {}
 
 Kruskal::~Kruskal() {}
 
-void Kruskal::start(priority_queue<VNode*, vector<VNode*>, CloserToOrigin> queue) {}
+void Kruskal::start(vector<VNode*> queue) {}

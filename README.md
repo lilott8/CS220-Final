@@ -2,8 +2,9 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - I understand the output.
- - I can use the output to solve the stiener tree problem
+ - Added the SPC foundation
+ - Cleaned up code base -- removed old code
+ - prepared the data structures for passing between classes
   
 ##Done:
  
@@ -21,11 +22,11 @@ CS220 Project Framework
 
 ##TODO:
   
- - Understand how to adequately clip an infinite line from the output
+ - Understand how to adequately clip an infinite line from the output*(Resolved)*
  - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
  - figure out why the map coords need to be switched in init!
  - Implement the nlogn Voronoi grapher *(Resolved)*
- - Create a datastructure to hold a Voronoi sector *(Resolved)*
+ - Create a data structure to hold a Voronoi sector *(Resolved)*
  - derive a good compare function for the beachline rb-tree *(Resolved)*
  - why can't vedge and arch have pointers to each other?? *(Resolved)*
  - Figure out what, exactly the output means and make it useful *(Resolved)*

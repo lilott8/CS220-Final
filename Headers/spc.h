@@ -6,6 +6,7 @@
 #include <vector>
 #include <boost/polygon/voronoi_diagram.hpp>
 #include "vnode.h"
+#include "../Headers/btree.h"
 
 using namespace Utilities;
 
@@ -21,6 +22,7 @@ namespace Flow {
         void set_cells(vector<boost::polygon::voronoi_diagram<double>::cell_type>);
     private:
         vector<boost::polygon::voronoi_diagram<double>::cell_type> kCells;
+        BinaryTree kBinaryTree;
     };
 }
 

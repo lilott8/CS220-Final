@@ -25,16 +25,6 @@ namespace Flow {
             return a->get_y() < b->get_y();
         }
     };
-
-/**
-* TODO: figure out a good compare method for this
-*/
-    class CompareBeachLine {
-    public:
-        bool operator()(VNode *a, VNode *b) {
-            return true;
-        }
-    };
 }
 
 #endif

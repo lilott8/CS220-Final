@@ -4,10 +4,13 @@
 
 using namespace Flow;
 
-SPC::SPC(){}
+SPC::SPC(){
+    kBinaryTree = BinaryTree();
+}
 
 SPC::SPC(vector<boost::polygon::voronoi_diagram<double>::cell_type> c) {
     kCells = c;
+    kBinaryTree = BinaryTree();
 }
 
 SPC::~SPC(){}

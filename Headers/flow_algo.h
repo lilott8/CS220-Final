@@ -7,6 +7,7 @@
 #include <queue>
 #include <list>
 #include <queue>
+#include <boost/polygon/voronoi.hpp>
 #include "vnode.h"
 #include "vpath.h"
 #include "comparators.h"
@@ -14,6 +15,8 @@
 
 using namespace Utilities;
 using namespace std;
+using boost::polygon::voronoi_builder;
+using boost::polygon::voronoi_cell;
 
 namespace Flow {
     class FlowAlgorithm {
@@ -37,6 +40,7 @@ namespace Flow {
     protected:
         vector<VNode*> kPins;       // Pins that are placed and need to be routed
         vector<VEdge*> kEdges;      // generated edges
+        vector<boost::polygon::voronoi_diagram<double>::cell_type> kCells;
 
         int kMaxHeight;             // Max height of our map
         int kMaxWidth;              // Max width of our map

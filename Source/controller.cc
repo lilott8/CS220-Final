@@ -7,6 +7,7 @@
 #include "fortune.h"
 #include "../Headers/flow_algo.h"
 #include "../Headers/kruskal.h"
+#include <vector>
 
 
 using namespace Utilities;

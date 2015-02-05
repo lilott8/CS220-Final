@@ -1,10 +1,10 @@
-#include "../Headers/spm.h"
 #include "../Headers/map.h"
 #include "../Headers/controller.h"
+#include "../Headers/spc.h"
 #include "../Headers/node.h"
 #include "../Headers/problem_object.h"
 #include "../Headers/claim.h"
-#include "fortune.h"
+#include "../Headers/fortune.h"
 #include "../Headers/flow_algo.h"
 #include "../Headers/kruskal.h"
 #include <vector>
@@ -21,6 +21,7 @@ Controller::Controller(ProblemObject *po) {
     this->kMap = new Map(po);
     this->kPins = this->kMap->get_pins();
     kOpt = FlowAlgorithm::Optimization::DEFAULT;
+    this->kSPC = SPC();
     //kAlgorithm = new Fortune();
 }
 
@@ -35,6 +36,7 @@ Controller::Controller(ProblemObject *po, FlowAlgorithm::AlgoType a, FlowAlgorit
     kOpt = o;
     // Make sure the size of the map is known to the algorithm classes
     kAlgorithm->set_map_size((double)this->kMap->get_x(), (double)this->kMap->get_y());
+    this->kSPC = SPC();
 }
 
 Controller::~Controller() {
@@ -44,6 +46,10 @@ void Controller::start() {
     kAlgorithm->set_euclidean(false);
     kAlgorithm->start(this->kMap->get_pins());
     kMap->draw_voronoi_edges(kAlgorithm->get_edges());
+    this->kSPC.set_cells(kAlgorithm->get_cells());
+    this->kSPC.start();
+
+
     kMap->print_map();
     //kKruskal.start();
 }
@@ -58,7 +64,7 @@ void Controller::set_algorithm(FlowAlgorithm::AlgoType t) {
             kAlgorithm = unique_ptr<FlowAlgorithm>(new Fortune());
             break;
         case FlowAlgorithm::AlgoType::SPM:
-            //claim("C/set_algorithm: using SPM", kNote);
+            claim("C/set_algorithm: SPM has been disabled, using Fortunes.", kWarning);
             //kSPM = new SPM();
             kAlgorithm = unique_ptr<FlowAlgorithm>(new Fortune());
             break;

@@ -13,7 +13,7 @@ path.cc
 problem_object.cc
 pathsegment.cc
 segmentgroup.cc
-spm.cc
+spc.cc
 vedge.cc
 vnode.cc
 vpath.cc

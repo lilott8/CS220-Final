@@ -6,7 +6,7 @@
 #include "problem_object.h"
 #include "flow_algo.h"
 #include "fortune.h"
-#include "spm.h"
+#include "spc.h"
 #include "kruskal.h"
 
 using namespace Utilities;
@@ -32,6 +32,7 @@ namespace Flow {
         unique_ptr<FlowAlgorithm> kAlgorithm;
         Kruskal kKruskal;
         FlowAlgorithm::Optimization kOpt;
+        SPC kSPC;
 
         void project_edges_on_map(vector<VEdge*>);
 

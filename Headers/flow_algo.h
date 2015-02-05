@@ -30,10 +30,11 @@ namespace Flow {
         string print_optimization(Optimization);    // debugging to let us know what we kruskals opt is used
 
         void set_map_size(int, int, int=0, int=0);  // Alert our class of the sizes of the map
-
-        virtual void start(vector<VNode*>); // run the algo
         void set_euclidean(bool);
 
+        virtual void start(vector<VNode*>); // run the algo
+
+        vector<boost::polygon::voronoi_diagram<double>::cell_type> get_cells();
         vector<VEdge*> get_edges();
     private:
 

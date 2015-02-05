@@ -74,6 +74,10 @@ void FlowAlgorithm::clear_all() {
     for(vector<VNode*>::iterator i = kPins.begin(); i != kPins.end(); i++) {
         delete(*i);
     }
+    // TODO: This segfaults....
+    for(vector<VEdge*>::iterator i = kEdges.begin(); i != kEdges.end(); i++) {
+        //delete(*i);
+    }
     kPins.clear();
     kEdges.clear();
 }
@@ -84,4 +88,8 @@ vector<VEdge*> FlowAlgorithm::get_edges() {
 
 void FlowAlgorithm::set_euclidean(bool b) {
     kIsEuclidean = b;
+}
+
+vector<boost::polygon::voronoi_diagram<double>::cell_type> FlowAlgorithm::get_cells() {
+    return kCells;
 }

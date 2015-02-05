@@ -26,7 +26,7 @@ namespace Flow {
         string print_algo_type(AlgoType);           // debugging for which algorithm is being used
         string print_optimization(Optimization);    // debugging to let us know what we kruskals opt is used
 
-        void set_map_size(double, double, double=0, double=0);  // Alert our class of the sizes of the map
+        void set_map_size(int, int, int=0, int=0);  // Alert our class of the sizes of the map
 
         virtual void start(vector<VNode*>); // run the algo
         void set_euclidean(bool);
@@ -38,10 +38,10 @@ namespace Flow {
         vector<VNode*> kPins;       // Pins that are placed and need to be routed
         vector<VEdge*> kEdges;      // generated edges
 
-        double kMaxHeight;          // Max height of our map
-        double kMaxWidth;           // Max width of our map
-        double kMinWidth;           // Min width of our map
-        double kMinHeight;          // Min height of map
+        int kMaxHeight;             // Max height of our map
+        int kMaxWidth;              // Max width of our map
+        int kMinWidth;              // Min width of our map
+        int kMinHeight;             // Min height of map
         bool kIsEuclidean;          // Euclidean or Rectilinear space
 
         void clear_all();           // clear the lists

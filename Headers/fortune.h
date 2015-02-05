@@ -178,17 +178,14 @@ namespace Flow {
         // Run the algorithm, this will actually generate the edges and
         // interface with the private methods.
         void start(vector<VNode*>);
-
-
-
-
-
         void use_boost_voronoi(vector<VNode*>);
+
         int iterate_primary_edges1(const voronoi_diagram<double>& vd);
         int iterate_primary_edges2(const voronoi_diagram<double>& vd);
         int iterate_primary_edges3(const voronoi_diagram<double>& vd);
 
 
+        void use_fortunes_voronoi(vector<VNode*>);
         void reset_iterator();
 
         bool get_next(float &, float &, float &, float &);
@@ -199,6 +196,10 @@ namespace Flow {
         /**
         * Methods
         */
+
+        VEdge* create_edge(const boost::polygon::voronoi_edge<double>::voronoi_vertex_type*,
+                const boost::polygon::voronoi_edge<double>::voronoi_vertex_type*);
+
         // entrance for building our voronoi graph
         bool generate_voronoi(int = 0);
         // clean up outsanding pointers

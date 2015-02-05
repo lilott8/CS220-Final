@@ -59,15 +59,15 @@ string FlowAlgorithm::print_optimization(Optimization t) {
     return s;
 }
 
-void FlowAlgorithm::set_map_size(double maxx, double maxy, double minx, double miny) {
+void FlowAlgorithm::set_map_size(int maxx, int maxy, int minx, int miny) {
     kMaxHeight = maxx-1;
     kMaxWidth = maxy-1;
     kMinWidth = miny;
     kMinHeight = minx;
-    claim("FA/set_map_size: max_height: " + to_string(maxx-1), kDebug);
-    claim("FA/set_map_size: max_width: " + to_string(maxy-1), kDebug);
-    claim("FA/set_map_size: min_height: " + to_string(minx), kDebug);
-    claim("FA/set_map_size: min_width: " + to_string(miny), kDebug);
+    //claim("FA/set_map_size: max_height: " + to_string(maxx-1), kDebug);
+    //claim("FA/set_map_size: max_width: " + to_string(maxy-1), kDebug);
+    //claim("FA/set_map_size: min_height: " + to_string(minx), kDebug);
+    //claim("FA/set_map_size: min_width: " + to_string(miny), kDebug);
 }
 
 void FlowAlgorithm::clear_all() {

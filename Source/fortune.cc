@@ -10,6 +10,7 @@ using boost::polygon::x;
 using boost::polygon::y;
 using boost::polygon::low;
 using boost::polygon::high;
+using boost::polygon::voronoi_edge;
 
 
 Fortune::Fortune() {
@@ -38,59 +39,12 @@ void Fortune::start(vector<VNode*> queue) {
     FlowAlgorithm::start(queue);
 
     use_boost_voronoi(queue);
-    return;
-
-    claim("F/start: Starting Fortunes!", kDebug);
-
-    float xValues[10] = {0, 9, 0, 9, 4, 5, 5, 3, 2, 7};
-    float yValues[10] = {0, 9, 9, 0, 4, 6, 2, 8, 3, 3};
-
-    this->generate_voronoi();
-
-    // these variables are populated byt the get_next_line method
-    float x1,y1,x2,y2;
-
-    // Must be called to iterate over the edges
-    this->reset_iterator();
-
-    printf("\n-------------------------------\n");
-    int x = 0;
-
-    if(kAnswerKey.size() < 1) {
-        init_answer_key();
-    }
-
-    VEdge* v;
-    while(get_next(x1,y1,x2,y2)) {
-        claim("F/start: GOT Line #" + to_string(x) + "\t(" + to_string(round(x1)) + ", "
-                + to_string(round(y1)) + ")->(" + to_string(round(x2)) + ", "
-                + to_string(round(y2)) + ")", kDebug);
-
-        //claim("F/start: AKA Line #" + to_string(x) + "\t(" + to_string(kAnswerKey.at(x)->x1) + ", "
-        //+ to_string(kAnswerKey.at(x)->y1) + ")->(" + to_string(kAnswerKey.at(x)->x2) + ", "
-        //+ to_string(kAnswerKey.at(x)->y2) + ")", kDebug);
-        //claim("=========================", kDebug);
-
-        v = new VEdge();
-        v->kStart = new VNode(x1, y1);
-        v->kEnd = new VNode(x2, y2);
-        kEdges.push_back(v);
-        x++;
-    }
-
-    //generate_rectilinear_graph();
-
-    if(!verify_debug_answers()) {
-        claim("F/Start: The answer key and the answer don't match!", kError);
-    }
-
-    claim("F/start: Done printing", kDebug);
+    //use_fortunes_voronoi(queue);
 }
 
 
 /**
 * http://www.boost.org/doc/libs/1_55_0/libs/polygon/doc/voronoi_basic_tutorial.htm
-* http://stackoverflow.com/questions/6646405/how-do-you-add-boost-libraries-in-cmakelists-txt
 * https://github.com/WilstonOreo/Voronoi
 */
 void Fortune::use_boost_voronoi(vector<VNode*> k) {
@@ -118,7 +72,7 @@ void Fortune::use_boost_voronoi(vector<VNode*> k) {
 
     // Using color member of the Voronoi primitives to store the average number
     // of edges around each cell (including secondary edges).
-    {
+    /*{
         printf("Number of edges (including secondary) around the Voronoi cells:\n");
         for (voronoi_diagram<double>::const_edge_iterator it = vd.edges().begin();
              it != vd.edges().end(); ++it) {
@@ -131,9 +85,10 @@ void Fortune::use_boost_voronoi(vector<VNode*> k) {
         }
         printf("\n");
         printf("\n");
-    }
+    }*/
 
     // Linking Voronoi cells with input geometries.
+    /*
     {
         unsigned int cell_index = 0;
         for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
@@ -141,7 +96,7 @@ void Fortune::use_boost_voronoi(vector<VNode*> k) {
             if (it->contains_point()) {
                 std::size_t index = it->source_index();
                 BPoint p = points[index];
-                printf("Cell #%ud contains a point: (%d, %d).\n",
+                printf("Cell #%u contains a point: (%d, %d).\n",
                         cell_index, x(p), y(p));
             } else {
                 std::size_t index = it->source_index() - points.size();
@@ -149,24 +104,20 @@ void Fortune::use_boost_voronoi(vector<VNode*> k) {
                 BPoint p1 = high(segments[index]);
                 if (it->source_category() ==
                         boost::polygon::SOURCE_CATEGORY_SEGMENT_START_POINT) {
-                    printf("Cell #%ud contains segment start point: (%d, %d).\n",
+                    printf("Cell #%u contains segment start point: (%d, %d).\n",
                             cell_index, x(p0), y(p0));
                 } else if (it->source_category() ==
                         boost::polygon::SOURCE_CATEGORY_SEGMENT_END_POINT) {
-                    printf("Cell #%ud contains segment end point: (%d, %d).\n",
+                    printf("Cell #%u contains segment end point: (%d, %d).\n",
                             cell_index, x(p0), y(p0));
                 } else {
-                    printf("Cell #%ud contains a segment: ((%d, %d), (%d, %d)). \n",
+                    printf("Cell #%u contains a segment: ((%d, %d), (%d, %d)). \n",
                             cell_index, x(p0), y(p0), x(p1), y(p1));
                 }
             }
             ++cell_index;
         }
-    }
-
-    //iterate_primary_edges1(vd);
-    //iterate_primary_edges2(vd);
-    //iterate_primary_edges3(vd);
+    }*/
 }
 
 
@@ -192,10 +143,69 @@ int Fortune::iterate_primary_edges2(const voronoi_diagram<double> &vd) {
         do {
             if (edge->is_primary())
                 ++result;
+            //if(edge->is_finite()) {
+                kEdges.push_back(create_edge(edge->vertex0(), edge->vertex1()));
+            /*}
+            if(edge->is_infinite()) {
+                claim("We have an infinite edge", kDebug);
+                string output = "(";
+                if(edge->vertex0() != NULL) {
+                    output += to_string(edge->vertex0()->x()) + ", " + to_string(edge->vertex0()->y()) + ")";
+                } else {
+                    output += "i, i)";
+                }
+                output += "\t->\t(";
+                if(edge->vertex1() != NULL) {
+                    output += to_string(edge->vertex1()->x()) + ", " + to_string(edge->vertex1()->y()) + ")";
+                } else {
+                    output += "i, i)";
+                }
+                claim("Vornoi Edge: " + output, kDebug);
+            }*/
+
             edge = edge->next();
         } while (edge != cell.incident_edge());
     }
     return result;
+}
+
+VEdge* Fortune::create_edge(const voronoi_edge<double>::voronoi_vertex_type* start,
+        const voronoi_edge<double>::voronoi_vertex_type* end) {
+    //const boost::polygon::voronoi_edge<double>::voronoi_vertex_type* start = edge->vertex0();
+    //const boost::polygon::voronoi_edge<double>::voronoi_vertex_type* end = edge->vertex1();
+
+    int x1, y1, x2, y2;
+
+    if(start != NULL) {
+        if (start->x() < 0) {x1 = kMinWidth;}
+        else if (start->x() > kMaxWidth) {x1 = kMaxWidth;}
+        else {x1 = round(start->x());}
+
+        if (start->y() < 0) {y1 = kMinHeight;}
+        else if (start->y() > kMaxHeight) {y1 = kMaxHeight;}
+        else {y1 = round(start->y());}
+    } else {
+
+    }
+
+    if(end != NULL) {
+        if (end->x() < 0) {x2 = kMinWidth;}
+        else if (end->x() > kMaxWidth) {x2 = kMaxWidth;}
+        else {x2 = round(end->x());}
+
+        if (end->y() < 0) {y2 = kMinHeight;}
+        else if (end->y() > kMaxHeight) {y2 = kMaxHeight;}
+        else {y2 = round(end->y());}
+    } else {
+
+    }
+
+    VEdge *e = new VEdge();
+    e->kStart = new VNode(x1, y1);
+    e->kEnd = new VNode(x2, y2);
+    //claim("creating a node of: " + e->vedge_to_string(), kDebug);
+    //claim("====================================", kDebug);
+    return e;
 }
 
 // Traversing Voronoi edges using vertex iterator.
@@ -250,7 +260,54 @@ int Fortune::iterate_primary_edges3(const voronoi_diagram<double> &vd) {
 
 
 
+void Fortune::use_fortunes_voronoi(vector<VNode*> k) {
 
+    claim("F/start: Starting Fortunes!", kDebug);
+
+    float xValues[10] = {0, 9, 0, 9, 4, 5, 5, 3, 2, 7};
+    float yValues[10] = {0, 9, 9, 0, 4, 6, 2, 8, 3, 3};
+
+    this->generate_voronoi();
+
+    // these variables are populated byt the get_next_line method
+    float x1,y1,x2,y2;
+
+    // Must be called to iterate over the edges
+    this->reset_iterator();
+
+    printf("\n-------------------------------\n");
+    int x = 0;
+
+    if(kAnswerKey.size() < 1) {
+        init_answer_key();
+    }
+
+    VEdge* v;
+    while(get_next(x1,y1,x2,y2)) {
+        claim("F/start: GOT Line #" + to_string(x) + "\t(" + to_string(round(x1)) + ", "
+                + to_string(round(y1)) + ")->(" + to_string(round(x2)) + ", "
+                + to_string(round(y2)) + ")", kDebug);
+
+        //claim("F/start: AKA Line #" + to_string(x) + "\t(" + to_string(kAnswerKey.at(x)->x1) + ", "
+        //+ to_string(kAnswerKey.at(x)->y1) + ")->(" + to_string(kAnswerKey.at(x)->x2) + ", "
+        //+ to_string(kAnswerKey.at(x)->y2) + ")", kDebug);
+        //claim("=========================", kDebug);
+
+        v = new VEdge();
+        v->kStart = new VNode(x1, y1);
+        v->kEnd = new VNode(x2, y2);
+        kEdges.push_back(v);
+        x++;
+    }
+
+    //generate_rectilinear_graph();
+
+    if(!verify_debug_answers()) {
+        claim("F/Start: The answer key and the answer don't match!", kError);
+    }
+
+    claim("F/start: Done printing", kDebug);
+}
 
 
 

@@ -2,12 +2,14 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - Boost::Polygon::Voronoi has been "implimented".  This is a loose implementation
- - Got line drawing done, but it doesn't collow a complete rectilinear fashion
- - implementing boost's voronoi diagram generator
+ - I understand the output.
+ - I can use the output to solve the stiener tree problem
   
 ##Done:
  
+ - Boost::Polygon::Voronoi has been "implimented".  This is a loose implementation
+ - Got line drawing done, but it doesn't follow a complete rectilinear fashion
+ - implementing boost's voronoi diagram generator
  - aliased line drawing
  - Fortune's is done
  - mapping is working
@@ -18,16 +20,16 @@ CS220 Project Framework
  - Use the output from the voronoi to draw on the graph
 
 ##TODO:
-
- - Figure out what, exactly the output means and make it useful
- - Implement my datastructures with the Boost::Voronoi algorithm 
+  
+ - Understand how to adequately clip an infinite line from the output
  - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
- - Either add all the appropriate .o files to the make file or convince Brian to use CMake!
  - figure out why the map coords need to be switched in init!
  - Implement the nlogn Voronoi grapher *(Resolved)*
  - Create a datastructure to hold a Voronoi sector *(Resolved)*
  - derive a good compare function for the beachline rb-tree *(Resolved)*
  - why can't vedge and arch have pointers to each other?? *(Resolved)*
+ - Figure out what, exactly the output means and make it useful *(Resolved)*
+ - Implement my datastructures with the Boost::Voronoi algorithm *(Resolved)*
  
 ## Project Overview
 

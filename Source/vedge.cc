@@ -19,6 +19,6 @@ VEdge::~VEdge() {
 }
 
 string VEdge::vedge_to_string() {
-    string ret = "Starting node: " + kStart->vnode_to_string() + "\t->\t Endind Node: " + kEnd->vnode_to_string();
+    string ret = "Starting node: " + kStart->vnode_to_string() + "\t->\t Ending Node: " + kEnd->vnode_to_string();
     return ret;
 }

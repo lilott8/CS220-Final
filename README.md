@@ -2,12 +2,11 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - Added the SPC foundation
- - Cleaned up code base -- removed old code
+ - Added the Binary tree interface for running SPC in V+ElogE time
  - prepared the data structures for passing between classes
   
 ##Done:
- 
+ - Binary tree implemented
  - Boost::Polygon::Voronoi has been "implimented".  This is a loose implementation
  - Got line drawing done, but it doesn't follow a complete rectilinear fashion
  - implementing boost's voronoi diagram generator
@@ -22,10 +21,12 @@ CS220 Project Framework
 
 ##TODO:
   
- - Understand how to adequately clip an infinite line from the output*(Resolved)*
+ - Test binary tree
+ - place edges into btree
  - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
  - figure out why the map coords need to be switched in init!
  - Implement the nlogn Voronoi grapher *(Resolved)*
+ - Understand how to adequately clip an infinite line from the output*(Resolved)*
  - Create a data structure to hold a Voronoi sector *(Resolved)*
  - derive a good compare function for the beachline rb-tree *(Resolved)*
  - why can't vedge and arch have pointers to each other?? *(Resolved)*

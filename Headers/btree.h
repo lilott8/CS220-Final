@@ -14,8 +14,8 @@ namespace Flow {
     struct btree_node {
         VNode node;
         int distance;
-        node *left;
-        node *right;
+        btree_node *left;
+        btree_node *right;
     };
 
     class BinaryTree {

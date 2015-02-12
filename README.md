@@ -2,10 +2,11 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - Added the Binary tree interface for running SPC in V+ElogE time
- - prepared the data structures for passing between classes
+ - Troubleshoot the output of the SPC.  It isn't anywhere clost to consistent with what my hand drawn diagram should be.
   
 ##Done:
+
+ - Added the Binary tree interface for running SPC in V+ElogE time
  - Binary tree implemented
  - Boost::Polygon::Voronoi has been "implimented".  This is a loose implementation
  - Got line drawing done, but it doesn't follow a complete rectilinear fashion
@@ -21,10 +22,11 @@ CS220 Project Framework
 
 ##TODO:
   
- - Test binary tree
- - place edges into btree
+ - Project just the vertices onto the map for testing purposes
  - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
  - figure out why the map coords need to be switched in init!
+ - place edges into btree *(Resolved)*
+ - Test binary tree *(Resolved)*
  - Implement the nlogn Voronoi grapher *(Resolved)*
  - Understand how to adequately clip an infinite line from the output*(Resolved)*
  - Create a data structure to hold a Voronoi sector *(Resolved)*

@@ -116,10 +116,11 @@ void BinaryTree::insert(VNode* node, btree_node *leaf) {
 
     // We don't want to insert the same edge multiple times.
     if(node->get_x() == leaf->node->get_x() && node->get_y() == leaf->node->get_y()) {
+        claim("BT/insert: we are attempting to insert a duplicate", kDebug);
         return;
     }
 
-    if(distance < leaf->distance) {
+    if(node->get_x() < leaf->node->get_x()) {
         if(leaf->left != NULL) {
             insert(node, leaf->left);
         } else {
@@ -130,7 +131,7 @@ void BinaryTree::insert(VNode* node, btree_node *leaf) {
             leaf->left->right = NULL;
             kSize += 1;
         }
-    } else if(distance >= leaf->distance) {
+    } else if(node->get_x() > leaf->node->get_x()) {
         if(leaf->right != NULL) {
             insert(node, leaf->right);
         } else {
@@ -141,25 +142,51 @@ void BinaryTree::insert(VNode* node, btree_node *leaf) {
             leaf->right->right = NULL;
             kSize += 1;
         }
+    } else {
+        if(node->get_y() < leaf->node->get_y()) {
+            if(leaf->left != NULL) {
+                insert(node, leaf->left);
+            } else {
+                //add the new node!
+                leaf->left = new btree_node();
+                leaf->left->node = node;
+                leaf->distance = distance;
+                leaf->left->left = NULL;
+                leaf->left->right = NULL;
+                kSize += 1;
+            }
+        } else {
+            if(leaf->right != NULL) {
+                insert(node, leaf->right);
+            } else {
+                // add the new node!
+                leaf->right = new btree_node();
+                leaf->right->node = node;
+                leaf->distance = distance;
+                leaf->right->left = NULL;
+                leaf->right->right = NULL;
+                kSize += 1;
+            }
+        }
     }
 }
 
 btree_node* BinaryTree::search_recursive(VNode* node, btree_node* leaf) {
     int distance = calculate_distance(node->get_coord());
 
-    if(leaf != NULL) {
-        if(distance == leaf->distance)
-            return leaf;
-        if(distance < leaf->distance) {
-            return search_recursive(node, leaf->left);
-        } else {
-            return search_recursive(node, leaf->right);
-        }
+    if(leaf->left != NULL && (node->get_x() < leaf->node->get_x())) {
+        return search_recursive(node, leaf->left);
+    } else if(leaf->right != NULL && (node->get_x() > leaf->node->get_x())) {
+        return search_recursive(node, leaf->right);
     } else {
-        return NULL;
-    }
-}
 
+            if(node->get_y() < leaf->node->get_y()) {
+                return search_recursive(node, leaf->left);
+            } else {
+                return search_recursive(node, leaf->right);
+            }
+        }
+}
 
 /**
 * This is kind of working.  I have to first project the vertices onto the map to verify
@@ -169,26 +196,39 @@ btree_node* BinaryTree::search_iterative(VNode* node, btree_node* leaf) {
         return NULL;
     }
 
+    claim("BT/search_iterative: ==================================================", kDebug);
+    claim("BT/search_iterative: Node: " + node->vnode_to_string(), kDebug);
+    claim("Root node: " + kRoot->node->vnode_to_string(), kDebug);
+
     btree_node* curr = kRoot;
     int node_distance = calculate_distance(node->get_coord());
     int best_guess = abs(kRoot->distance - node_distance);
     btree_node* best_guess_node = kRoot;
 
+    claim("BT/search_iterative: Current node " + node->vnode_to_string() + "\tdistance is: " + to_string(node_distance), kDebug);
+
+    int x = 0;
+
     do{
-        if((curr->distance - best_guess) < 0) {
-            curr = curr->right;
-        } else {
+        if(node->get_x() < curr->node->get_x()) {
+            claim("Changing node from: " + curr->node->vnode_to_string() + " to " + curr->left->node->vnode_to_string(), kDebug);
             curr = curr->left;
+        } else {
+            claim("Changing node from: " + curr->node->vnode_to_string() + " to " + curr->right->node->vnode_to_string(), kDebug);
+            curr = curr->right;
         }
 
         // Change the best guess only if the next best guess is lower!
         if(abs(curr->distance - node_distance) < best_guess) {
             best_guess = abs(curr->distance - node_distance);
             best_guess_node = curr;
-            claim("Setting the best guess stuff!", kDebug);
+            //claim("Setting the best guess stuff!", kDebug);
         }
+        x++;
     } while(curr->left != NULL && curr->right != NULL);
 
+    claim("BT/search_iterative: Done searching after: "+to_string(x)+ " iterations", kDebug);
+    claim("BT/search_iterative: ==================================================", kDebug);
     return best_guess_node;
 }
 

@@ -12,19 +12,14 @@
 using namespace Utilities;
 
 namespace Flow {
-    class SPC {
+    class SPC : public FlowAlgorithm {
     public:
         SPC();
-        SPC(vector<VNode*>, BinaryTree*);
         ~SPC();
 
         void start();
 
-        void set_cells(vector<boost::polygon::voronoi_diagram<double>::cell_type>);
     private:
-        vector<boost::polygon::voronoi_diagram<double>::cell_type> kCells;
-        BinaryTree* kBTree;
-        vector<VNode*> kPins;
     };
 }
 

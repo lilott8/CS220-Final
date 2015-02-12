@@ -3,11 +3,13 @@
 
 #pragma once
 
+#include <boost/polygon/voronoi.hpp>
 #include <string>
 #include <queue>
 #include <list>
 #include <queue>
-#include <boost/polygon/voronoi.hpp>
+#include <boost/geometry/index/rtree.hpp>
+
 #include "vnode.h"
 #include "vpath.h"
 #include "comparators.h"
@@ -18,8 +20,16 @@ using namespace Utilities;
 using namespace std;
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_cell;
+namespace bgi = boost::geometry::index;
+namespace bg = boost::geometry;
 
 namespace Flow {
+
+    typedef bg::model::point<int, 2, bg::cs::cartesian> rTreePoint;
+    typedef bg::model::segment <rTreePoint> rTreeSegment;
+    //typedef pair<rTreeSegment, size_t> rTreeValue;
+    typedef pair<rTreePoint, size_t> rTreeValue;
+
     class FlowAlgorithm {
     public:
         enum AlgoType {KRUSKAL, FORTUNE, SPM};      // algorithm enum
@@ -34,8 +44,7 @@ namespace Flow {
         void set_euclidean(bool);
 
         virtual void start(vector<VNode*>); // run the algo
-
-        BinaryTree* get_binary_tree();
+        virtual void start();
 
         vector<boost::polygon::voronoi_diagram<double>::cell_type> get_cells();
         vector<VEdge*> get_edges();
@@ -52,7 +61,9 @@ namespace Flow {
         int kMinHeight;             // Min height of map
         bool kIsEuclidean;          // Euclidean or Rectilinear space
 
-        BinaryTree kBTree = BinaryTree();
+        // Create the dynamic balancing rstar tree
+        // the "16" dictates how many elements can be in an R-Tree node
+        bgi::rtree<rTreeValue, bgi::rstar<16>> kRtree;
 
         void clear_all();           // clear the lists
     };

@@ -45,8 +45,10 @@ void Controller::start() {
     kAlgorithm->set_euclidean(false);
     kAlgorithm->start(this->kMap->get_pins());
     //kMap->draw_voronoi_edges(kAlgorithm->get_edges());
-    this->kSPC = SPC(this->kMap->get_pins(), kAlgorithm->get_binary_tree());
-    this->kSPC.set_cells(kAlgorithm->get_cells());
+
+    this->project_vertices_on_map(kAlgorithm->get_edges());
+
+    this->kSPC = SPC();
     this->kSPC.start();
 
     kMap->print_map();
@@ -76,4 +78,12 @@ void Controller::set_algorithm(FlowAlgorithm::AlgoType t) {
 
 void Controller::print_map() {
     this->kMap->print_map();
+}
+
+void Controller::project_vertices_on_map(vector<VEdge *> e) {
+    vector<VEdge*> edges = e;
+    for(int x = 0;x<(int)edges.size();x++) {
+        kMap->set(edges.at(x)->kStart);
+        kMap->set(edges.at(x)->kEnd);
+    }
 }

@@ -2,10 +2,11 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - Troubleshoot the output of the SPC.  It isn't anywhere clost to consistent with what my hand drawn diagram should be.
+ - Implemented the boost R* tree.
   
 ##Done:
 
+ - Removed the binary tree and added the R* tree from boost.
  - Added the Binary tree interface for running SPC in V+ElogE time
  - Binary tree implemented
  - Boost::Polygon::Voronoi has been "implimented".  This is a loose implementation

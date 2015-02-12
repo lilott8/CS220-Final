@@ -1,5 +1,4 @@
 set(LIB_SOURCE
-btree.cc
 claim.cc
 controller.cc
 edge.cc

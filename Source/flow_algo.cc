@@ -25,6 +25,11 @@ void FlowAlgorithm::start(vector<VNode*> k) {
     claim("A/Start: Starting the algorithm", kDebug);
 }
 
+void FlowAlgorithm::start() {
+    clear_all();
+    claim("A/Start: Starting the algorithm with no pins...", kDebug);
+}
+
 string FlowAlgorithm::print_algo_type(AlgoType t) {
     string s = "";
     switch(t) {
@@ -92,8 +97,4 @@ void FlowAlgorithm::set_euclidean(bool b) {
 
 vector<boost::polygon::voronoi_diagram<double>::cell_type> FlowAlgorithm::get_cells() {
     return kCells;
-}
-
-BinaryTree* FlowAlgorithm::get_binary_tree() {
-    return &kBTree;
 }

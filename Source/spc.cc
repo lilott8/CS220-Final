@@ -8,30 +8,24 @@ using namespace Flow;
 
 SPC::SPC(){}
 
-SPC::SPC(vector<VNode*> p, BinaryTree* btree) {
-    kPins = p;
-    kBTree = btree;
-}
-
 SPC::~SPC(){}
 
 
 void SPC::start() {
     claim("S/start: starting SPC", kDebug);
-    btree_node* found_node;
 
-    kBTree->bfs();
+    vector<rTreePoint> results;
 
     for(VNode* node : kPins) {
-        found_node = kBTree->search_distance(node);
-        if(found_node != NULL) {
-            claim("S/start: " + node->vnode_to_string() + " is closest to: " + found_node->node->vnode_to_string(), kDebug);
-        } else {
-            claim("S/start: " + node->vnode_to_string() + " has no closest point...", kDebug);
-        }
-    }
-}
+        claim("Node: " + node->vnode_to_string(), kDebug);
 
-void SPC::set_cells(vector<boost::polygon::voronoi_cell<double>> c) {
-    kCells = c;
+        // TODO: get the querying to work!
+        //kRtree.query(bgi::nearest(rTreePoint(node->get_x(), node->get_y()), 5), back_inserter(results));
+
+        for(int x = 0;x<(int)results.size();x++) {
+            claim("guess :" + to_string(x) + " is: ", kDebug);
+        }
+
+        claim("=========================", kDebug);
+    }
 }

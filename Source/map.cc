@@ -200,6 +200,12 @@ void Map::draw_bresenham_lines(vector<VEdge*> edges) {
     }
 }
 
+void Map::set(VNode* node) {
+    if(this->kMap.at(node->get_x()).at(node->get_y())->get_type() == VNode::Type::NONE) {
+        this->kMap.at(node->get_x()).at(node->get_y())->set_type(node->get_type());
+    }
+}
+
 
 /**
 * http://rosettacode.org/wiki/Xiaolin_Wu%27s_line_algorithm#C

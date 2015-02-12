@@ -29,7 +29,7 @@ void Fortune::start(vector<VNode*> queue) {
 }
 
 void Fortune::use_boost_voronoi(vector<VNode*> k) {
-    vector<BSegment> segments;
+    vector<BSegment> segments = vector<BSegment>();
 
     for(int x = 0; x < k.size(); x++) {
         kPoints.push_back(BPoint(k.at(x)->get_x(), k.at(x)->get_y()));
@@ -51,9 +51,9 @@ void Fortune::generate_edges(const voronoi_diagram<double> &vd) {
         const voronoi_diagram<double>::edge_type* edge = cell.incident_edge();
         kCells.push_back(cell);
         VEdge* vedge;
+        int id = 0;
         // This is convenient way to iterate edges around Voronoi cell.
         do {
-
             if (edge->is_primary()) {
                 if(edge->is_finite()) {
                     // With this check, we are insuring that each edge is only drawn once,
@@ -61,9 +61,11 @@ void Fortune::generate_edges(const voronoi_diagram<double> &vd) {
                     if(edge->cell()->source_index() < edge->twin()->cell()->source_index()) {
                         vedge = create_edge(edge->vertex0()->x(), edge->vertex0()->y(),
                                 edge->vertex1()->x(), edge->vertex1()->y());
+
+                        kRtree.insert(make_pair(rTreePoint(vedge->kStart->get_x(), vedge->kStart->get_y()), id));
+                        kRtree.insert(make_pair(rTreePoint(vedge->kEnd->get_x(), vedge->kEnd->get_y()), id));
                         kEdges.push_back(vedge);
-                        kBTree.insert(vedge->kStart);
-                        kBTree.insert(vedge->kEnd);
+                        //claim("F/generate_edgs: Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
                 } else {
                     const voronoi_diagram<double>::vertex_type* v0 = edge->vertex0();
@@ -75,17 +77,19 @@ void Fortune::generate_edges(const voronoi_diagram<double> &vd) {
                         // enough number to reach your bounding box
                         BPoint p1 = kPoints.at(edge->cell()->source_index());
                         BPoint p2 = kPoints.at(edge->twin()->cell()->source_index());
-                        double end_x = (p1.b - p2.b) * 640;
-                        double end_y = (p1.a - p2.b) * -640;
+                        double end_x = (p1.b - p2.b);// * 640;
+                        double end_y = (p1.a - p2.b);// * -640;
 
                         vedge = create_edge(v0->x(), v0->y(), end_x, end_y);
+                        kRtree.insert(make_pair(rTreePoint(vedge->kStart->get_x(), vedge->kStart->get_y()), id));
+                        kRtree.insert(make_pair(rTreePoint(vedge->kEnd->get_x(), vedge->kEnd->get_y()), id));
                         kEdges.push_back(vedge);
-                        kBTree.insert(vedge->kStart);
-                        kBTree.insert(vedge->kEnd);
+                        //claim("F/generate_edgs: *Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
                 }
             }
             edge = edge->next();
+            id++;
         } while (edge != cell.incident_edge());
     }
 }
@@ -113,6 +117,8 @@ VEdge* Fortune::create_edge(double start_x, double start_y, double end_x, double
     VEdge *e = new VEdge();
     e->kStart = new VNode(x1, y1);
     e->kEnd = new VNode(x2, y2);
+    e->kStart->set_type(VNode::Type::STEINER);
+    e->kEnd->set_type(VNode::Type::STEINER);
     //claim("creating a node of: " + e->vedge_to_string(), kDebug);
     //claim("====================================", kDebug);
     return e;

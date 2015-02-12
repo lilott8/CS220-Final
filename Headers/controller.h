@@ -34,7 +34,7 @@ namespace Flow {
         FlowAlgorithm::Optimization kOpt;
         SPC kSPC;
 
-        void project_edges_on_map(vector<VEdge*>);
+        void project_vertices_on_map(vector<VEdge*>);
 
 
     };

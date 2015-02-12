@@ -14,7 +14,7 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 set(Boost_INLCUDE_DIR /usr/local/Cellar/boost/1.57.0/includes)
-find_package(Boost 1.57.0 COMPONENTS Polygon)
+find_package(Boost 1.57.0 COMPONENTS Polygon geometry)
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})

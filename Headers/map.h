@@ -32,6 +32,8 @@ namespace Flow {
 
         void print_map();
         void draw_voronoi_edges(vector<VEdge*>);
+        void set(VNode* node);
+
         vector<VNode*> get_pins();
 
         int get_x();

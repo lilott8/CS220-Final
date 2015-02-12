@@ -56,6 +56,9 @@ string VNode::type_to_string(Type t) {
         case EDGE:
             output = "e";
             break;
+        case STEINER:
+            output = "s";
+            break;
         case NONE:
         default:
             output = " ";

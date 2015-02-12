@@ -93,3 +93,7 @@ void FlowAlgorithm::set_euclidean(bool b) {
 vector<boost::polygon::voronoi_diagram<double>::cell_type> FlowAlgorithm::get_cells() {
     return kCells;
 }
+
+BinaryTree* FlowAlgorithm::get_binary_tree() {
+    return &kBTree;
+}

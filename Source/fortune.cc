@@ -39,8 +39,8 @@ void Fortune::use_boost_voronoi(vector<VNode*> k) {
     construct_voronoi(kPoints.begin(), kPoints.end(), segments.begin(), segments.end(), &vd);
 
     // Iterate all the cells to obtain all the edges!
+    claim("/F/use_boost_vorono: Generating egdes now", kDebug);
     generate_edges(vd);
-    claim("Size of cells: " + to_string(kCells.size()), kDebug);
 }
 
 // Traversing Voronoi edges using cell iterator.
@@ -50,15 +50,20 @@ void Fortune::generate_edges(const voronoi_diagram<double> &vd) {
         const voronoi_diagram<double>::cell_type& cell = *it;
         const voronoi_diagram<double>::edge_type* edge = cell.incident_edge();
         kCells.push_back(cell);
+        VEdge* vedge;
         // This is convenient way to iterate edges around Voronoi cell.
         do {
+
             if (edge->is_primary()) {
                 if(edge->is_finite()) {
                     // With this check, we are insuring that each edge is only drawn once,
                     // because the edge could be a half edge, and this roots out half edges
                     if(edge->cell()->source_index() < edge->twin()->cell()->source_index()) {
-                        kEdges.push_back(create_edge(edge->vertex0()->x(), edge->vertex0()->y(),
-                                edge->vertex1()->x(), edge->vertex1()->y()));
+                        vedge = create_edge(edge->vertex0()->x(), edge->vertex0()->y(),
+                                edge->vertex1()->x(), edge->vertex1()->y());
+                        kEdges.push_back(vedge);
+                        kBTree.insert(vedge->kStart);
+                        kBTree.insert(vedge->kEnd);
                     }
                 } else {
                     const voronoi_diagram<double>::vertex_type* v0 = edge->vertex0();
@@ -72,7 +77,11 @@ void Fortune::generate_edges(const voronoi_diagram<double> &vd) {
                         BPoint p2 = kPoints.at(edge->twin()->cell()->source_index());
                         double end_x = (p1.b - p2.b) * 640;
                         double end_y = (p1.a - p2.b) * -640;
-                        kEdges.push_back(create_edge(v0->x(), v0->y(), end_x, end_y));
+
+                        vedge = create_edge(v0->x(), v0->y(), end_x, end_y);
+                        kEdges.push_back(vedge);
+                        kBTree.insert(vedge->kStart);
+                        kBTree.insert(vedge->kEnd);
                     }
                 }
             }

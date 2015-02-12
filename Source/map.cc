@@ -159,7 +159,7 @@ void Map::draw_bresenham_lines(vector<VEdge*> edges) {
         x2 = edge->kEnd->get_x();
         y1 = edge->kStart->get_y();
         y2 = edge->kEnd->get_y();
-        claim("Drawing Line: (" + to_string(x1) + ", " + to_string(y1) + ")\t->\t(" + to_string(x2) + ", " + to_string(y2) + ")", kDebug);
+        //claim("Drawing Line: (" + to_string(x1) + ", " + to_string(y1) + ")\t->\t(" + to_string(x2) + ", " + to_string(y2) + ")", kDebug);
         const bool steep = (fabs(y2 - y1) > fabs(x2 - x1));
         if(steep) {
             std::swap(x1, y1);

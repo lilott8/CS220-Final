@@ -12,6 +12,7 @@
 #include "vpath.h"
 #include "comparators.h"
 #include "vedge.h"
+#include "btree.h"
 
 using namespace Utilities;
 using namespace std;
@@ -34,6 +35,8 @@ namespace Flow {
 
         virtual void start(vector<VNode*>); // run the algo
 
+        BinaryTree* get_binary_tree();
+
         vector<boost::polygon::voronoi_diagram<double>::cell_type> get_cells();
         vector<VEdge*> get_edges();
     private:
@@ -48,6 +51,8 @@ namespace Flow {
         int kMinWidth;              // Min width of our map
         int kMinHeight;             // Min height of map
         bool kIsEuclidean;          // Euclidean or Rectilinear space
+
+        BinaryTree kBTree = BinaryTree();
 
         void clear_all();           // clear the lists
     };

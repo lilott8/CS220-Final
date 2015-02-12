@@ -1,10 +1,11 @@
 #ifndef _BTREE_H_
-#define _BTREE_H
+#define _BTREE_H_
 
 #pragma once
 
 #include "vnode.h"
 #include "../Headers/node.h"
+#include <deque>
 
 using namespace Utilities;
 using namespace std;
@@ -12,7 +13,7 @@ using namespace std;
 namespace Flow {
 
     struct btree_node {
-        VNode node;
+        VNode* node;
         int distance;
         btree_node *left;
         btree_node *right;
@@ -23,16 +24,27 @@ namespace Flow {
         BinaryTree();
         ~BinaryTree();
 
-        void insert(VNode);
-        btree_node *search(VNode);
+        void insert(VNode*);
         void destroy_tree();
+        void dfs();
+        void bfs();
+
+        btree_node *search_distance(VNode*);
+
+        int get_size();
 
     private:
         void destroy_tree(btree_node *);
-        void insert(VNode, btree_node *);
-        btree_node *searhc(VNode, btree_node *);
+        void insert(VNode*, btree_node *);
 
-        btree_node *root;
+        btree_node* search_recursive(VNode*, btree_node*);
+        btree_node* search_iterative(VNode*, btree_node*);
+
+        int calculate_distance(Point);
+
+        deque<btree_node*> kQueue;
+        btree_node *kRoot;
+        int kSize = 0;
     };
 }
 

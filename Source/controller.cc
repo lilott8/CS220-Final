@@ -21,7 +21,6 @@ Controller::Controller(ProblemObject *po) {
     this->kMap = new Map(po);
     this->kPins = this->kMap->get_pins();
     kOpt = FlowAlgorithm::Optimization::DEFAULT;
-    this->kSPC = SPC();
     //kAlgorithm = new Fortune();
 }
 
@@ -45,10 +44,10 @@ Controller::~Controller() {
 void Controller::start() {
     kAlgorithm->set_euclidean(false);
     kAlgorithm->start(this->kMap->get_pins());
-    kMap->draw_voronoi_edges(kAlgorithm->get_edges());
+    //kMap->draw_voronoi_edges(kAlgorithm->get_edges());
+    this->kSPC = SPC(this->kMap->get_pins(), kAlgorithm->get_binary_tree());
     this->kSPC.set_cells(kAlgorithm->get_cells());
     this->kSPC.start();
-
 
     kMap->print_map();
     //kKruskal.start();

@@ -27,6 +27,7 @@ namespace Flow {
 
     typedef bg::model::point<int, 2, bg::cs::cartesian> rTreePoint;
     typedef bg::model::segment <rTreePoint> rTreeSegment;
+    typedef bg::model::box <rTreePoint> rTreeBox;
     //typedef pair<rTreeSegment, size_t> rTreeValue;
     typedef pair<rTreePoint, size_t> rTreeValue;
 
@@ -34,6 +35,7 @@ namespace Flow {
     public:
         enum AlgoType {KRUSKAL, FORTUNE, SPM};      // algorithm enum
         enum Optimization {H_OPT, U_OPT, DEFAULT};  // kruskal's optimization enum
+
         FlowAlgorithm();                            // constructor
         virtual ~FlowAlgorithm();                   // virtual destructor
 

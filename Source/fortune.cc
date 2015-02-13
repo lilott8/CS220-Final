@@ -24,7 +24,7 @@ Fortune::~Fortune() {
 
 void Fortune::start(vector<VNode*> queue) {
     FlowAlgorithm::start(queue);
-
+    claim("F/start: starting the algorithm", kDebug);
     use_boost_voronoi(queue);
 }
 
@@ -39,19 +39,19 @@ void Fortune::use_boost_voronoi(vector<VNode*> k) {
     construct_voronoi(kPoints.begin(), kPoints.end(), segments.begin(), segments.end(), &vd);
 
     // Iterate all the cells to obtain all the edges!
-    claim("/F/use_boost_vorono: Generating egdes now", kDebug);
+    claim("F/use_boost_vorono: Generating egdes now", kDebug);
     generate_edges(vd);
 }
 
 // Traversing Voronoi edges using cell iterator.
 void Fortune::generate_edges(const voronoi_diagram<double> &vd) {
+    int id = 0;
     for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
          it != vd.cells().end(); ++it) {
         const voronoi_diagram<double>::cell_type& cell = *it;
         const voronoi_diagram<double>::edge_type* edge = cell.incident_edge();
         kCells.push_back(cell);
         VEdge* vedge;
-        int id = 0;
         // This is convenient way to iterate edges around Voronoi cell.
         do {
             if (edge->is_primary()) {
@@ -63,7 +63,11 @@ void Fortune::generate_edges(const voronoi_diagram<double> &vd) {
                                 edge->vertex1()->x(), edge->vertex1()->y());
 
                         kRtree.insert(make_pair(rTreePoint(vedge->kStart->get_x(), vedge->kStart->get_y()), id));
+                        //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
+                        // make sure we increment the id!
+                        id += 1;
                         kRtree.insert(make_pair(rTreePoint(vedge->kEnd->get_x(), vedge->kEnd->get_y()), id));
+                        //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
                         kEdges.push_back(vedge);
                         //claim("F/generate_edgs: Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
@@ -82,7 +86,10 @@ void Fortune::generate_edges(const voronoi_diagram<double> &vd) {
 
                         vedge = create_edge(v0->x(), v0->y(), end_x, end_y);
                         kRtree.insert(make_pair(rTreePoint(vedge->kStart->get_x(), vedge->kStart->get_y()), id));
+                        //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
+                        id += 1;
                         kRtree.insert(make_pair(rTreePoint(vedge->kEnd->get_x(), vedge->kEnd->get_y()), id));
+                        //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
                         kEdges.push_back(vedge);
                         //claim("F/generate_edgs: *Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
@@ -122,4 +129,24 @@ VEdge* Fortune::create_edge(double start_x, double start_y, double end_x, double
     //claim("creating a node of: " + e->vedge_to_string(), kDebug);
     //claim("====================================", kDebug);
     return e;
+}
+
+void Fortune::run_queries() {
+    vector<rTreeValue> results;
+
+    for (VNode *node : kPins) {
+        claim("Node: " + node->vnode_to_string(), kDebug);
+
+        kRtree.query(bgi::nearest(rTreePoint(node->get_x(), node->get_y()), 5), back_inserter(results));
+
+        if (results.size() > 0) {
+            for (int x = 0; x < (int) results.size(); x++) {
+                claim("guess :" + to_string(x) + " is: ", kDebug);
+            }
+        } else {
+            claim("There were no nearest neighbors for: " + node->vnode_to_string(), kDebug);
+        }
+        results.clear();
+        claim("=========================", kDebug);
+    }
 }

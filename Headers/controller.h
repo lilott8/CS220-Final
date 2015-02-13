@@ -29,10 +29,11 @@ namespace Flow {
         FlowAlgorithm::AlgoType kAlgo;
         vector<VNode*> kPins;
         // This allows me to keep all my algorithms in one container!
-        unique_ptr<FlowAlgorithm> kAlgorithm;
+        //unique_ptr<FlowAlgorithm> kAlgorithm;
+        Fortune *kAlgorithm;
         Kruskal kKruskal;
         FlowAlgorithm::Optimization kOpt;
-        SPC kSPC;
+        //SPC kSPC;
 
         void project_vertices_on_map(vector<VEdge*>);
 

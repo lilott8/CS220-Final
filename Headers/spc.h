@@ -18,7 +18,7 @@ namespace Flow {
         ~SPC();
 
         void start();
-
+        void start(vector<VNode*>);
     private:
     };
 }

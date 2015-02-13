@@ -38,13 +38,14 @@ namespace Flow {
         // interface with the private methods.
         void start(vector<VNode*>);
         void use_boost_voronoi(vector<VNode*>);
-
+        void run_queries();
     private:
         /**
         * Methods
         */
         VEdge* create_edge(double, double, double, double);
         void generate_edges(const voronoi_diagram<double>& vd);
+
         /**
         * Variables
         */

@@ -35,10 +35,11 @@ Controller::Controller(ProblemObject *po, FlowAlgorithm::AlgoType a, FlowAlgorit
     kOpt = o;
     // Make sure the size of the map is known to the algorithm classes
     kAlgorithm->set_map_size((double)this->kMap->get_x(), (double)this->kMap->get_y());
-    this->kSPC = SPC();
+    //this->kSPC = SPC();
 }
 
 Controller::~Controller() {
+delete kAlgorithm;
 }
 
 void Controller::start() {
@@ -48,8 +49,10 @@ void Controller::start() {
 
     this->project_vertices_on_map(kAlgorithm->get_edges());
 
-    this->kSPC = SPC();
-    this->kSPC.start();
+    kAlgorithm->run_queries();
+
+    //this->kSPC = SPC();
+    //this->kSPC.start(this->kMap->get_pins());
 
     kMap->print_map();
     //kKruskal.start();
@@ -62,12 +65,13 @@ void Controller::set_algorithm(FlowAlgorithm::AlgoType t) {
         case FlowAlgorithm::AlgoType::FORTUNE:
             //claim("C/set_algorithm: using fortune", kNote);
             //kFortune = new Fortune();
-            kAlgorithm = unique_ptr<FlowAlgorithm>(new Fortune());
+            //kAlgorithm = unique_ptr<FlowAlgorithm>(new Fortune());
+            kAlgorithm = new Fortune();
             break;
         case FlowAlgorithm::AlgoType::SPM:
             claim("C/set_algorithm: SPM has been disabled, using Fortunes.", kWarning);
             //kSPM = new SPM();
-            kAlgorithm = unique_ptr<FlowAlgorithm>(new Fortune());
+            //kAlgorithm = unique_ptr<FlowAlgorithm>(new Fortune());
             break;
         case FlowAlgorithm::AlgoType::KRUSKAL:
             claim("C/set_algorithm: This shouldn't be kruskal!?", kWarning);

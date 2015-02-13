@@ -7,12 +7,11 @@
 #include <vector>
 #include "vnode.h"
 #include "comparators.h"
-#include "flow_algo.h"
 
 using namespace Utilities;
 
 namespace Flow {
-    class Kruskal : public FlowAlgorithm {
+    class Kruskal {
     public:
         Kruskal();
         ~Kruskal();

@@ -2,8 +2,6 @@ set(LIB_SOURCE
 claim.cc
 controller.cc
 edge.cc
-flow_algo.cc
-fortune.cc
 grid.cc
 kruskal.cc
 map.cc
@@ -13,9 +11,11 @@ path.cc
 problem_object.cc
 pathsegment.cc
 segmentgroup.cc
+steiner.cc
 spc.cc
 vedge.cc
 vnode.cc
+voronoi.cc
 vpath.cc
 )
 

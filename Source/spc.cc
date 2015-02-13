@@ -11,7 +11,7 @@ SPC::SPC(){}
 SPC::~SPC(){}
 
 void SPC::start(vector<VNode*> queue) {
-    FlowAlgorithm::start(queue);
+    /*
     claim("S/start: starting SPC", kDebug);
 
     claim("size of pins: " + to_string(kPins.size()), kDebug);
@@ -22,7 +22,7 @@ void SPC::start(vector<VNode*> queue) {
         claim("Node: " + node->vnode_to_string(), kDebug);
 
         // TODO: get the querying to work!
-        kRtree.query(bgi::nearest(rTreePoint(node->get_x(), node->get_y()), 5), back_inserter(results));
+        //kRtree.query(bgi::nearest(rTreePoint(node->get_x(), node->get_y()), 5), back_inserter(results));
 
         if(results.size() > 0) {
             for (int x = 0; x < (int) results.size(); x++) {
@@ -34,4 +34,5 @@ void SPC::start(vector<VNode*> queue) {
 
         claim("=========================", kDebug);
     }
+    */
 }

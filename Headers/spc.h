@@ -12,7 +12,7 @@
 using namespace Utilities;
 
 namespace Flow {
-    class SPC : public FlowAlgorithm {
+    class SPC {
     public:
         SPC();
         ~SPC();

@@ -2,7 +2,7 @@ CS220 Project Framework
 ===============
 #Changelog:
  
- - Implemented the boost R* tree.
+  - Massive refactoring.  Things were getting too dependent and not modular.  They are much more abstracted now.
   
 ##Done:
 

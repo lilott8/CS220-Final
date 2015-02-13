@@ -4,36 +4,39 @@
 #pragma once
 
 #include "problem_object.h"
-#include "flow_algo.h"
-#include "fortune.h"
+#include "steiner.h"
 #include "spc.h"
 #include "kruskal.h"
 
 using namespace Utilities;
+using namespace Algorithms;
 
 namespace Flow {
+
     class Controller {
     public:
+        enum AlgoType {KRUSKAL, FORTUNE, SPM};      // algorithm enum
+        enum Optimization {H_OPT, U_OPT, DEFAULT};  // kruskal's optimization enum
+
         Controller();
         Controller(ProblemObject*);
-        Controller(ProblemObject*, FlowAlgorithm::AlgoType, FlowAlgorithm::Optimization);
+        Controller(ProblemObject*, AlgoType, Optimization);
         ~Controller();
 
         void start();
-        void set_algorithm(FlowAlgorithm::AlgoType);
-        void set_optimization(FlowAlgorithm::Optimization);
         void print_map();
 
     private:
         Map *kMap;
-        FlowAlgorithm::AlgoType kAlgo;
+
+        vector<VEdge*> kEdges;      // generated edges
         vector<VNode*> kPins;
-        // This allows me to keep all my algorithms in one container!
-        //unique_ptr<FlowAlgorithm> kAlgorithm;
-        Fortune *kAlgorithm;
-        Kruskal kKruskal;
-        FlowAlgorithm::Optimization kOpt;
-        //SPC kSPC;
+
+        Steiner *kSteiner;
+
+        Optimization kOpt;
+
+        bool kIsEuclidean;          // Euclidean or Rectilinear space
 
         void project_vertices_on_map(vector<VEdge*>);
 

@@ -16,8 +16,8 @@ using std::endl;
 using namespace Flow;
 using namespace Utilities;
 
-FlowAlgorithm::AlgoType resolve_algorithm(string);
-FlowAlgorithm::Optimization resolve_optimization(string);
+Controller::AlgoType resolve_algorithm(string);
+Controller::Optimization resolve_optimization(string);
 
 int main(int argc,char* argv[]) {
 
@@ -33,8 +33,8 @@ int main(int argc,char* argv[]) {
 
 	//Controller* controller = new Controller(first_problem);
 
-	FlowAlgorithm::AlgoType a_type = FlowAlgorithm::AlgoType::FORTUNE;
-	FlowAlgorithm::Optimization  o_type = FlowAlgorithm::Optimization::DEFAULT;
+	Controller::AlgoType a_type = Controller::AlgoType::FORTUNE;
+	Controller::Optimization  o_type = Controller::Optimization::DEFAULT;
 	string file = "../Tests/debug_small.json";
 
 	switch(argc) {
@@ -59,22 +59,22 @@ int main(int argc,char* argv[]) {
 	return 0;
 }
 
-FlowAlgorithm::AlgoType resolve_algorithm(string s) {
-	FlowAlgorithm::AlgoType result = FlowAlgorithm::AlgoType::FORTUNE;
+Controller::AlgoType resolve_algorithm(string s) {
+	Controller::AlgoType result = Controller::AlgoType::FORTUNE;
 	if(s.compare("fortune") == 0) {
-		result = FlowAlgorithm::AlgoType::FORTUNE;
+		result = Controller::AlgoType::FORTUNE;
 	} else if(s.compare("spm") == 0) {
-		result = FlowAlgorithm::AlgoType::SPM;
+		result = Controller::AlgoType::SPM;
 	}
 	return result;
 }
 
-FlowAlgorithm::Optimization resolve_optimization(string s) {
-	FlowAlgorithm::Optimization result = FlowAlgorithm::Optimization::DEFAULT;
+Controller::Optimization resolve_optimization(string s) {
+	Controller::Optimization result = Controller::Optimization::DEFAULT;
 	if(s.compare("h") == 0) {
-		result = FlowAlgorithm::Optimization::H_OPT;
+		result = Controller::Optimization::H_OPT;
 	} else if(s.compare("u") == 0) {
-		result = FlowAlgorithm::Optimization::U_OPT;
+		result = Controller::Optimization::U_OPT;
 	}
 	return result;
 }

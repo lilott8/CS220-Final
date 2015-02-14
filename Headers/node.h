@@ -1,6 +1,8 @@
 #ifndef _NODE_BASE_H_
 #define _NODE_BASE_H_
 
+#pragma once
+
 #include "../Headers/point.h"
 #include <vector>
 #include <iostream>

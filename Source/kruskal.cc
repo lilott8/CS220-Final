@@ -1,6 +1,7 @@
 #include "../Headers/kruskal.h"
 
 using namespace Flow;
+using namespace Algorithms;
 
 Kruskal::Kruskal() {}
 

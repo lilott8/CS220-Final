@@ -29,6 +29,8 @@ namespace Flow {
         void dfs();
         void bfs();
 
+        vector<VNode*> get_bfs();
+
         btree_node *search_distance(VNode*);
 
         int get_size();

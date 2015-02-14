@@ -19,7 +19,6 @@ Controller::Controller() {
 
 Controller::Controller(ProblemObject *po) {
     this->kMap = new Map(po);
-    this->kPins = this->kMap->get_pins();
     kOpt = Controller::Optimization::DEFAULT;
     //kAlgorithm = new Fortune();
 }
@@ -28,9 +27,11 @@ Controller::Controller(ProblemObject *po, Controller::AlgoType a, Controller::Op
     // init our map
     this->kMap = new Map(po);
     // get the pins from the map.
-    this->kPins = this->kMap->get_pins();
-    // this will always be fortunes, this is the algorithm I'm implementing
-    kSteiner = new Steiner(this->kMap);
+    kVertices = this->kMap->get_pins();
+
+    // This begins our process
+    kVoronoi = new Voronoi(this->kMap);
+
     //this->set_algorithm(a);
 
     // set the optimization we will be using
@@ -40,13 +41,27 @@ Controller::Controller(ProblemObject *po, Controller::AlgoType a, Controller::Op
 
 Controller::~Controller() {
     delete kSteiner;
+    delete kVoronoi;
 }
 
 void Controller::start() {
-    kSteiner->start();
-    //kMap->draw_voronoi_edges(kAlgorithm->get_edges());
+    /**
+    * Paper 5 details a multi-step process to generate the OAVG
+    *
+    * 1) Generate the Voronoi Diagram (vertices become steiner points)
+    * 2) use prims algorithm to pick the best steiner points
+    * 3) refine using algorithms in the paper
+    */
+    // Step 1
+    kVoronoi->start();
+    project_vertices_on_map(kVoronoi->get_edges());
+    vector<VNode*> temp = kVoronoi->get_vertices();
+    for(int x = 0;x<temp.size();x++) { kVertices.push_back(temp.at(x));}
+    // step 1.5 figure out further
+    kSteiner = new Steiner();
 
-    //this->project_vertices_on_map(kSteiner->get_edges());
+    kSteiner->set_vertices(kVertices);
+    kSteiner->start();
 
     //this->kSPC = SPC();
     //this->kSPC.start(this->kMap->get_pins());
@@ -61,9 +76,12 @@ void Controller::print_map() {
 }
 
 void Controller::project_vertices_on_map(vector<VEdge *> e) {
-    vector<VEdge*> edges = e;
-    for(int x = 0;x<(int)edges.size();x++) {
-        kMap->set(edges.at(x)->kStart);
-        kMap->set(edges.at(x)->kEnd);
+    for(VEdge* v : e) {
+        kMap->set(v->kStart);
+        kMap->set(v->kEnd);
     }
+}
+
+int Controller::calculate_distance(int x, int y) {
+    return (abs(x - 0) + abs(y - 0));
 }

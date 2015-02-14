@@ -25,7 +25,6 @@ void BinaryTree::insert(VNode* node){
         kRoot->right = NULL;
         kRoot->distance = calculate_distance(node->get_coord());
         kSize += 1;
-        claim("Root is null", kDebug);
     }
 }
 
@@ -77,6 +76,30 @@ void BinaryTree::bfs() {
     claim(output, kDebug);
 }
 
+vector<VNode*> BinaryTree::get_bfs() {
+    vector<VNode*> queue;
+    kQueue.push_back(kRoot);
+    queue.push_back(kRoot->node);
+
+    btree_node* node;
+    int x = 0;
+    while(!kQueue.empty()) {
+        node = kQueue.front();
+        kQueue.pop_front();
+        if (node != NULL) {
+            if (node->left != NULL) {
+                kQueue.push_back(node->left);
+                queue.push_back(node->left->node);
+            }
+            if (node->right != NULL) {
+                kQueue.push_back(node->right);
+                queue.push_back(node->right->node);
+            }
+        }
+    }
+    return queue;
+}
+
 void BinaryTree::dfs() {
     string output="B/dfs: ";
     kQueue.push_back(kRoot);
@@ -116,7 +139,7 @@ void BinaryTree::insert(VNode* node, btree_node *leaf) {
 
     // We don't want to insert the same edge multiple times.
     if(node->get_x() == leaf->node->get_x() && node->get_y() == leaf->node->get_y()) {
-        claim("BT/insert: we are attempting to insert a duplicate", kDebug);
+        //claim("BT/insert: we are attempting to insert a duplicate", kDebug);
         return;
     }
 
@@ -198,7 +221,7 @@ btree_node* BinaryTree::search_iterative(VNode* node, btree_node* leaf) {
 
     claim("BT/search_iterative: ==================================================", kDebug);
     claim("BT/search_iterative: Node: " + node->vnode_to_string(), kDebug);
-    claim("Root node: " + kRoot->node->vnode_to_string(), kDebug);
+    claim("BT/searhc: Root node: " + kRoot->node->vnode_to_string(), kDebug);
 
     btree_node* curr = kRoot;
     int node_distance = calculate_distance(node->get_coord());
@@ -211,10 +234,10 @@ btree_node* BinaryTree::search_iterative(VNode* node, btree_node* leaf) {
 
     do{
         if(node->get_x() < curr->node->get_x()) {
-            claim("Changing node from: " + curr->node->vnode_to_string() + " to " + curr->left->node->vnode_to_string(), kDebug);
+            claim("BT/search: Changing node from: " + curr->node->vnode_to_string() + " to " + curr->left->node->vnode_to_string(), kDebug);
             curr = curr->left;
         } else {
-            claim("Changing node from: " + curr->node->vnode_to_string() + " to " + curr->right->node->vnode_to_string(), kDebug);
+            claim("BT/search: Changing node from: " + curr->node->vnode_to_string() + " to " + curr->right->node->vnode_to_string(), kDebug);
             curr = curr->right;
         }
 

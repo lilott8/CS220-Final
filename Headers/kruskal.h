@@ -9,8 +9,9 @@
 #include "comparators.h"
 
 using namespace Utilities;
+using namespace Flow;
 
-namespace Flow {
+namespace Algorithms {
     class Kruskal {
     public:
         Kruskal();

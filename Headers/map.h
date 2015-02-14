@@ -1,6 +1,8 @@
 #ifndef _MAP_H_
 #define _MAP_H_
 
+#pragma once
+
 #include "vnode.h"
 #include "problem_object.h"
 #include "vedge.h"

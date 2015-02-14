@@ -5,6 +5,7 @@
 
 #include <boost/polygon/voronoi.hpp>
 #include <boost/polygon/voronoi_diagram.hpp>
+#include "map.h"
 
 using namespace Flow;
 using boost::polygon::voronoi_builder;
@@ -32,23 +33,27 @@ namespace Algorithms {
     class Voronoi {
     public:
         Voronoi();
+        Voronoi(Map*);
         Voronoi(int max_x, int max_y, int min_x = 0, int min_y = 0);
         ~Voronoi();
 
-        void generate_voronoi(vector<VNode*>);
+        void start();
 
         vector<VEdge*> get_edges();
+        vector<VNode*> get_vertices();
 
     private:
         void generate_edges();
         VEdge* create_edge(double, double, double, double);
 
         vector<VoronoiPoint> kPoints;
-        vector<VEdge*> kEdges;
+        vector<VEdge*> kVoronoiEdges;
+        vector<VNode*> kVoronoiVertices;
         vector<boost::polygon::voronoi_diagram<double>::cell_type> kCells;
 
         voronoi_diagram<double> kVoronoiDiagram;
 
+        Map* kMap;
         // Dimensions of the map
         int kMaxHeight, kMaxWidth, kMinHeight, kMinWidth;
 

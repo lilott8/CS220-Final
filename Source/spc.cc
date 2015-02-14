@@ -4,6 +4,7 @@
 #include <boost/polygon/voronoi_diagram.hpp>
 #include <claim.h>
 
+using namespace Algorithms;
 using namespace Flow;
 
 SPC::SPC(){}

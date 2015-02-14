@@ -10,8 +10,9 @@
 #include "flow_algo.h"
 
 using namespace Utilities;
+using namespace Flow;
 
-namespace Flow {
+namespace Algorithms {
     class SPC {
     public:
         SPC();

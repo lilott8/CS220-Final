@@ -1,3 +1,4 @@
+#include <controller.h>
 #include "../Headers/vnode.h"
 #include "../Headers/problem_object.h"
 #include "../Headers/claim.h"
@@ -87,7 +88,7 @@ void Map::initialize_map() {
             /**
             * TODO: it should be new Vnode(x,y,0);!?!?!?!?
             */
-            temp_row.push_back(new VNode(y,x,0));
+            temp_row.push_back(new VNode(y,x,Controller::calculate_distance(y, x)));
         }
         this->kMap.push_back(temp_row);
     }

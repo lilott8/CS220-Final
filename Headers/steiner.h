@@ -3,9 +3,10 @@
 
 #pragma once
 
-#include <set>
 #include "map.h"
 #include "voronoi.h"
+#include "btree.h"
+#include <set>
 
 using namespace Utilities;
 using namespace std;
@@ -13,23 +14,26 @@ using namespace Flow;
 
 namespace Algorithms {
 
+    struct compare_distance {
+        bool operator() (VNode i, VNode j) {
+            return i.get_cost() < j.get_cost();
+        }
+    };
+
     class Steiner {
     public:
         Steiner();
-        Steiner(Map*);
         ~Steiner();
         // Run the algorithm, this will actually generate the edges and
         void start();
 
+        void set_vertices(vector<VNode*>);
+
     private:
-        void run_queries();
+        vector<VNode*> kAllVertices;
+        //priority_queue<VNode*, vector<VNode*>, Algorithms::compare_distance> kPQueue;
 
-        vector<VoronoiPoint> kPoints;    // list of pins converted to BPoints
-
-        vector<VEdge*> kEdges;
-        Map* kMap;
-        Voronoi* kVoronoi;
-
+        BinaryTree kBinaryTree = BinaryTree();
     };
 }
 #endif

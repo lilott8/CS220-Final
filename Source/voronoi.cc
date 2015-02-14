@@ -1,4 +1,5 @@
 #include <boost/polygon/voronoi.hpp>
+#include <controller.h>
 #include "../Headers/claim.h"
 #include "../Headers/vedge.h"
 #include "../Headers/voronoi.h"
@@ -16,9 +17,17 @@ using boost::polygon::voronoi_edge;
 
 Voronoi::Voronoi(){}
 
+Voronoi::Voronoi(Map* m) {
+    kMap = m;
+    kMaxWidth = kMap->get_x()-1;
+    kMaxHeight = kMap->get_y()-1;
+    kMinHeight = 0;
+    kMinWidth = 0;
+}
+
 Voronoi::Voronoi(int max_x, int max_y, int min_x, int min_y ) {
-    kMaxWidth = max_x;
-    kMaxHeight = max_y;
+    kMaxWidth = max_x-1;
+    kMaxHeight = max_y-1;
     kMinHeight = min_y;
     kMinWidth = min_x;
 }
@@ -26,11 +35,11 @@ Voronoi::Voronoi(int max_x, int max_y, int min_x, int min_y ) {
 Voronoi::~Voronoi(){}
 
 
-void Voronoi::generate_voronoi(vector<VNode*> nodes) {
+void Voronoi::start() {
     vector<VoronoiSegment> segments = vector<VoronoiSegment>();
 
-    for(int x = 0; x < nodes.size(); x++) {
-        kPoints.push_back(VoronoiPoint(nodes.at(x)->get_x(), nodes.at(x)->get_y()));
+    for(int x = 0; x < this->kMap->get_pins().size(); x++) {
+        kPoints.push_back(VoronoiPoint(this->kMap->get_pins().at(x)->get_x(), this->kMap->get_pins().at(x)->get_y()));
     }
 
     construct_voronoi(kPoints.begin(), kPoints.end(), segments.begin(), segments.end(), &kVoronoiDiagram);
@@ -63,8 +72,8 @@ void Voronoi::generate_edges() {
                         id += 1;
                         //kRtree.insert(make_pair(rTreePoint(vedge->kEnd->get_x(), vedge->kEnd->get_y()), id));
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
-                        kEdges.push_back(vedge);
-                        claim("F/generate_edgs: Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
+                        kVoronoiEdges.push_back(vedge);
+                        //claim("F/generate_edgs: Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
                 } else {
                     const voronoi_diagram<double>::vertex_type* v0 = edge->vertex0();
@@ -76,8 +85,8 @@ void Voronoi::generate_edges() {
                         // enough number to reach your bounding box
                         VoronoiPoint p1 = kPoints.at(edge->cell()->source_index());
                         VoronoiPoint p2 = kPoints.at(edge->twin()->cell()->source_index());
-                        double end_x = (p1.b - p2.b);// * 640;
-                        double end_y = (p1.a - p2.b);// * -640;
+                        double end_x = (p1.b - p2.b) * 640;
+                        double end_y = (p1.a - p2.b) * -640;
 
                         vedge = create_edge(v0->x(), v0->y(), end_x, end_y);
                         //kRtree.insert(make_pair(rTreePoint(vedge->kStart->get_x(), vedge->kStart->get_y()), id));
@@ -85,8 +94,8 @@ void Voronoi::generate_edges() {
                         id += 1;
                         //kRtree.insert(make_pair(rTreePoint(vedge->kEnd->get_x(), vedge->kEnd->get_y()), id));
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
-                        kEdges.push_back(vedge);
-                        claim("F/generate_edgs: *Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
+                        kVoronoiEdges.push_back(vedge);
+                        //claim("F/generate_edgs: *Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
                 }
             }
@@ -97,7 +106,11 @@ void Voronoi::generate_edges() {
 }
 
 vector<VEdge*> Voronoi::get_edges() {
-    return this->kEdges;
+    return this->kVoronoiEdges;
+}
+
+vector<VNode*> Voronoi::get_vertices() {
+    return this->kVoronoiVertices;
 }
 
 VEdge* Voronoi::create_edge(double start_x, double start_y, double end_x, double end_y) {
@@ -124,10 +137,13 @@ VEdge* Voronoi::create_edge(double start_x, double start_y, double end_x, double
     else {y2 = round(end_y);}
 
     VEdge *e = new VEdge();
-    e->kStart = new VNode(x1, y1);
-    e->kEnd = new VNode(x2, y2);
+    e->kStart = new VNode(x1, y1, Controller::calculate_distance(x1, y1));
+    e->kEnd = new VNode(x2, y2, Controller::calculate_distance(x2, y2));
     e->kStart->set_type(VNode::Type::STEINER);
     e->kEnd->set_type(VNode::Type::STEINER);
+    // We need to save the individual vertices as well.
+    kVoronoiVertices.push_back(e->kStart);
+    kVoronoiVertices.push_back(e->kEnd);
     //claim("creating a node of: " + e->vedge_to_string(), kDebug);
     //claim("====================================", kDebug);
     return e;

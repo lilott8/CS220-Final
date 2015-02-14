@@ -26,13 +26,18 @@ namespace Flow {
         void start();
         void print_map();
 
+        static int calculate_distance(int, int);
+
     private:
         Map *kMap;
 
         vector<VEdge*> kEdges;      // generated edges
-        vector<VNode*> kPins;
+        vector<VNode*> kVertices;      // list of all nodes, steiner and points
+
 
         Steiner *kSteiner;
+        Voronoi *kVoronoi;
+        SPC *kSPC;
 
         Optimization kOpt;
 

@@ -49,17 +49,20 @@ void Controller::start() {
     * Paper 5 details a multi-step process to generate the OAVG
     *
     * 1) Generate the Voronoi Diagram (vertices become steiner points)
+    * 2) add steiner points
     * 2) use prims algorithm to pick the best steiner points
     * 3) refine using algorithms in the paper
     */
     // Step 1
     kVoronoi->start();
     project_vertices_on_map(kVoronoi->get_edges());
+    // add the nodes to our vertices
     vector<VNode*> temp = kVoronoi->get_vertices();
+    claim("Number of vertices from voronoi: " + to_string(kVoronoi->get_vertices().size()), kDebug);
     for(int x = 0;x<temp.size();x++) { kVertices.push_back(temp.at(x));}
+
     // step 1.5 figure out further
     kSteiner = new Steiner();
-
     kSteiner->set_vertices(kVertices);
     kSteiner->start();
 

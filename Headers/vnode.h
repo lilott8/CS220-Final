@@ -4,15 +4,19 @@
 #pragma once
 
 #include "node.h"
+#include "claim.h"
 
 using namespace Utilities;
 using namespace std;
 
 namespace Flow {
     class VNode : public Node {
+
+    //friend bool operator==(VNode&, VNode&);
+
     public:
         enum Direction {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST};
-        enum Type {PIN, BLOCKED, PATH, EDGE, NONE, STEINER};
+        enum Type {PIN, BLOCKED, PATH, EDGE, NONE, STEINER, VORONOI};
 
         VNode();
         VNode(double, double, int cost = 0);
@@ -35,6 +39,8 @@ namespace Flow {
         double get_dy();
 
         string vnode_to_string();
+
+        bool operator==(VNode&);
 
     private:
         int kId;

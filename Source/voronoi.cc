@@ -46,7 +46,7 @@ void Voronoi::start() {
     this->generate_edges();
 }
 
-// Traversing Voronoi edges using cell iterator.
+// Traversing Voronoi edges using cell iterator.  This will iterate edges twice
 void Voronoi::generate_edges() {
     claim("F/generate_voronoi: Generating egdes now", kDebug);
     int id = 0;
@@ -66,13 +66,10 @@ void Voronoi::generate_edges() {
                         vedge = create_edge(edge->vertex0()->x(), edge->vertex0()->y(),
                                 edge->vertex1()->x(), edge->vertex1()->y());
 
-                        //kRtree.insert(make_pair(rTreePoint(vedge->kStart->get_x(), vedge->kStart->get_y()), id));
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
-                        // make sure we increment the id!
-                        id += 1;
-                        //kRtree.insert(make_pair(rTreePoint(vedge->kEnd->get_x(), vedge->kEnd->get_y()), id));
-                        //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
-                        kVoronoiEdges.push_back(vedge);
+                        if(!in_edges(vedge)) {
+                            kVoronoiEdges.push_back(vedge);
+                        }
                         //claim("F/generate_edgs: Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
                 } else {
@@ -89,12 +86,10 @@ void Voronoi::generate_edges() {
                         double end_y = (p1.a - p2.b) * -640;
 
                         vedge = create_edge(v0->x(), v0->y(), end_x, end_y);
-                        //kRtree.insert(make_pair(rTreePoint(vedge->kStart->get_x(), vedge->kStart->get_y()), id));
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
-                        id += 1;
-                        //kRtree.insert(make_pair(rTreePoint(vedge->kEnd->get_x(), vedge->kEnd->get_y()), id));
-                        //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
-                        kVoronoiEdges.push_back(vedge);
+                        if(!in_edges(vedge)) {
+                            kVoronoiEdges.push_back(vedge);
+                        }
                         //claim("F/generate_edgs: *Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
                 }
@@ -139,12 +134,40 @@ VEdge* Voronoi::create_edge(double start_x, double start_y, double end_x, double
     VEdge *e = new VEdge();
     e->kStart = new VNode(x1, y1, Controller::calculate_distance(x1, y1));
     e->kEnd = new VNode(x2, y2, Controller::calculate_distance(x2, y2));
-    e->kStart->set_type(VNode::Type::STEINER);
-    e->kEnd->set_type(VNode::Type::STEINER);
-    // We need to save the individual vertices as well.
-    kVoronoiVertices.push_back(e->kStart);
-    kVoronoiVertices.push_back(e->kEnd);
+    e->kStart->set_type(VNode::Type::VORONOI);
+    e->kEnd->set_type(VNode::Type::VORONOI);
+    // We need to save the individual vertices as well
+    if(!in_vertices(e->kStart)) {
+        kVoronoiVertices.push_back(e->kStart);
+    }
+    if(!in_vertices(e->kEnd)) {
+        kVoronoiVertices.push_back(e->kEnd);
+    }
     //claim("creating a node of: " + e->vedge_to_string(), kDebug);
     //claim("====================================", kDebug);
     return e;
+}
+
+/**
+* TODO: Use a datastructure where find() isn't O(n)
+*/
+bool Voronoi::in_vertices(VNode* node) {
+    for(VNode* element : kVoronoiVertices) {
+        if(*node == *element) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+* TODO: Use a datastructure where find() isn't O(n)
+*/
+bool Voronoi::in_edges(VEdge* edge) {
+    for(VEdge* e : kVoronoiEdges) {
+        if(*edge == *e) {
+            return true;
+        }
+    }
+    return false;
 }

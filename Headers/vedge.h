@@ -20,6 +20,8 @@ namespace Flow {
         VNode* kDirection;
 
         string vedge_to_string();
+
+        bool operator==(VEdge&);
     };
 }
 

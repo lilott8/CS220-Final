@@ -45,6 +45,8 @@ namespace Algorithms {
     private:
         void generate_edges();
         VEdge* create_edge(double, double, double, double);
+        bool in_vertices(VNode*);
+        bool in_edges(VEdge*);
 
         vector<VoronoiPoint> kPoints;
         vector<VEdge*> kVoronoiEdges;

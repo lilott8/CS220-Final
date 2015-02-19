@@ -1,4 +1,5 @@
 #include <math.h>
+#include <claim.h>
 #include "../Headers/node.h"
 #include "../Headers/VNode.h"
 
@@ -59,6 +60,9 @@ string VNode::type_to_string(Type t) {
         case STEINER:
             output = "s";
             break;
+        case VORONOI:
+            output = "v";
+            break;
         case NONE:
         default:
             output = " ";
@@ -89,3 +93,6 @@ string VNode::vnode_to_string() {
     return ret;
 }
 
+bool VNode::operator==(VNode &other) {
+    return ((this->get_x() == other.get_x()) && (this->get_y() == other.get_y()));
+}

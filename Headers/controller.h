@@ -41,7 +41,7 @@ namespace Flow {
 
         Optimization kOpt;
 
-        bool kIsEuclidean;          // Euclidean or Rectilinear space
+        //bool kIsEuclidean;          // Euclidean or Rectilinear space
 
         void project_vertices_on_map(vector<VEdge*>);
 

@@ -105,7 +105,7 @@ int jsonlex();
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "json_parser.tab.hpp".  */
+   by #include "json_parser.tab.Header".  */
 #ifndef YY_JSON_JSON_PARSER_TAB_HPP_INCLUDED
 # define YY_JSON_JSON_PARSER_TAB_HPP_INCLUDED
 /* Debug traces.  */

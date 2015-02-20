@@ -2,7 +2,7 @@ CS220 Project Framework
 ===============
 #Changelog:
  
-  - Massive refactoring.  Things were getting too dependent and not modular.  They are much more abstracted now.
+  - Steiner point creation is almost done
   
 ##Done:
 
@@ -23,11 +23,12 @@ CS220 Project Framework
 
 ##TODO:
   
- - Project just the vertices onto the map for testing purposes
+ - Rectify the Steiner::find_angle_size() method, it isn't behaving completely correctly
  - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
  - figure out why the map coords need to be switched in init!
  - place edges into btree *(Resolved)*
  - Test binary tree *(Resolved)*
+ - Project just the vertices onto the map for testing purposes *(Resolved)*
  - Implement the nlogn Voronoi grapher *(Resolved)*
  - Understand how to adequately clip an infinite line from the output*(Resolved)*
  - Create a data structure to hold a Voronoi sector *(Resolved)*

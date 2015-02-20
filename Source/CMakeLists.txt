@@ -28,4 +28,5 @@ set(MAIN_SRC
 
 add_executable(flow ${MAIN_SRC})
 target_link_libraries(flow SOURCE_LIB)
+#target_link_libraries(flow WYKOBI_LIB)
 target_link_libraries(flow JSON_LIB)

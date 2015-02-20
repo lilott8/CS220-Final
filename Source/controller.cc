@@ -59,7 +59,7 @@ void Controller::start() {
     // add the nodes to our vertices
     vector<VNode*> temp = kVoronoi->get_vertices();
     claim("Number of vertices from voronoi: " + to_string(kVoronoi->get_vertices().size()), kDebug);
-    for(int x = 0;x<temp.size();x++) { kVertices.push_back(temp.at(x));}
+    for(int x = 0;x<(int)temp.size();x++) { kVertices.push_back(temp.at(x));}
 
     // step 1.5 figure out further
     kSteiner = new Steiner();

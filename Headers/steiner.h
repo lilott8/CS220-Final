@@ -13,9 +13,6 @@ using namespace std;
 using namespace Flow;
 
 namespace Algorithms {
-
-# define M_PI 3.14159265358979323846  /* pi */
-
     struct SteinerTriangle {
         VNode* p1;
         VNode* p2;
@@ -33,24 +30,34 @@ namespace Algorithms {
 
     class Steiner {
     public:
+        const double PI=3.14159265358979323846;
+
         Steiner();
         ~Steiner();
-        // Run the algorithm, this will actually generate the edges and
+        // Templated entry point for all algorithmic starts
         void start();
 
         void set_vertices(vector<VNode*>);
+        vector<VNode*> get_steiner_points();
 
     private:
         vector<VNode*> kAllVertices;
         vector<SteinerTriangle*> kTriangles;
         vector<VNode*> kSteinerPoints;
+        vector<VEdge*> kSteinerEdges;
 
         void generate_triangles(VNode* [], int, int, int, int);
-        void generate_steiner_points();
+        void generate_steiner_intersections();
 
-        double find_angle_size(VNode*, VNode*);
+        void generate_steiner_points();
+        bool verify_triangle_angles(SteinerTriangle*);
+
         VNode* manhattan_geometric_mean(SteinerTriangle*);
+
         double euclidean_geometric_mean();
+        double calculate_euclidean_distance(VNode*, VNode*);
+        double find_bigger_angle(double, double, double);
+        double find_other_angle(double, double, double);
     };
 }
 #endif

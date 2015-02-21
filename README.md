@@ -2,10 +2,13 @@ CS220 Project Framework
 ===============
 #Changelog:
  
-  - Steiner point creation is almost done
+  - Steiner point creation is done
+  - Prim's algorithm is almost done being implemented as well
+  - documented voronoi.cpp and .h
   
 ##Done:
 
+ - Steiner point creation
  - Removed the binary tree and added the R* tree from boost.
  - Added the Binary tree interface for running SPC in V+ElogE time
  - Binary tree implemented
@@ -22,11 +25,12 @@ CS220 Project Framework
  - Use the output from the voronoi to draw on the graph
 
 ##TODO:
-  
- - Rectify the Steiner::find_angle_size() method, it isn't behaving completely correctly
+ 
+ - finish the prim's boost implementation
  - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
  - figure out why the map coords need to be switched in init!
  - place edges into btree *(Resolved)*
+ - Rectify the Steiner::find_angle_size() method, it isn't behaving completely correctly *(Resolved)*
  - Test binary tree *(Resolved)*
  - Project just the vertices onto the map for testing purposes *(Resolved)*
  - Implement the nlogn Voronoi grapher *(Resolved)*

@@ -15,8 +15,15 @@ using boost::polygon::low;
 using boost::polygon::high;
 using boost::polygon::voronoi_edge;
 
+/**
+* Default constructor, not used
+*/
 Voronoi::Voronoi(){}
 
+/**
+* Initialize the voronoi class
+* @param map* Pointer to the map object that the controller has
+*/
 Voronoi::Voronoi(Map* m) {
     kMap = m;
     kMaxWidth = kMap->get_x()-1;
@@ -24,17 +31,26 @@ Voronoi::Voronoi(Map* m) {
     kMinHeight = 0;
     kMinWidth = 0;
 }
-
+/*
 Voronoi::Voronoi(int max_x, int max_y, int min_x, int min_y ) {
     kMaxWidth = max_x-1;
     kMaxHeight = max_y-1;
     kMinHeight = min_y;
     kMinWidth = min_x;
-}
+}*/
 
+/**
+* Destructor
+*/
 Voronoi::~Voronoi(){}
 
 
+/**
+* Public interface to begin using the voronoi class
+* This method will convert all the data to the necessary data internal datastructures,
+* build and execute the boost voronoi library, and then convert the output back to
+* our generic data structures
+*/
 void Voronoi::start() {
     vector<VoronoiSegment> segments = vector<VoronoiSegment>();
 
@@ -46,6 +62,10 @@ void Voronoi::start() {
     this->generate_edges();
 }
 
+/**
+* Iterates the boost library cells and generates all the edges and vertices that
+* were discovered in the graph creation.
+*/
 // Traversing Voronoi edges using cell iterator.  This will iterate edges twice
 void Voronoi::generate_edges() {
     claim("F/generate_voronoi: Generating egdes now", kDebug);
@@ -100,14 +120,33 @@ void Voronoi::generate_edges() {
     }
 }
 
+/**
+* Retrieve the edges generated from the boost voronoi creator
+* @return vector of edges
+*/
 vector<VEdge*> Voronoi::get_edges() {
     return this->kVoronoiEdges;
 }
 
+/**
+* Retrieve the vertices generated from the boost voronoi creator
+* @return vector of vertices
+*/
 vector<VNode*> Voronoi::get_vertices() {
     return this->kVoronoiVertices;
 }
 
+/**
+* Build a new edge from the input.  This method will do several things:
+* It first verifies that the coordinates given as input are not outside
+* of the size of our map it will clip as necessary, it also verifies we
+* haven't seen the edge or vertex before, and finally create the edge and
+* vertices as needed.
+* @param1 x1
+* @param2 y1
+* @param3 x2
+* @param4 y2
+*/
 VEdge* Voronoi::create_edge(double start_x, double start_y, double end_x, double end_y) {
 
     int x1, y1, x2, y2;

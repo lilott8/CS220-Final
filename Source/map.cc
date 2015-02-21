@@ -120,7 +120,8 @@ void Map::print_map() {
                     kMap.at(x).at(y)->get_type() == VNode::Type::PIN ||
                     kMap.at(x).at(y)->get_type() == VNode::Type::PATH ||
                     kMap.at(x).at(y)->get_type() == VNode::Type::EDGE ||
-                    kMap.at(x).at(y)->get_type() == VNode::Type::STEINER) {
+                    kMap.at(x).at(y)->get_type() == VNode::Type::STEINER ||
+                    kMap.at(x).at(y)->get_type() == VNode::Type::VORONOI) {
                 output += VNode::type_to_string(kMap.at(x).at(y)->get_type()) + "\t";
             } else {
                 if(kMap.at(x).at(y)->get_output() == 0) {
@@ -203,6 +204,7 @@ void Map::draw_bresenham_lines(vector<VEdge*> edges) {
 
 void Map::set(VNode* node) {
     if(this->kMap.at(node->get_x()).at(node->get_y())->get_type() == VNode::Type::NONE) {
+        //claim("M/set: Setting: " + node->vnode_to_string() + " to: " + node->type_to_string(node->get_type()), kDebug);
         this->kMap.at(node->get_x()).at(node->get_y())->set_type(node->get_type());
     }
 }

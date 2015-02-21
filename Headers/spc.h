@@ -18,6 +18,7 @@ namespace Algorithms {
         SPC();
         ~SPC();
 
+        // Templated entry point for all algorithmic starts
         void start();
         void start(vector<VNode*>);
     private:

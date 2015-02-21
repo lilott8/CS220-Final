@@ -11,6 +11,7 @@ node.cc
 path.cc
 problem_object.cc
 pathsegment.cc
+prim.cc
 segmentgroup.cc
 steiner.cc
 spc.cc

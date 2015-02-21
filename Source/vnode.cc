@@ -42,6 +42,7 @@ void VNode::set_type(Type t) {
     this->kType = t;
 }
 
+
 string VNode::type_to_string(Type t) {
     string output = "";
     switch(t) {

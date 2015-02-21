@@ -6,6 +6,7 @@
 #include "../Headers/claim.h"
 #include "../Headers/kruskal.h"
 #include "../Headers/steiner.h"
+#include "../Headers/prim.h"
 #include <vector>
 
 
@@ -42,6 +43,7 @@ Controller::Controller(ProblemObject *po, Controller::AlgoType a, Controller::Op
 Controller::~Controller() {
     delete kSteiner;
     delete kVoronoi;
+    delete kPrim;
 }
 
 void Controller::start() {
@@ -50,21 +52,30 @@ void Controller::start() {
     *
     * 1) Generate the Voronoi Diagram (vertices become steiner points)
     * 2) add steiner points
-    * 2) use prims algorithm to pick the best steiner points
-    * 3) refine using algorithms in the paper
+    * 3) use prims algorithm to pick the best steiner points
+    * 4) refine using algorithms in the paper
     */
     // Step 1
     kVoronoi->start();
-    project_vertices_on_map(kVoronoi->get_edges());
     // add the nodes to our vertices
     vector<VNode*> temp = kVoronoi->get_vertices();
-    claim("Number of vertices from voronoi: " + to_string(kVoronoi->get_vertices().size()), kDebug);
+    claim("C/start: Number of vertices from voronoi: " + to_string(kVoronoi->get_vertices().size()), kDebug);
+    // Combine the voronoie with the pins
     for(int x = 0;x<(int)temp.size();x++) { kVertices.push_back(temp.at(x));}
+    project_vertices_on_map(kVertices);
 
-    // step 1.5 figure out further
+    // step 2
     kSteiner = new Steiner();
     kSteiner->set_vertices(kVertices);
     kSteiner->start();
+    vector<VNode*> sp = kSteiner->get_steiner_points();
+
+    project_vertices_on_map(sp);
+    // Step 3
+    kPrim = new Prim();
+    kPrim->start();
+
+    // Step 4
 
     //this->kSPC = SPC();
     //this->kSPC.start(this->kMap->get_pins());
@@ -78,10 +89,16 @@ void Controller::print_map() {
     this->kMap->print_map();
 }
 
-void Controller::project_vertices_on_map(vector<VEdge *> e) {
+void Controller::project_edges_on_map(vector<VEdge *> e) {
     for(VEdge* v : e) {
         kMap->set(v->kStart);
         kMap->set(v->kEnd);
+    }
+}
+
+void Controller::project_vertices_on_map(vector<VNode *> n) {
+    for(VNode* v : n) {
+        kMap->set(v);
     }
 }
 

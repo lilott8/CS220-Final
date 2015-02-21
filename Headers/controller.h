@@ -7,6 +7,7 @@
 #include "steiner.h"
 #include "spc.h"
 #include "kruskal.h"
+#include "prim.h"
 
 using namespace Utilities;
 using namespace Algorithms;
@@ -34,7 +35,7 @@ namespace Flow {
         vector<VEdge*> kEdges;      // generated edges
         vector<VNode*> kVertices;      // list of all nodes, steiner and points
 
-
+        Prim *kPrim;
         Steiner *kSteiner;
         Voronoi *kVoronoi;
         SPC *kSPC;
@@ -43,9 +44,8 @@ namespace Flow {
 
         //bool kIsEuclidean;          // Euclidean or Rectilinear space
 
-        void project_vertices_on_map(vector<VEdge*>);
-
-
+        void project_vertices_on_map(vector<VNode*>);
+        void project_edges_on_map(vector<VEdge*>);
     };
 }
 #endif

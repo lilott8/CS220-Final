@@ -9,31 +9,35 @@ using namespace Flow;
 
 SPC::SPC(){}
 
+SPC::SPC(vector<VEdge*> edges) {
+    kEdges = edges;
+    kNumNodes = (int)edges.size();
+}
+
 SPC::~SPC(){}
 
-void SPC::start(vector<VNode*> queue) {
-    /*
+void SPC::start() {
     claim("S/start: starting SPC", kDebug);
+    run_dijkstra();
+    run_kruskal();
+}
 
-    claim("size of pins: " + to_string(kPins.size()), kDebug);
+void SPC::run_dijkstra() {
+    claim("S/run_dijkstra: starting boost/dijkstra", kDebug);
 
-    vector<rTreeValue> results;
+    /*
+    kGraph = graph_t(edge_array, edge_array + num_args, kWeights, kNumNodes);
+    //graph_t g(edge_array, edge_array + num_arcs, kWeights, kNumNodes);
+    property_map<graph_t, edge_weight_t>::type weight_map = get(edge_weight, kGraph);
 
-    for(VNode* node : kPins) {
-        claim("Node: " + node->vnode_to_string(), kDebug);
+    vector<vertex_descriptor> p(num_vertices(kGraph));
+    vector<int> d(num_vertices(kGraph));
+    vertex_descriptor v_d = vertex(A, kGraph);
 
-        // TODO: get the querying to work!
-        //kRtree.query(bgi::nearest(rTreePoint(node->get_x(), node->get_y()), 5), back_inserter(results));
-
-        if(results.size() > 0) {
-            for (int x = 0; x < (int) results.size(); x++) {
-                claim("guess :" + to_string(x) + " is: ", kDebug);
-            }
-        } else {
-            claim("There were no nearest neighbors for: " + node->vnode_to_string(), kDebug);
-        }
-
-        claim("=========================", kDebug);
-    }
+    dijkstra_shortest_paths(kGraph, v_d, predecessor_map(&p[0]).distance_map(&d[0]));
     */
+}
+
+void SPC::run_kruskal() {
+    claim("S/run)kruskal: starting boost/kruskal", kDebug);
 }

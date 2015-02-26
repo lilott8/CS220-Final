@@ -4,7 +4,6 @@ claim.cc
 controller.cc
 edge.cc
 grid.cc
-kruskal.cc
 map.cc
 netlist.cc
 node.cc

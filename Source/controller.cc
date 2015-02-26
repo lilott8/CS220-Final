@@ -4,7 +4,6 @@
 #include "../Headers/node.h"
 #include "../Headers/problem_object.h"
 #include "../Headers/claim.h"
-#include "../Headers/kruskal.h"
 #include "../Headers/steiner.h"
 #include "../Headers/prim.h"
 #include <vector>
@@ -37,13 +36,13 @@ Controller::Controller(ProblemObject *po, Controller::AlgoType a, Controller::Op
 
     // set the optimization we will be using
     kOpt = o;
-    //this->kSPC = SPC();
 }
 
 Controller::~Controller() {
     delete kSteiner;
     delete kVoronoi;
     delete kPrim;
+    delete kSPC;
 }
 
 void Controller::start() {
@@ -52,7 +51,7 @@ void Controller::start() {
     *
     * 1) Generate the Voronoi Diagram (vertices become steiner points)
     * 2) add steiner points
-    * 3) use prims algorithm to pick the best steiner points
+    * 3) use Dijkstra's/Kruskal's algorithm to pick the best steiner points
     * 4) refine using algorithms in the paper
     */
     // Step 1
@@ -72,16 +71,10 @@ void Controller::start() {
 
     project_vertices_on_map(sp);
     // Step 3
-    kPrim = new Prim();
-    kPrim->start();
-
-    // Step 4
-
-    //this->kSPC = SPC();
-    //this->kSPC.start(this->kMap->get_pins());
+    this->kSPC = new SPC();
+    this->kSPC->start();
 
     kMap->print_map();
-    //kKruskal.start();
 }
 
 

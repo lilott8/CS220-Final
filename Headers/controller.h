@@ -6,7 +6,6 @@
 #include "problem_object.h"
 #include "steiner.h"
 #include "spc.h"
-#include "kruskal.h"
 #include "prim.h"
 
 using namespace Utilities;

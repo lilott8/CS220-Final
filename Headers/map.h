@@ -8,15 +8,15 @@
 #include "vedge.h"
 #include <queue>
 #include "comparators.h"
+#include <set>
 
 #define plot_(X,Y,D) do{ rgb_color f_;				\
   f_.red = r; f_.green = g; f_.blue = b;			\
   _dla_plot(img, (X), (Y), &f_, (D)) ; }while(0)
 
-#define swap_(a, b) do{ __typeof__(a) tmp;  tmp = a; a = b; b = tmp; }while(0)
+#define mapswap(a, b) do{ __typeof__(a) tmp;  tmp = a; a = b; b = tmp; }while(0)
 
 using namespace Utilities;
-using namespace std;
 
 namespace Flow {
 
@@ -36,7 +36,8 @@ namespace Flow {
         void draw_voronoi_edges(vector<VEdge*>);
         void set(VNode* node);
 
-        vector<VNode*> get_pins();
+        std::set<VNode*> get_pins();
+        static vector<vector<VNode*>> get_map();
 
         int get_x();
         int get_y();
@@ -46,8 +47,8 @@ namespace Flow {
         int kWidth;
         int kDefaultSize = 10;
         bool kIsEuclidean;
-        vector<VNode*> kPins;
-        vector<vector<VNode*>> kMap;
+        std::set<VNode*> kPins;
+        //static vector<vector<VNode*>> kMap;
 
         void initialize_map();
         void set_pins(vector<Connection>);

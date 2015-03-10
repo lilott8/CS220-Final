@@ -3,7 +3,7 @@
 #include "../Headers/problem_object.h"
 #include "../Headers/map.h"
 #include "../Headers/controller.h"
-#include "../Headers/flow_algo.h"
+#include "../Headers/vnode.h"
 #include "../Headers/claim.h"
 #include <time.h>
 #include <cstdlib>
@@ -49,6 +49,8 @@ int main(int argc,char* argv[]) {
 
 	Utilities::ProblemObject* first_problem = new Utilities::ProblemObject(file);
 	Controller* controller = new Controller(first_problem, a_type, o_type);
+
+	VNode::kLastId = 0;
 
 	//controller->print_map();
 	controller->start();

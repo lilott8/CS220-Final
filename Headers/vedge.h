@@ -13,11 +13,14 @@ namespace Flow {
     public:
         VEdge();
         VEdge(VNode*, VNode*, VNode*);
+        VEdge(VNode*, VNode*);
         ~VEdge();
 
         VNode* kStart;
         VNode* kEnd;
         VNode* kDirection;
+
+        int kCost;
 
         string vedge_to_string();
 

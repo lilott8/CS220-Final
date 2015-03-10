@@ -7,8 +7,6 @@
 #include <boost/polygon/voronoi.hpp>
 #include "flow_algo.h"
 
-using namespace Utilities;
-using namespace std;
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_diagram;
 using boost::polygon::x;
@@ -36,8 +34,8 @@ namespace Flow {
         ~Fortune();
         // Run the algorithm, this will actually generate the edges and
         // interface with the private methods.
-        void start(vector<VNode*>);
-        void use_boost_voronoi(vector<VNode*>);
+        void start(std::vector<VNode*>);
+        void use_boost_voronoi(std::vector<VNode*>);
         void run_queries();
     private:
         /**
@@ -49,7 +47,7 @@ namespace Flow {
         /**
         * Variables
         */
-        vector<BPoint> kPoints;    // list of pins converted to BPoints
+        std::vector<BPoint> kPoints;    // list of pins converted to BPoints
     };
 }
 

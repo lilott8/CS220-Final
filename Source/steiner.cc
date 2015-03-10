@@ -1,10 +1,15 @@
+#include <controller.h>
 #include "../Headers/map.h"
 #include "../Headers/steiner.h"
 
 using namespace Flow;
-using namespace Algorithms;
+using namespace FlowAlgorithms;
 
 Steiner::Steiner() {
+}
+
+Steiner::Steiner(set<VNode*> v) {
+    kAllVertices = v;
 }
 
 Steiner::~Steiner() {
@@ -16,54 +21,82 @@ void Steiner::start() {
     generate_steiner_intersections();
 }
 
-void Steiner::set_vertices(vector<VNode*> v) {
-    kAllVertices = v;
-    // This is a fixed size because a triangle can only ever have 3 points
-    //VNode* data[3];
-    //generate_triangles(data, 0, kAllVertices.size()-1, 0, 3);
-
-    generate_steiner_intersections();
-}
-
-vector<VNode*> Steiner::get_steiner_points() {
+set<VNode*> Steiner::get_steiner_points() {
     return kSteinerPoints;
 }
 
+set<VEdge*> Steiner::get_steiner_edges() {
+    return kSteinerEdges;
+}
+
 void Steiner::generate_steiner_intersections() {
-    for(int x = 0; x < (int)kAllVertices.size();x++) {
-        for(int y = x; y < (int)kAllVertices.size();y++) {
-            if(y == x) {
-                continue;
-            }
+    //VNode *node1;
+    //VNode *node2;
 
-            VNode *node1;
-            VNode *node2;
+    for(VNode* outer : kAllVertices) {
+        for(VNode* inner : kAllVertices) {
+         if(outer == inner) {
+             continue;
+         }
 
-            if(kAllVertices.at(x)->get_x() == kAllVertices.at(y)->get_x()) {
-                int midpoint = (kAllVertices.at(x)->get_y() + kAllVertices.at(y)->get_y()) / 2;
+            if(outer->get_x() == inner->get_x()) {
+                // Calculate the midpoint
+                int midpoint = (outer->get_y() + inner->get_y()) / 2;
 
-                node1 = new VNode(kAllVertices.at(x)->get_x(), midpoint);
-                node1->set_type(VNode::Type::STEINER);
-            } else if(kAllVertices.at(x)->get_y() == kAllVertices.at(y)->get_y()) {
-                int midpoint = (kAllVertices.at(x)->get_x() + kAllVertices.at(y)->get_x()) / 2;
+                // Toggle the point on the map that needs to become a steiner point
+                Map::get_map().at(outer->get_x()).at(midpoint)->set_type(VNode::Type::STEINER);
+                // Add the steiner point to our array of candidate vertices
+                kSteinerPoints.insert(Map::get_map().at(outer->get_x()).at(midpoint));
 
-                node1 = new VNode(midpoint, kAllVertices.at(x)->get_y());
-                node1->set_type(VNode::Type::STEINER);
+                // Save point x -> midpoint
+                kSteinerEdges.insert(new VEdge(
+                        outer, Map::get_map().at(outer->get_x()).at(midpoint)
+                ));
+
+                // save midpoint -> point y
+                kSteinerEdges.insert(new VEdge(
+                        Map::get_map().at(inner->get_x()).at(midpoint), inner
+                ));
+            } else if(outer->get_y() == inner->get_y()) {
+                // Calculate the midpoint
+                int midpoint = (outer->get_x() + inner->get_x()) / 2;
+
+                // Toggle the point on the map that needs to become a steiner point
+                Map::get_map().at(midpoint).at(outer->get_y())->set_type(VNode::Type::STEINER);
+                // Add the steiner point to our array of candidate vertices
+                kSteinerPoints.insert(Map::get_map().at(midpoint).at(outer->get_y()));
+
+                // Save point x -> midpoint
+                kSteinerEdges.insert(new VEdge(
+                        outer, Map::get_map().at(midpoint).at(outer->get_y())
+                ));
+                // Save midpoint -> point y
+                kSteinerEdges.insert(new VEdge(
+                        Map::get_map().at(midpoint).at(inner->get_y()), inner
+                ));
             } else {
-                node1 = new VNode(kAllVertices.at(x)->get_x(), kAllVertices.at(y)->get_y());
-                node2 = new VNode(kAllVertices.at(y)->get_x(), kAllVertices.at(x)->get_y());
+                // Generate the x/y of the midpoint
+                int mx, my;
+                mx = (outer->get_x() + inner->get_x()) / 2;
+                my = (outer->get_y() + inner->get_y()) / 2;
 
-                node1->set_type(VNode::Type::STEINER);
-                node2->set_type(VNode::Type::STEINER);
+                // Toggle the point on the map that needs to become a steiner point
+                Map::get_map().at(mx).at(my)->set_type(VNode::Type::STEINER);
+
+                // Add the steiner point to our array of candidate vertices
+                kSteinerPoints.insert(Map::get_map().at(mx).at(my));
+
+                // Create the vedges for our new steiner points
+                kSteinerEdges.insert(new VEdge(
+                        outer, Map::get_map().at(mx).at(my)
+                ));
+                // Create the vedges for our new steiner points
+                kSteinerEdges.insert(new VEdge(
+                        Map::get_map().at(mx).at(my), inner
+                ));
             }
 
-            // Node1 will always be set
-            kSteinerPoints.push_back(node1);
 
-            // This might not always be set
-            if(node2 != NULL) {
-                kSteinerPoints.push_back(node2);
-            }
         }
     }
 }
@@ -78,7 +111,7 @@ void Steiner::generate_steiner_points() {
 
     for(int x = 0; x<(int)kTriangles.size();x++) {
         if (verify_triangle_angles(kTriangles.at(x))) {
-            kSteinerPoints.push_back(manhattan_geometric_mean(kTriangles.at(x)));
+            kSteinerPoints.insert(manhattan_geometric_mean(kTriangles.at(x)));
             y++;
         } else {
             //claim("Angle is greater than 120!", kDebug);
@@ -107,8 +140,8 @@ void Steiner::generate_triangles(VNode* data[], int start, int end, int index, i
     // at index will make a combination with remaining elements
     // at remaining positions
     for(int i=start; i<=end && end-i+1 >= combo - index; i++) {
-        data[index] = kAllVertices.at(i);
-        generate_triangles(data, i+1, end, index+1, combo);
+        //data[index] = kAllVertices.at(i);
+        //generate_triangles(data, i+1, end, index+1, combo);
     }
 
 }

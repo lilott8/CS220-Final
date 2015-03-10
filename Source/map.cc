@@ -1,4 +1,4 @@
-#include <controller.h>
+#include "../Headers/controller.h"
 #include "../Headers/vnode.h"
 #include "../Headers/problem_object.h"
 #include "../Headers/claim.h"
@@ -7,6 +7,9 @@
 
 using namespace Flow;
 using namespace Utilities;
+using namespace std;
+
+vector<vector<VNode*>> kMap;
 
 Map::Map() {
     kHeight = kWidth = kDefaultSize;
@@ -61,7 +64,7 @@ void Map::set_pins(vector<Connection> c) {
         // Declare the pin(s)
         if(kMap.at(c.at(x).source.x).at(c.at(x).source.y)->get_type() == VNode::Type::NONE) {
             kMap.at(c.at(x).source.x).at(c.at(x).source.y)->set_type(VNode::Type::PIN);
-            kPins.push_back(kMap.at(c.at(x).source.x).at(c.at(x).source.y));
+            kPins.insert(kMap.at(c.at(x).source.x).at(c.at(x).source.y));
         } else {
             claim("M/sp: We couldn't place: " + kMap.at(c.at(x).source.x).at(c.at(x).source.y)->coords_to_string()
                     + " something was already there!", kWarning);
@@ -69,7 +72,7 @@ void Map::set_pins(vector<Connection> c) {
 
         if(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->get_type() == VNode::Type::NONE) {
             kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->set_type(VNode::Type::PIN);
-            kPins.push_back(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y));
+            kPins.insert(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y));
         } else {
             claim("M/sp: We couldn't place: " + kMap.at(c.at(x).source.x).at(c.at(x).source.y)->coords_to_string()
                     + " something was already there!", kWarning);
@@ -77,8 +80,12 @@ void Map::set_pins(vector<Connection> c) {
     }
 }
 
-vector<VNode*> Map::get_pins() {
+std::set<VNode*> Map::get_pins() {
     return kPins;
+}
+
+vector<vector<VNode*>> Map::get_map() {
+    return kMap;
 }
 
 void Map::initialize_map() {
@@ -90,7 +97,7 @@ void Map::initialize_map() {
             */
             temp_row.push_back(new VNode(y,x,Controller::calculate_distance(y, x)));
         }
-        this->kMap.push_back(temp_row);
+        kMap.push_back(temp_row);
     }
 }
 
@@ -164,13 +171,13 @@ void Map::draw_bresenham_lines(vector<VEdge*> edges) {
         //claim("Drawing Line: (" + to_string(x1) + ", " + to_string(y1) + ")\t->\t(" + to_string(x2) + ", " + to_string(y2) + ")", kDebug);
         const bool steep = (fabs(y2 - y1) > fabs(x2 - x1));
         if(steep) {
-            std::swap(x1, y1);
-            std::swap(x2, y2);
+            mapswap(x1, y1);
+            mapswap(x2, y2);
         }
 
         if(x1 > x2) {
-            std::swap(x1, x2);
-            std::swap(y1, y2);
+            mapswap(x1, x2);
+            mapswap(y1, y2);
         }
 
         const float dx = x2 - x1;
@@ -203,9 +210,9 @@ void Map::draw_bresenham_lines(vector<VEdge*> edges) {
 }
 
 void Map::set(VNode* node) {
-    if(this->kMap.at(node->get_x()).at(node->get_y())->get_type() == VNode::Type::NONE) {
+    if(kMap.at(node->get_x()).at(node->get_y())->get_type() == VNode::Type::NONE) {
         //claim("M/set: Setting: " + node->vnode_to_string() + " to: " + node->type_to_string(node->get_type()), kDebug);
-        this->kMap.at(node->get_x()).at(node->get_y())->set_type(node->get_type());
+        kMap.at(node->get_x()).at(node->get_y())->set_type(node->get_type());
     }
 }
 

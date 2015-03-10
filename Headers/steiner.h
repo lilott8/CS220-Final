@@ -12,7 +12,7 @@ using namespace Utilities;
 using namespace std;
 using namespace Flow;
 
-namespace Algorithms {
+namespace FlowAlgorithms {
     struct SteinerTriangle {
         VNode* p1;
         VNode* p2;
@@ -33,18 +33,20 @@ namespace Algorithms {
         const double PI=3.14159265358979323846;
 
         Steiner();
+        Steiner(set<VNode*>);
         ~Steiner();
         // Templated entry point for all algorithmic starts
         void start();
 
-        void set_vertices(vector<VNode*>);
-        vector<VNode*> get_steiner_points();
+        void set_vertices(set<VNode*>);
+        set<VNode*> get_steiner_points();
+        set<VEdge*> get_steiner_edges();
 
     private:
-        vector<VNode*> kAllVertices;
+        set<VNode*> kAllVertices;
         vector<SteinerTriangle*> kTriangles;
-        vector<VNode*> kSteinerPoints;
-        vector<VEdge*> kSteinerEdges;
+        set<VNode*> kSteinerPoints;
+        set<VEdge*> kSteinerEdges;
 
         void generate_triangles(VNode* [], int, int, int, int);
         void generate_steiner_intersections();
@@ -58,6 +60,7 @@ namespace Algorithms {
         double calculate_euclidean_distance(VNode*, VNode*);
         double find_bigger_angle(double, double, double);
         double find_other_angle(double, double, double);
+        VEdge* calculate_midpoint(Point, Point);
     };
 }
 #endif

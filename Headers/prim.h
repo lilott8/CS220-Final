@@ -7,7 +7,7 @@
 
 using namespace Flow;
 
-namespace Algorithms {
+namespace FlowAlgorithms {
 
     //typedef adjacency_list < vecS, vecS, undirectedS,
     //        property<vertex_distance_t, int>, property < edge_weight_t, int > > Graph;

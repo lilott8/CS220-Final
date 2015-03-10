@@ -17,7 +17,7 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 set(Boost_INLCUDE_DIR /usr/local/Cellar/boost/1.57.0/includes)
-find_package(Boost 1.57.0 COMPONENTS Polygon geometry)
+find_package(Boost 1.57.0 COMPONENTS Polygon geometry Graph)
 
 #set(CGAL_INCLUDE_DIRS  "/usr/local/Cellar/cgal/4.5/include" )
 #set(CGAL_MODULES_DIR   "/opt/local//opt/local/lib/cmake" )

@@ -8,9 +8,6 @@
 #include "spc.h"
 #include "prim.h"
 
-using namespace Utilities;
-using namespace Algorithms;
-
 namespace Flow {
 
     class Controller {
@@ -27,24 +24,25 @@ namespace Flow {
         void print_map();
 
         static int calculate_distance(int, int);
+        static int calculate_manhattan_distance(VNode*, VNode*);
 
     private:
         Map *kMap;
 
-        vector<VEdge*> kEdges;      // generated edges
-        vector<VNode*> kVertices;      // list of all nodes, steiner and points
+        set<VEdge*> kEdges;      // generated edges
+        set<VNode*> kVertices;      // list of all nodes, steiner and points
 
-        Prim *kPrim;
-        Steiner *kSteiner;
-        Voronoi *kVoronoi;
-        SPC *kSPC;
+        //FlowAlgorithms::Prim *kPrim;
+        FlowAlgorithms::Steiner *kSteiner;
+        FlowAlgorithms::Voronoi *kVoronoi;
+        FlowAlgorithms::SPC *kSPC;
 
         Optimization kOpt;
 
         //bool kIsEuclidean;          // Euclidean or Rectilinear space
 
-        void project_vertices_on_map(vector<VNode*>);
-        void project_edges_on_map(vector<VEdge*>);
+        void project_vertices_on_map(set<VNode*>);
+        void project_edges_on_map(set<VEdge*>);
     };
 }
 #endif

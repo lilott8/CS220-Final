@@ -6,6 +6,8 @@
 using namespace Flow;
 using namespace Utilities;
 
+int VNode::kLastId = 0;
+
 VNode::VNode() {
 
 }
@@ -18,6 +20,8 @@ VNode::VNode(double x, double y, int cost) {
     this->kDoubleY = y;
     this->kOutput = 0;
     this->kType = VNode::NONE;
+    this->kId = kLastId;
+    VNode::kLastId += 1;
 }
 
 VNode::VNode(Point p, int cost) {
@@ -25,6 +29,8 @@ VNode::VNode(Point p, int cost) {
     Node::set_cost(cost);
     this->kOutput = 0;
     this->kType = VNode::NONE;
+    this->kId = kLastId;
+    VNode::kLastId += 1;
 }
 
 VNode::~VNode() {

@@ -3,7 +3,7 @@
 #include "../Headers/vnode.h"
 #include "../Headers/claim.h"
 
-using namespace Algorithms;
+using namespace FlowAlgorithms;
 using namespace Flow;
 
 Prim::Prim() {

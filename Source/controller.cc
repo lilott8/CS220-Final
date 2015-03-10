@@ -7,11 +7,13 @@
 #include "../Headers/steiner.h"
 #include "../Headers/prim.h"
 #include <vector>
+#include <set>
 
 
 using namespace Utilities;
-using namespace Algorithms;
+using namespace FlowAlgorithms;
 using namespace Flow;
+using namespace std;
 
 Controller::Controller() {
 
@@ -41,7 +43,6 @@ Controller::Controller(ProblemObject *po, Controller::AlgoType a, Controller::Op
 Controller::~Controller() {
     delete kSteiner;
     delete kVoronoi;
-    delete kPrim;
     delete kSPC;
 }
 
@@ -57,24 +58,25 @@ void Controller::start() {
     // Step 1
     kVoronoi->start();
     // add the nodes to our vertices
-    vector<VNode*> temp = kVoronoi->get_vertices();
+    std::set<VNode*> temp = kVoronoi->get_vertices();
     claim("C/start: Number of vertices from voronoi: " + to_string(kVoronoi->get_vertices().size()), kDebug);
     // Combine the voronoie with the pins
-    for(int x = 0;x<(int)temp.size();x++) { kVertices.push_back(temp.at(x));}
+    for(VNode* v : temp) {kVertices.insert(v);}
     project_vertices_on_map(kVertices);
 
     // step 2
-    kSteiner = new Steiner();
-    kSteiner->set_vertices(kVertices);
+    kSteiner = new Steiner(kVertices);
     kSteiner->start();
-    vector<VNode*> sp = kSteiner->get_steiner_points();
+    set<VNode*> sp = kSteiner->get_steiner_points();
+    claim("there are " + to_string(sp.size()) + " steiner points", kDebug);
+    claim("there are " + to_string(kSteiner->get_steiner_edges().size()) + " steiner edges", kDebug);
 
     project_vertices_on_map(sp);
     // Step 3
-    this->kSPC = new SPC();
+    this->kSPC = new SPC(kSteiner->get_steiner_edges());
     this->kSPC->start();
 
-    kMap->print_map();
+    //kMap->print_map();
 }
 
 
@@ -82,14 +84,14 @@ void Controller::print_map() {
     this->kMap->print_map();
 }
 
-void Controller::project_edges_on_map(vector<VEdge *> e) {
+void Controller::project_edges_on_map(set<VEdge *> e) {
     for(VEdge* v : e) {
         kMap->set(v->kStart);
         kMap->set(v->kEnd);
     }
 }
 
-void Controller::project_vertices_on_map(vector<VNode *> n) {
+void Controller::project_vertices_on_map(set<VNode *> n) {
     for(VNode* v : n) {
         kMap->set(v);
     }
@@ -97,4 +99,11 @@ void Controller::project_vertices_on_map(vector<VNode *> n) {
 
 int Controller::calculate_distance(int x, int y) {
     return (abs(x - 0) + abs(y - 0));
+}
+
+int Controller::calculate_manhattan_distance(VNode* a, VNode* b) {
+    int order1, order2;
+    order1 = abs(a->get_x() - b->get_x());
+    order2 = abs(a->get_y() - b->get_y());
+    return order1 + order2;
 }

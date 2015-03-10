@@ -1,11 +1,11 @@
-#include <boost/polygon/voronoi.hpp>
-#include <controller.h>
+//#include <boost/polygon/voronoi.hpp>
+#include "../Headers/controller.h"
 #include "../Headers/claim.h"
 #include "../Headers/vedge.h"
 #include "../Headers/voronoi.h"
 #include "../Headers/vnode.h"
 
-using namespace Algorithms;
+using namespace FlowAlgorithms;
 using namespace Flow;
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_diagram;
@@ -54,11 +54,12 @@ Voronoi::~Voronoi(){}
 void Voronoi::start() {
     vector<VoronoiSegment> segments = vector<VoronoiSegment>();
 
-    for(int x = 0; x < this->kMap->get_pins().size(); x++) {
-        kPoints.push_back(VoronoiPoint(this->kMap->get_pins().at(x)->get_x(), this->kMap->get_pins().at(x)->get_y()));
+    //for(int x = 0; x < this->kMap->get_pins().size(); x++) {
+    for(VNode* v : this->kMap->get_pins()) {
+        kVertices.push_back(VoronoiVertex(v->get_x(), v->get_y()));
     }
 
-    construct_voronoi(kPoints.begin(), kPoints.end(), segments.begin(), segments.end(), &kVoronoiDiagram);
+    construct_voronoi(kVertices.begin(), kVertices.end(), segments.begin(), segments.end(), &kVoronoiDiagram);
     this->generate_edges();
 }
 
@@ -88,7 +89,7 @@ void Voronoi::generate_edges() {
 
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
                         if(!in_edges(vedge)) {
-                            kVoronoiEdges.push_back(vedge);
+                            kVoronoiEdges.insert(vedge);
                         }
                         //claim("F/generate_edgs: Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
@@ -100,15 +101,15 @@ void Voronoi::generate_edges() {
                         // between the points owning the two half edges.
                         // Take the rotated right vector and multiply by a large
                         // enough number to reach your bounding box
-                        VoronoiPoint p1 = kPoints.at(edge->cell()->source_index());
-                        VoronoiPoint p2 = kPoints.at(edge->twin()->cell()->source_index());
+                        VoronoiVertex p1 = kVertices.at(edge->cell()->source_index());
+                        VoronoiVertex p2 = kVertices.at(edge->twin()->cell()->source_index());
                         double end_x = (p1.b - p2.b) * 640;
                         double end_y = (p1.a - p2.b) * -640;
 
                         vedge = create_edge(v0->x(), v0->y(), end_x, end_y);
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
                         if(!in_edges(vedge)) {
-                            kVoronoiEdges.push_back(vedge);
+                            kVoronoiEdges.insert(vedge);
                         }
                         //claim("F/generate_edgs: *Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
@@ -124,7 +125,7 @@ void Voronoi::generate_edges() {
 * Retrieve the edges generated from the boost voronoi creator
 * @return vector of edges
 */
-vector<VEdge*> Voronoi::get_edges() {
+set<VEdge*> Voronoi::get_edges() {
     return this->kVoronoiEdges;
 }
 
@@ -132,7 +133,7 @@ vector<VEdge*> Voronoi::get_edges() {
 * Retrieve the vertices generated from the boost voronoi creator
 * @return vector of vertices
 */
-vector<VNode*> Voronoi::get_vertices() {
+set<VNode*> Voronoi::get_vertices() {
     return this->kVoronoiVertices;
 }
 
@@ -171,16 +172,19 @@ VEdge* Voronoi::create_edge(double start_x, double start_y, double end_x, double
     else {y2 = round(end_y);}
 
     VEdge *e = new VEdge();
-    e->kStart = new VNode(x1, y1, Controller::calculate_distance(x1, y1));
-    e->kEnd = new VNode(x2, y2, Controller::calculate_distance(x2, y2));
+    //e->kStart = new VNode(x1, y1, Controller::calculate_distance(x1, y1));
+    e->kStart = Map::get_map().at(x1).at(y1);
+    //e->kEnd = new VNode(x2, y2, Controller::calculate_distance(x2, y2));
+    e->kEnd = Map::get_map().at(x2).at(y2);
     e->kStart->set_type(VNode::Type::VORONOI);
     e->kEnd->set_type(VNode::Type::VORONOI);
+    e->kCost = Controller::calculate_manhattan_distance(e->kStart, e->kEnd);
     // We need to save the individual vertices as well
     if(!in_vertices(e->kStart)) {
-        kVoronoiVertices.push_back(e->kStart);
+        kVoronoiVertices.insert(e->kStart);
     }
     if(!in_vertices(e->kEnd)) {
-        kVoronoiVertices.push_back(e->kEnd);
+        kVoronoiVertices.insert(e->kEnd);
     }
     //claim("creating a node of: " + e->vedge_to_string(), kDebug);
     //claim("====================================", kDebug);

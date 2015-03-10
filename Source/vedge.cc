@@ -1,3 +1,4 @@
+#include <controller.h>
 #include "../Headers/vedge.h"
 #include "../Headers/vnode.h"
 #include "../Headers/node.h"
@@ -12,6 +13,12 @@ VEdge::VEdge(VNode* start, VNode* left, VNode* right) {
     kEnd = NULL;
 
     kDirection = new VNode(right->get_y() - left->get_y(), -(right->get_x() - left->get_x()));
+}
+
+VEdge::VEdge(VNode* start, VNode* end) {
+    kStart = start;
+    kEnd = end;
+    //kCost = Controller::calculate_manhattan_distance(start, end);
 }
 
 VEdge::~VEdge() {

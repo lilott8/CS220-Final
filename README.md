@@ -2,12 +2,13 @@ CS220 Project Framework
 ===============
 #Changelog:
  
-  - Steiner point creation is done
-  - Prim's algorithm is almost done being implemented as well
-  - documented voronoi.cpp and .h
+  - Dijkstra's is done
+  - Huge efficiency improvements, instead of creating >600 nodes, I now only create MxN nodes
+  - Using sets for data structures to guarantee uniqueness in lists.
   
 ##Done:
 
+ - Dijkstra's is done
  - Steiner point creation
  - Removed the binary tree and added the R* tree from boost.
  - Added the Binary tree interface for running SPC in V+ElogE time
@@ -26,7 +27,7 @@ CS220 Project Framework
 
 ##TODO:
  
- - finish the prim's boost implementation
+ - fix the output of the dijkstra, so that it can be moved into Kruskal's
  - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
  - figure out why the map coords need to be switched in init!
  - place edges into btree *(Resolved)*
@@ -40,6 +41,8 @@ CS220 Project Framework
  - why can't vedge and arch have pointers to each other?? *(Resolved)*
  - Figure out what, exactly the output means and make it useful *(Resolved)*
  - Implement my datastructures with the Boost::Voronoi algorithm *(Resolved)*
+ 
+http://people.cs.pitt.edu/~alanjawi/cs449/code/shell/UnixSignals.htm 
  
 ## Project Overview
 

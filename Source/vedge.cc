@@ -6,6 +6,8 @@
 
 using namespace Flow;
 
+int VEdge::kLastId = 0;
+
 VEdge::VEdge(){}
 
 VEdge::VEdge(VNode* start, VNode* left, VNode* right) {
@@ -18,7 +20,9 @@ VEdge::VEdge(VNode* start, VNode* left, VNode* right) {
 VEdge::VEdge(VNode* start, VNode* end) {
     kStart = start;
     kEnd = end;
-    //kCost = Controller::calculate_manhattan_distance(start, end);
+    kId = kLastId;
+    kLastId += 1;
+    kCost = Controller::calculate_manhattan_distance(start, end);
 }
 
 VEdge::~VEdge() {

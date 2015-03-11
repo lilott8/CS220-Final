@@ -16,9 +16,12 @@ namespace Flow {
         VEdge(VNode*, VNode*);
         ~VEdge();
 
+        static int kLastId;
+
         VNode* kStart;
         VNode* kEnd;
         VNode* kDirection;
+        int kId;
 
         int kCost;
 

@@ -25,36 +25,29 @@ namespace FlowAlgorithms {
         int id;
         int source, target;
         double weight;
-        Flow::VEdge* edge;
+        //Flow::VEdge* edge;
     };
-
-    /**
-    * Kruskal definitions
-    */
-    /*typedef adjacency_list < vecS, vecS, undirectedS,
-            no_property, property < edge_weight_t, int > > kruskal_graph_t;
-    typedef graph_traits < kruskal_graph_t >::edge_descriptor kruskal_edge_desrciptor;
-    typedef graph_traits < kruskal_graph_t >::vertex_descriptor kruskal_vertex_descriptor;
-    typedef std::pair<int, int> kruskal_edge;*/
 
     class SPC {
         /**
         * Dijkstra definitions
         */
         using dijkstra_graph_t  = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, boost::no_property, VEdgeWrapper>;
-        using vertex_descriptor = boost::graph_traits<dijkstra_graph_t>::vertex_descriptor;
-        using edge_descriptor   = boost::graph_traits<dijkstra_graph_t>::edge_descriptor;
-        using weight_map_t      = boost::property_map<dijkstra_graph_t, double VEdgeWrapper::*>::type;
-        using d_start_map_t     = boost::property_map<dijkstra_graph_t, int VEdgeWrapper::*>::type;
-        //using d_vedge_map_t     = boost::property_map<dijkstra_graph_t, VEdge VEdgeWrapper::*>type;
+        using d_vertex_descriptor = boost::graph_traits<dijkstra_graph_t>::vertex_descriptor;
+        using d_edge_descriptor   = boost::graph_traits<dijkstra_graph_t>::edge_descriptor;
+        using d_weight_map_t      = boost::property_map<dijkstra_graph_t, double VEdgeWrapper::*>::type;
 
+        /**
+        * Kruskal definitions
+        */
         using kruskal_graph_t       = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, boost::no_property, VEdgeWrapper>;
         using k_vertex_descriptor   = boost::graph_traits<kruskal_graph_t>::vertex_descriptor;
         using k_edge_descriptor     = boost::graph_traits<kruskal_graph_t>::edge_descriptor;
         using k_weight_map_t        = boost::property_map<kruskal_graph_t, double VEdgeWrapper::*>::type;
 
     public:
-        enum MapAlgorithm {DIJKSTRA, KRUSKAL};
+
+        enum STEP {ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX};
 
         SPC();
 
@@ -70,13 +63,18 @@ namespace FlowAlgorithms {
 
         void run_kruskal();
 
-        void generate_dot_file(MapAlgorithm);
-        void print_path(MapAlgorithm);
+        void generate_dot_dijkstra();
+        void generate_dot_kruskal();
+        void debug_dijkstra();
+        void debug_kruskal();
         void print_dijkstra_output();
 
         dijkstra_graph_t kDijkstraGraph;
+        kruskal_graph_t kKruskalGraph;
         std::vector<int> kD;
-        std::vector<vertex_descriptor> kP;
+        std::vector<d_vertex_descriptor> kDijkstraVD;
+        std::vector<k_vertex_descriptor> kKruskalVD;
+
         std::vector<VEdgeWrapper> kInputEdges;
         std::vector<VEdge*> kDijkstraOutputEdges;
         std::unordered_map<int, VNode*> kHashMap;

@@ -2,6 +2,8 @@ CS220 Project Framework
 ===============
 #Changelog:
  
+  - paper 5's iterative process is ready, I just have to figure out a few last details
+  - Kruskal's is implemented, the output is correct and able to accept input
   - Dijkstra's output is correct and prepared for Kruskal's input
   - retooled the Steiner point generation, the papers are very conservative, so points are only created by means of comparing a node to it's closest neighbor.
   - Dijkstra's is done

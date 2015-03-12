@@ -32,22 +32,23 @@ namespace FlowAlgorithms {
         /**
         * Dijkstra definitions
         */
-        using dijkstra_graph_t  = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, boost::no_property, VEdgeWrapper>;
-        using d_vertex_descriptor = boost::graph_traits<dijkstra_graph_t>::vertex_descriptor;
-        using d_edge_descriptor   = boost::graph_traits<dijkstra_graph_t>::edge_descriptor;
-        using d_weight_map_t      = boost::property_map<dijkstra_graph_t, double VEdgeWrapper::*>::type;
+        using graph_t  = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, boost::no_property, VEdgeWrapper>;
+        using vertex_descriptor = boost::graph_traits<graph_t>::vertex_descriptor;
+        using edge_descriptor   = boost::graph_traits<graph_t>::edge_descriptor;
+        using weight_map_t      = boost::property_map<graph_t, double VEdgeWrapper::*>::type;
 
         /**
         * Kruskal definitions
         */
-        using kruskal_graph_t       = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, boost::no_property, VEdgeWrapper>;
-        using k_vertex_descriptor   = boost::graph_traits<kruskal_graph_t>::vertex_descriptor;
-        using k_edge_descriptor     = boost::graph_traits<kruskal_graph_t>::edge_descriptor;
-        using k_weight_map_t        = boost::property_map<kruskal_graph_t, double VEdgeWrapper::*>::type;
+        //using kruskal_graph_t       = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, boost::no_property, VEdgeWrapper>;
+        //using k_vertex_descriptor   = boost::graph_traits<kruskal_graph_t>::vertex_descriptor;
+        //using k_edge_descriptor     = boost::graph_traits<kruskal_graph_t>::edge_descriptor;
+        //using k_weight_map_t        = boost::property_map<kruskal_graph_t, double VEdgeWrapper::*>::type;
 
     public:
 
-        enum STEP {ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX};
+        enum PHASE {ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX};
+        enum GRAPH_ALGO{DIJKSTRA, KRUSKAL};
 
         SPC();
 
@@ -59,25 +60,25 @@ namespace FlowAlgorithms {
         void start();
 
     private:
+
         void run_dijkstra();
 
         void run_kruskal();
 
-        void generate_dot_dijkstra();
-        void generate_dot_kruskal();
-        void debug_dijkstra();
-        void debug_kruskal();
+        void generate_dot_file(GRAPH_ALGO);
+        void debug_graph_algorithm(GRAPH_ALGO);
         void print_dijkstra_output();
 
-        dijkstra_graph_t kDijkstraGraph;
-        kruskal_graph_t kKruskalGraph;
+        graph_t kGraph;
+        //kruskal_graph_t kKruskalGraph;
         std::vector<int> kD;
-        std::vector<d_vertex_descriptor> kDijkstraVD;
-        std::vector<k_vertex_descriptor> kKruskalVD;
+        std::vector<vertex_descriptor> kVD;
+        //std::vector<k_vertex_descriptor> kKruskalVD;
 
         std::vector<VEdgeWrapper> kInputEdges;
         std::vector<VEdge*> kDijkstraOutputEdges;
         std::unordered_map<int, VNode*> kHashMap;
+        std::string kGraphAlgo[2] = {"Dijkstra", "Kruskal"};
     };
 }
 

@@ -40,32 +40,30 @@ void SPC::start() {
         switch(step) {
             // generate Dijkstra from subset of InputEdges (G1)
             case ONE:
-
+                run_dijkstra();
                 break;
-            // generate Kruskal from Dijkstra outputs (G2)
+                // generate Kruskal from Dijkstra outputs (G2)
             case TWO:
-
+                run_kruskal();
                 break;
-            // replace edges in G2 with their shortest edge from G (G4)
+                // replace edges in G2 with their shortest edge from G (G4)
             case THREE:
 
                 break;
-            // generate Kruskal from G4 (G5)
+                // generate Kruskal from G4 (G5)
             case FOUR:
 
                 break;
-            // supposedely delete edges from G4, done!
+                // supposedely delete edges from G4, done!
             case FIVE:
 
                 break;
-            // noop
+                // noop
             default:
             case ZERO:
 
                 break;
         }
-        run_dijkstra();
-        run_kruskal();
     }
 }
 
@@ -82,21 +80,22 @@ void SPC::run_kruskal() {
             std::greater<size_t>());
 
     auto e = kInputEdges | transformed([](VEdgeWrapper const &ve) { return std::make_pair(ve.source, ve.target); });
-    kKruskalGraph = kruskal_graph_t(e.begin(), e.end(), kInputEdges.begin(), max_node + 1);
+    kGraph = graph_t(e.begin(), e.end(), kInputEdges.begin(), max_node + 1);
 
-    k_weight_map_t kWeightMap = boost::get(&VEdgeWrapper::weight, kKruskalGraph);
+    weight_map_t kWeightMap = boost::get(&VEdgeWrapper::weight, kGraph);
 
-    k_vertex_descriptor kS  = vertex(0, kKruskalGraph);
-    kKruskalVD              = std::vector<k_vertex_descriptor>(num_vertices(kKruskalGraph));
-    kD                      = std::vector<int>(num_vertices(kKruskalGraph));
+    vertex_descriptor kS  = vertex(0, kGraph);
+    kVD              = std::vector<vertex_descriptor>(num_vertices(kGraph));
+    kD                      = std::vector<int>(num_vertices(kGraph));
 
     dijkstra_shortest_paths(
-            kKruskalGraph, kS,
-            predecessor_map(boost::make_iterator_property_map(kKruskalVD.begin(), get(boost::vertex_index, kKruskalGraph)))
-                    .distance_map(boost::make_iterator_property_map(kD.begin(), get(boost::vertex_index, kKruskalGraph)))
+            kGraph, kS,
+            predecessor_map(boost::make_iterator_property_map(kVD.begin(), get(boost::vertex_index, kGraph)))
+                    .distance_map(boost::make_iterator_property_map(kD.begin(), get(boost::vertex_index, kGraph)))
                     .weight_map(kWeightMap));
-    //debug_kruskal();
-    generate_dot_kruskal();
+
+    debug_graph_algorithm(KRUSKAL);
+    generate_dot_file(KRUSKAL);
 }
 
 void SPC::run_dijkstra() {
@@ -112,55 +111,44 @@ void SPC::run_dijkstra() {
             std::greater<size_t>());
 
     auto e = kInputEdges | transformed([](VEdgeWrapper const &ve) { return std::make_pair(ve.source, ve.target); });
-    kDijkstraGraph = dijkstra_graph_t(e.begin(), e.end(), kInputEdges.begin(), max_node + 1);
+    kGraph = graph_t(e.begin(), e.end(), kInputEdges.begin(), max_node + 1);
 
-    d_weight_map_t kWeightMap = boost::get(&VEdgeWrapper::weight, kDijkstraGraph);
+    weight_map_t kWeightMap = boost::get(&VEdgeWrapper::weight, kGraph);
 
-    d_vertex_descriptor kS    = vertex(0, kDijkstraGraph);
-    kDijkstraVD             = std::vector<d_vertex_descriptor>(num_vertices(kDijkstraGraph));
-    kD                      = std::vector<int>(num_vertices(kDijkstraGraph));
+    vertex_descriptor kS    = vertex(0, kGraph);
+    kVD             = std::vector<vertex_descriptor>(num_vertices(kGraph));
+    kD                      = std::vector<int>(num_vertices(kGraph));
 
     dijkstra_shortest_paths(
-            kDijkstraGraph, kS,
-            predecessor_map(boost::make_iterator_property_map(kDijkstraVD.begin(), get(boost::vertex_index, kDijkstraGraph)))
-                    .distance_map(boost::make_iterator_property_map(kD.begin(), get(boost::vertex_index, kDijkstraGraph)))
+            kGraph, kS,
+            predecessor_map(boost::make_iterator_property_map(kVD.begin(), get(boost::vertex_index, kGraph)))
+                    .distance_map(boost::make_iterator_property_map(kD.begin(), get(boost::vertex_index, kGraph)))
                     .weight_map(kWeightMap));
 
-    //debug_dijkstra();
-    generate_dot_dijkstra();
+    debug_graph_algorithm(DIJKSTRA);
+    generate_dot_file(DIJKSTRA);
     //print_dijkstra_output();
 }
 
 // TODO: figure out why the output values for distance are the max value of int...
-void SPC::debug_dijkstra() {
-    boost::graph_traits<dijkstra_graph_t>::vertex_iterator vi, vend;
-    string output = "distances and parents:\n";
-    for (boost::tie(vi, vend) = vertices(kDijkstraGraph); vi != vend; ++vi) {
+void SPC::debug_graph_algorithm(GRAPH_ALGO a) {
+    boost::graph_traits<graph_t>::vertex_iterator vi, vend;
+    string output = kGraphAlgo[a] + ": distances and parents:\n";
+    for (boost::tie(vi, vend) = vertices(kGraph); vi != vend; ++vi) {
         output += "distance(" + to_string(*vi) + ") = " + to_string(kD[*vi]) + ", ";
-        output += "parent(" + to_string(*vi) + ") = " + to_string(kDijkstraVD[*vi]) + "\n";
+        output += "parent(" + to_string(*vi) + ") = " + to_string(kVD[*vi]) + "\n";
     }
     claim(output, kDebug);
 }
 
-// TODO: figure out why the output values for distance are the max value of int...
-void SPC::debug_kruskal() {
-    boost::graph_traits<kruskal_graph_t>::vertex_iterator vi, vend;
-    string output = "distances and parents:\n";
-    for (boost::tie(vi, vend) = vertices(kKruskalGraph); vi != vend; ++vi) {
-        output += "distance(" + to_string(*vi) + ") = " + to_string(kD[*vi]) + ", ";
-        output += "parent(" + to_string(*vi) + ") = " + to_string(kKruskalVD[*vi]) + "\n";
-    }
-    claim(output, kDebug);
-}
-
-void SPC::generate_dot_kruskal() {
+void SPC::generate_dot_file(GRAPH_ALGO a) {
     std::string output_file_name;
-    output_file_name = "kruskal-eg.dot";
-    k_weight_map_t weight_map = boost::get(&VEdgeWrapper::weight, kKruskalGraph);
+    output_file_name = kGraphAlgo[a] + "-eg.dot";
+    weight_map_t weight_map = boost::get(&VEdgeWrapper::weight, kGraph);
 
     std::ofstream dot_file(output_file_name,std::ofstream::out);
 
-    string output = "digraph D {\nrankdir=LR\n";
+    string output = kGraphAlgo[a] + ":\ndigraph D {\nrankdir=LR\n";
     output += "  size=\"4,3\"\nratio=\"fill\"\n";
     output += "  edge[style=\"bold\"]\nnode[shape=\"circle\"]\n";
 
@@ -171,62 +159,17 @@ void SPC::generate_dot_kruskal() {
             << "  edge[style=\"bold\"]\n"
             << "  node[shape=\"circle\"]\n";
 
-    boost::graph_traits<kruskal_graph_t>::edge_iterator ei, ei_end;
-    for (boost::tie(ei, ei_end) = boost::edges(kKruskalGraph); ei != ei_end; ++ei) {
-        boost::graph_traits<kruskal_graph_t>::edge_descriptor e = *ei;
-        boost::graph_traits<kruskal_graph_t>::vertex_descriptor u = source(e, kKruskalGraph), v = target(e, kKruskalGraph);
+    boost::graph_traits<graph_t>::edge_iterator ei, ei_end;
+    for (boost::tie(ei, ei_end) = boost::edges(kGraph); ei != ei_end; ++ei) {
+        boost::graph_traits<graph_t>::edge_descriptor e = *ei;
+        boost::graph_traits<graph_t>::vertex_descriptor u = source(e, kGraph), v = target(e, kGraph);
         dot_file << u << " -> " << v << "[label=\"" << get(weight_map, e) << "\"";
         output += to_string(u) + " -> " + to_string(v) + "[label=\"" + to_string(get(weight_map, e)) + "\"";
 
         // Add the edges of the graph to the output, to prepare for Kruskal
         //kDijkstraOutputEdges.push_back(new VEdge(kHashMap.at((int)u), kHashMap.at((int)v)));
 
-        if (kKruskalVD[v] == u) {
-            dot_file << ", color=\"black\"";
-            output += ", color=\"black\"";
-        } else {
-            dot_file << ", color=\"grey\"";
-            output += ", color=\"grey\"";
-        }
-        dot_file << "]";
-        output += "]";
-    }
-    dot_file << "}";
-    output += "}";
-
-    claim(output, kDebug);
-    dot_file.close();
-}
-
-void SPC::generate_dot_dijkstra() {
-    std::string output_file_name;
-    output_file_name = "dijkstra-eg.dot";
-    d_weight_map_t weight_map = boost::get(&VEdgeWrapper::weight, kDijkstraGraph);
-
-    std::ofstream dot_file(output_file_name,std::ofstream::out);
-
-    string output = "digraph D {\nrankdir=LR\n";
-    output += "  size=\"4,3\"\nratio=\"fill\"\n";
-    output += "  edge[style=\"bold\"]\nnode[shape=\"circle\"]\n";
-
-    dot_file << "digraph D {\n"
-            << "  rankdir=LR\n"
-            << "  size=\"4,3\"\n"
-            << "  ratio=\"fill\"\n"
-            << "  edge[style=\"bold\"]\n"
-            << "  node[shape=\"circle\"]\n";
-
-    boost::graph_traits<dijkstra_graph_t>::edge_iterator ei, ei_end;
-    for (boost::tie(ei, ei_end) = boost::edges(kDijkstraGraph); ei != ei_end; ++ei) {
-        boost::graph_traits<dijkstra_graph_t>::edge_descriptor e = *ei;
-        boost::graph_traits<dijkstra_graph_t>::vertex_descriptor u = source(e, kDijkstraGraph), v = target(e, kDijkstraGraph);
-        dot_file << u << " -> " << v << "[label=\"" << get(weight_map, e) << "\"";
-        output += to_string(u) + " -> " + to_string(v) + "[label=\"" + to_string(get(weight_map, e)) + "\"";
-
-        // Add the edges of the graph to the output, to prepare for Kruskal
-        kDijkstraOutputEdges.push_back(new VEdge(kHashMap.at((int)u), kHashMap.at((int)v)));
-
-        if (kDijkstraVD[v] == u) {
+        if (kVD[v] == u) {
             dot_file << ", color=\"black\"";
             output += ", color=\"black\"";
         } else {

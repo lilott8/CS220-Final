@@ -53,7 +53,7 @@ string VNode::type_to_string(Type t) {
     string output = "";
     switch(t) {
         case PIN:
-            output = "p";
+            output = "pin";
             break;
         case BLOCKED:
             output = "x";
@@ -96,7 +96,7 @@ double VNode::get_dy() {
 }
 
 string VNode::vnode_to_string() {
-    string ret = "ID: " + to_string(kId) + ", (" + to_string(get_x()) + ", " + to_string(get_y()) + ")";
+    string ret = "Meta: (ID: " + to_string(kId) + "\tType: " + type_to_string(kType) + ")\t Coords: (" + to_string(get_x()) + ", " + to_string(get_y()) + ")\t";
     return ret;
 }
 

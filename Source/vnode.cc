@@ -96,7 +96,7 @@ double VNode::get_dy() {
 }
 
 string VNode::vnode_to_string() {
-    string ret = "(" + to_string(get_x()) + ", " + to_string(get_y()) + ")";
+    string ret = "ID: " + to_string(kId) + ", (" + to_string(get_x()) + ", " + to_string(get_y()) + ")";
     return ret;
 }
 

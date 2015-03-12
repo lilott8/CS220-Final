@@ -13,6 +13,9 @@ VEdge::VEdge(){}
 VEdge::VEdge(VNode* start, VNode* left, VNode* right) {
     kStart = start;
     kEnd = NULL;
+    kCost = -1;
+    kId = kLastId;
+    kLastId += 1;
 
     kDirection = new VNode(right->get_y() - left->get_y(), -(right->get_x() - left->get_x()));
 }
@@ -30,7 +33,8 @@ VEdge::~VEdge() {
 }
 
 string VEdge::vedge_to_string() {
-    string ret = "Starting node: " + kStart->vnode_to_string() + "\t->\t Ending Node: " + kEnd->vnode_to_string();
+    string ret = "Id: " + to_string(kId) + " Starting node: " + kStart->vnode_to_string()
+            + "\t->\t Ending Node: " + kEnd->vnode_to_string() + " with a cost of: " + to_string(kCost);
     return ret;
 }
 

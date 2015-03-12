@@ -20,67 +20,19 @@ using namespace boost::adaptors;
 SPC::SPC(){}
 
 SPC::SPC(std::set<VEdge*> edges) {
-    VEdgeWrapper ve;
     for(VEdge* e : edges) {
-        ve.id = e->kId;
-        ve.weight = e->kCost;
-        ve.source = e->kStart->get_id();
-        ve.target = e->kEnd->get_id();
-        kEdges.push_back(ve);
+        kInputEdges.push_back({ e->kId, e->kStart->get_id(), e->kEnd->get_id(), (double)e->kCost, e});
+        kHashMap.insert({e->kStart->get_id(), e->kStart});
+        kHashMap.insert({e->kEnd->get_id(), e->kEnd});
     }
-
-    kNumNodes = (int)edges.size();
-
 }
 
-SPC::~SPC(){
-    //delete kDijkstra;
-}
+SPC::~SPC(){}
 
 void SPC::start() {
     claim("S/start: starting SPC", kDebug);
     run_dijkstra();
     run_kruskal();
-    run_dijkstra_two(kEdges);
-}
-
-
-void SPC::run_dijkstra() {
-    claim("S/run_dijkstra: starting boost/dijkstra", kDebug);
-
-   /* DEdge kEdgeArray[] = {};
-    int kWeightsArray[] = {};
-
-    const int num_nodes = 5;
-    enum nodes { A, B, C, D, E };
-    char name[] = "ABCDE";
-
-    DEdge edge_array[] = { DEdge(A, C), DEdge(B, B), DEdge(B, D), DEdge(B, E),
-            DEdge(C, B), DEdge(C, D), DEdge(D, E), DEdge(E, A), DEdge(E, B)
-    };
-
-    int weights[] = { 1, 2, 1, 2, 7, 3, 1, 1, 1 };
-    int num_arcs = sizeof(edge_array) / sizeof(DEdge);
-    dijkstra_graph_t graph(edge_array, edge_array + num_arcs, weights, num_nodes);
-
-    // Boost graph object
-    property_map<dijkstra_graph_t, edge_weight_t>::type weightmap = get(edge_weight, graph);
-    std::vector<dijkstra_vertex_descriptor> p(num_vertices(graph));
-    std::vector<int> d(num_vertices(graph));
-    dijkstra_vertex_descriptor s = vertex(A, graph);
-
-    dijkstra_shortest_paths(graph, s,
-            predecessor_map(boost::make_iterator_property_map(p.begin(), get(boost::vertex_index, graph))).
-                    distance_map(boost::make_iterator_property_map(d.begin(), get(boost::vertex_index, graph))));
-
-    std::cout << "distances and parents:" << std::endl;
-    graph_traits < dijkstra_graph_t >::vertex_iterator vi, vend;
-    for (boost::tie(vi, vend) = vertices(graph); vi != vend; ++vi) {
-        std::cout << "distance(" << name[*vi] << ") = " << d[*vi] << ", ";
-        std::cout << "parent(" << name[*vi] << ") = " << name[p[*vi]] << std::
-        endl;
-    }
-    std::cout << std::endl;*/
 }
 
 void SPC::run_kruskal() {
@@ -108,43 +60,62 @@ void SPC::run_kruskal() {
     }*/
 }
 
-void SPC::run_dijkstra_two(vector<VEdgeWrapper> edges) {
+void SPC::run_dijkstra() {
+    claim("S/run_dijkstra: starting boost/dijkstra", kDebug);
+
     using namespace boost::adaptors;
 
     size_t max_node;
 
     boost::partial_sort_copy(
-            edges | transformed([](VEdgeWrapper const &e) -> size_t { return std::max(e.source, e.target); }),
+            kInputEdges | transformed([](VEdgeWrapper const &e) -> size_t { return std::max(e.source, e.target); }),
             boost::make_iterator_range(&max_node, &max_node + 1),
             std::greater<size_t>());
 
-    auto e = edges | transformed([](VEdgeWrapper const &ve) { return std::make_pair(ve.source, ve.target); });
-    kGraph = dijkstra_graph_t(e.begin(), e.end(), edges.begin(), max_node + 1);
+    auto e = kInputEdges | transformed([](VEdgeWrapper const &ve) { return std::make_pair(ve.source, ve.target); });
+    kDijkstraGraph = dijkstra_graph_t(e.begin(), e.end(), kInputEdges.begin(), max_node + 1);
 
-    weight_map_t kWeightMap = boost::get(&VEdgeWrapper::weight, kGraph);
+    weight_map_t kWeightMap = boost::get(&VEdgeWrapper::weight, kDijkstraGraph);
 
-    vertex_descriptor kS    = vertex(0, kGraph);
-    kP                      = std::vector<vertex_descriptor>(num_vertices(kGraph));
-    kD                      = std::vector<int>(num_vertices(kGraph));
+    vertex_descriptor kS    = vertex(1, kDijkstraGraph);
+    kP                      = std::vector<vertex_descriptor>(num_vertices(kDijkstraGraph));
+    kD                      = std::vector<int>(num_vertices(kDijkstraGraph));
 
     dijkstra_shortest_paths(
-            kGraph, kS,
-            predecessor_map(boost::make_iterator_property_map(kP.begin(), get(boost::vertex_index, kGraph)))
-                    .distance_map(boost::make_iterator_property_map(kD.begin(), get(boost::vertex_index, kGraph)))
+            kDijkstraGraph, kS,
+            predecessor_map(boost::make_iterator_property_map(kP.begin(), get(boost::vertex_index, kDijkstraGraph)))
+                    .distance_map(boost::make_iterator_property_map(kD.begin(), get(boost::vertex_index, kDijkstraGraph)))
                     .weight_map(kWeightMap));
 
+    //print_path(DIJKSTRA);
+    generate_dot_file(DIJKSTRA);
+    print_dijkstra_output();
+}
+
+// TODO: figure out why the output values for distance are the max value of int...
+void SPC::print_path(MapAlgorithm a) {
     std::cout << "distances and parents:" << std::endl;
     boost::graph_traits<dijkstra_graph_t>::vertex_iterator vi, vend;
 
-    for (boost::tie(vi, vend) = vertices(kGraph); vi != vend; ++vi) {
-        std::cout << "distance(" << *vi << ") = " << kD[*vi] << ", ";
-        std::cout << "parent(" << *vi << ") = " << kP[*vi] << "\n";
+    string output = "";
+
+    for (boost::tie(vi, vend) = vertices(kDijkstraGraph); vi != vend; ++vi) {
+        //std::cout << *vi << std::endl;
+        output += "distance(" + to_string(*vi) + ") = " + to_string(kD[*vi]) + ", ";
+        output += "parent(" + to_string(*vi) + ") = " + to_string(kP[*vi]) + "\n";
     }
 
-    /**
-    * Generating the DOT file
-    */
-    std::ofstream dot_file("dijkstra-eg.dot",std::ofstream::out);
+    claim(output, kDebug);
+}
+
+
+void SPC::generate_dot_file(MapAlgorithm a) {
+
+    std::string output_file_name;
+    weight_map_t weight_map = boost::get(&VEdgeWrapper::weight, kDijkstraGraph);
+    output_file_name = "dijkstra-eg.dot";
+
+    std::ofstream dot_file(output_file_name,std::ofstream::out);
 
     string output = "digraph D {\nrankdir=LR\n";
     output += "  size=\"4,3\"\nratio=\"fill\"\n";
@@ -157,13 +128,15 @@ void SPC::run_dijkstra_two(vector<VEdgeWrapper> edges) {
             << "  edge[style=\"bold\"]\n"
             << "  node[shape=\"circle\"]\n";
 
-
     boost::graph_traits<dijkstra_graph_t>::edge_iterator ei, ei_end;
-    for (boost::tie(ei, ei_end) = boost::edges(kGraph); ei != ei_end; ++ei) {
+    for (boost::tie(ei, ei_end) = boost::edges(kDijkstraGraph); ei != ei_end; ++ei) {
         boost::graph_traits<dijkstra_graph_t>::edge_descriptor e = *ei;
-        boost::graph_traits<dijkstra_graph_t>::vertex_descriptor u = source(e, kGraph), v = target(e, kGraph);
-        dot_file << u << " -> " << v << "[label=\"" << get(kWeightMap, e) << "\"";
-        output += to_string(u) + " -> " + to_string(v) + "[label=\"" + to_string(get(kWeightMap, e)) + "\"";
+        boost::graph_traits<dijkstra_graph_t>::vertex_descriptor u = source(e, kDijkstraGraph), v = target(e, kDijkstraGraph);
+        dot_file << u << " -> " << v << "[label=\"" << get(weight_map, e) << "\"";
+        output += to_string(u) + " -> " + to_string(v) + "[label=\"" + to_string(get(weight_map, e)) + "\"";
+
+        // Add the edges of the graph to the output, to prepare for Kruskal
+        kDijkstraOutputEdges.push_back(new VEdge(kHashMap.at((int)u), kHashMap.at((int)v)));
 
         if (kP[v] == u) {
             dot_file << ", color=\"black\"";
@@ -179,6 +152,11 @@ void SPC::run_dijkstra_two(vector<VEdgeWrapper> edges) {
     output += "}";
 
     claim(output, kDebug);
-
     dot_file.close();
+}
+
+void SPC::print_dijkstra_output() {
+    for(VEdge* e : kDijkstraOutputEdges) {
+        claim(e->vedge_to_string(), kDebug);
+    }
 }

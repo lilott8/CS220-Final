@@ -2,6 +2,8 @@ CS220 Project Framework
 ===============
 #Changelog:
  
+  - Dijkstra's output is correct and prepared for Kruskal's input
+  - retooled the Steiner point generation, the papers are very conservative, so points are only created by means of comparing a node to it's closest neighbor.
   - Dijkstra's is done
   - Huge efficiency improvements, instead of creating >600 nodes, I now only create MxN nodes
   - Using sets for data structures to guarantee uniqueness in lists.
@@ -27,9 +29,11 @@ CS220 Project Framework
 
 ##TODO:
  
- - fix the output of the dijkstra, so that it can be moved into Kruskal's
+ - refactor dijkstra so there isn't as much debugging and unnecessary code
+ - delete unnecessary edges once created
  - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
  - figure out why the map coords need to be switched in init!
+ - fix the output of the dijkstra, so that it can be moved into Kruskal's *(Resolved)*
  - place edges into btree *(Resolved)*
  - Rectify the Steiner::find_angle_size() method, it isn't behaving completely correctly *(Resolved)*
  - Test binary tree *(Resolved)*

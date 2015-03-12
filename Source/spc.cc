@@ -11,6 +11,7 @@
 #include <boost/range/adaptors.hpp>
 #include <fstream>
 #include <iostream>
+#include "../Headers/controller.h"
 
 using namespace FlowAlgorithms;
 using namespace boost;
@@ -20,8 +21,11 @@ using namespace boost::adaptors;
 SPC::SPC(){}
 
 SPC::SPC(std::set<VEdge*> edges) {
+
+    int x = 0;
     for(VEdge* e : edges) {
-        kInputEdges.push_back({ e->kId, e->kStart->get_id(), e->kEnd->get_id(), (double)e->kCost});//, e});
+        kInputEdges.push_back({ e->kId, e->kStart->get_id(), e->kEnd->get_id(), (double)e->kCost});
+        // Save the nodes in a hashmaph for later use!
         kHashMap.insert({e->kStart->get_id(), e->kStart});
         kHashMap.insert({e->kEnd->get_id(), e->kEnd});
     }
@@ -40,11 +44,11 @@ void SPC::start() {
         switch(step) {
             // generate Dijkstra from subset of InputEdges (G1)
             case ONE:
-                run_dijkstra();
+                subset = run_dijkstra(kInputEdges);
                 break;
                 // generate Kruskal from Dijkstra outputs (G2)
             case TWO:
-                run_kruskal();
+                run_kruskal(subset);
                 break;
                 // replace edges in G2 with their shortest edge from G (G4)
             case THREE:
@@ -67,51 +71,28 @@ void SPC::start() {
     }
 }
 
-void SPC::run_kruskal() {
+void SPC::run_kruskal(std::vector<VEdgeWrapper> edges) {
     claim("S/run_kruskal: starting boost/kruskal", kDebug);
 
-    using namespace boost::adaptors;
-
-    size_t max_node;
-
-    boost::partial_sort_copy(
-            kInputEdges | transformed([](VEdgeWrapper const &e) -> size_t { return std::max(e.source, e.target); }),
-            boost::make_iterator_range(&max_node, &max_node + 1),
-            std::greater<size_t>());
-
-    auto e = kInputEdges | transformed([](VEdgeWrapper const &ve) { return std::make_pair(ve.source, ve.target); });
-    kGraph = graph_t(e.begin(), e.end(), kInputEdges.begin(), max_node + 1);
-
-    weight_map_t kWeightMap = boost::get(&VEdgeWrapper::weight, kGraph);
-
-    vertex_descriptor kS  = vertex(0, kGraph);
-    kVD              = std::vector<vertex_descriptor>(num_vertices(kGraph));
-    kD                      = std::vector<int>(num_vertices(kGraph));
-
-    dijkstra_shortest_paths(
-            kGraph, kS,
-            predecessor_map(boost::make_iterator_property_map(kVD.begin(), get(boost::vertex_index, kGraph)))
-                    .distance_map(boost::make_iterator_property_map(kD.begin(), get(boost::vertex_index, kGraph)))
-                    .weight_map(kWeightMap));
-
-    debug_graph_algorithm(KRUSKAL);
-    generate_dot_file(KRUSKAL);
 }
 
-void SPC::run_dijkstra() {
+
+std::vector<VEdgeWrapper> SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
     claim("S/run_dijkstra: starting boost/dijkstra", kDebug);
+
+    std::vector<VEdgeWrapper> result;
 
     using namespace boost::adaptors;
 
     size_t max_node;
 
     boost::partial_sort_copy(
-            kInputEdges | transformed([](VEdgeWrapper const &e) -> size_t { return std::max(e.source, e.target); }),
+            edges | transformed([](VEdgeWrapper const &e) -> size_t { return std::max(e.source, e.target); }),
             boost::make_iterator_range(&max_node, &max_node + 1),
             std::greater<size_t>());
 
-    auto e = kInputEdges | transformed([](VEdgeWrapper const &ve) { return std::make_pair(ve.source, ve.target); });
-    kGraph = graph_t(e.begin(), e.end(), kInputEdges.begin(), max_node + 1);
+    auto e = edges | transformed([](VEdgeWrapper const &ve) { return std::make_pair(ve.source, ve.target); });
+    kGraph = graph_t(e.begin(), e.end(), edges.begin(), max_node + 1);
 
     weight_map_t kWeightMap = boost::get(&VEdgeWrapper::weight, kGraph);
 
@@ -125,9 +106,24 @@ void SPC::run_dijkstra() {
                     .distance_map(boost::make_iterator_property_map(kD.begin(), get(boost::vertex_index, kGraph)))
                     .weight_map(kWeightMap));
 
-    debug_graph_algorithm(DIJKSTRA);
+    boost::graph_traits<graph_t>::edge_iterator ei, ei_end;
+    for (boost::tie(ei, ei_end) = boost::edges(kGraph); ei != ei_end; ++ei) {
+        boost::graph_traits<graph_t>::edge_descriptor e = *ei;
+        boost::graph_traits<graph_t>::vertex_descriptor u = source(e, kGraph), v = target(e, kGraph);
+
+        // Add the edges of the graph to the output, to prepare for Kruskal
+        VEdgeWrapper vw;
+        vw.id = VEdge::get_next_vedge_id();
+        vw.source = u;
+        vw.target = v;
+        vw.weight = Flow::Controller::calculate_manhattan_distance(kHashMap.at((int) u), kHashMap.at((int) v));
+        result.push_back(vw);
+    }
+
+    //debug_graph_algorithm(DIJKSTRA);
     generate_dot_file(DIJKSTRA);
-    //print_dijkstra_output();
+
+    return result;
 }
 
 // TODO: figure out why the output values for distance are the max value of int...
@@ -166,9 +162,6 @@ void SPC::generate_dot_file(GRAPH_ALGO a) {
         dot_file << u << " -> " << v << "[label=\"" << get(weight_map, e) << "\"";
         output += to_string(u) + " -> " + to_string(v) + "[label=\"" + to_string(get(weight_map, e)) + "\"";
 
-        // Add the edges of the graph to the output, to prepare for Kruskal
-        //kDijkstraOutputEdges.push_back(new VEdge(kHashMap.at((int)u), kHashMap.at((int)v)));
-
         if (kVD[v] == u) {
             dot_file << ", color=\"black\"";
             output += ", color=\"black\"";
@@ -184,10 +177,4 @@ void SPC::generate_dot_file(GRAPH_ALGO a) {
 
     claim(output, kDebug);
     dot_file.close();
-}
-
-void SPC::print_dijkstra_output() {
-    for(VEdge* e : kDijkstraOutputEdges) {
-        claim(e->vedge_to_string(), kDebug);
-    }
 }

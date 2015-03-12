@@ -8,7 +8,7 @@
 #include "../Headers/prim.h"
 #include <vector>
 #include <set>
-
+#include "../Headers/graph_alogs.h"
 
 using namespace Utilities;
 using namespace FlowAlgorithms;
@@ -43,7 +43,7 @@ Controller::Controller(ProblemObject *po, Controller::AlgoType a, Controller::Op
 Controller::~Controller() {
     delete kSteiner;
     delete kVoronoi;
-    delete kSPC;
+    //delete kSPC;
 }
 
 void Controller::start() {
@@ -71,10 +71,13 @@ void Controller::start() {
     claim("there are " + to_string(sp.size()) + " steiner points", kDebug);
     claim("there are " + to_string(kSteiner->get_steiner_edges().size()) + " steiner edges", kDebug);
 
-    project_vertices_on_map(sp);
+    //project_vertices_on_map(sp);
     // Step 3
-    this->kSPC = new SPC(kSteiner->get_steiner_edges());
-    this->kSPC->start();
+    GraphAlgos* ga = new GraphAlgos(kSteiner->get_steiner_edges());
+    ga->start();
+
+    //this->kSPC = new SPC(kSteiner->get_steiner_edges());
+    //this->kSPC->start();
 
     //kMap->print_map();
 }

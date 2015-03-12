@@ -19,7 +19,7 @@ voronoi.cc
 vpath.cc
 )
 
-add_library(SOURCE_LIB ${LIB_SOURCE})
+add_library(SOURCE_LIB ${LIB_SOURCE} ../Headers/graph_alogs.h graph_alogs.cpp)
 
 set(MAIN_SRC
     main.cc

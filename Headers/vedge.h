@@ -28,6 +28,8 @@ namespace Flow {
         string vedge_to_string();
 
         bool operator==(VEdge&);
+
+        static int get_next_vedge_id();
     };
 }
 

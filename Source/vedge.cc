@@ -41,3 +41,7 @@ string VEdge::vedge_to_string() {
 bool VEdge::operator==(VEdge &other) {
     return ((this->kStart == other.kStart) && (this->kEnd == other.kEnd));
 }
+
+int VEdge::get_next_vedge_id() {
+    return ++kLastId;
+}

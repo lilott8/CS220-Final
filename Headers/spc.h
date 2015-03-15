@@ -19,8 +19,17 @@
 using namespace boost;
 using namespace Flow;
 
+/**
+* Class that handles the running of the Dijkstra and Kruskal algorithms.
+* It contains the definition for the boost library Dijkstra and Kruskal
+* Objects
+*/
+
 namespace FlowAlgorithms {
 
+    /**
+    * Wrapper for my VEdge data structure
+    */
     struct VEdgeWrapper {
         int id;
         int source, target;
@@ -37,13 +46,11 @@ namespace FlowAlgorithms {
         using edge_descriptor   = boost::graph_traits<graph_t>::edge_descriptor;
         using weight_map_t      = boost::property_map<graph_t, double VEdgeWrapper::*>::type;
 
-        /**
-        * Kruskal definitions
-        */
-
     public:
 
+        // iterative enum that lets us know what, exactly wher are doing at each step
         enum PHASE {ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX};
+        // simple way to resolve which algorithm we are on
         enum GRAPH_ALGO{DIJKSTRA, KRUSKAL};
 
         SPC();
@@ -57,14 +64,19 @@ namespace FlowAlgorithms {
 
     private:
 
+        // Run the boost::dijkstra algorithm
         void run_dijkstra(std::vector<VEdgeWrapper>);
 
+        // Run the boost::kruskal algorithm
         void run_kruskal();
 
+        // Deprecated
         void generate_dot_file(GRAPH_ALGO);
         void debug_graph_algorithm(GRAPH_ALGO);
 
+        // Graph object
         graph_t kGraph;
+        // iterator objects
         std::vector<int> kD;
         std::vector<vertex_descriptor> kVD;
 

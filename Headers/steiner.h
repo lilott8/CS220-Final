@@ -5,14 +5,19 @@
 
 #include "map.h"
 #include "voronoi.h"
-#include "btree.h"
 #include <math.h>
 
 using namespace Utilities;
 using namespace std;
 using namespace Flow;
 
+/**
+* Steiner class that takes in nodes and generates candidate steiner points from those points.
+*/
+
 namespace FlowAlgorithms {
+
+    // Data structure to contain a triangle
     struct SteinerTriangle {
         VNode* p1;
         VNode* p2;
@@ -38,30 +43,40 @@ namespace FlowAlgorithms {
         // Templated entry point for all algorithmic starts
         void start();
 
-        void set_vertices(set<VNode*>);
+        //void set_vertices(set<VNode*>);
+        // Return steiner variables
         set<VNode*> get_steiner_points();
         set<VEdge*> get_steiner_edges();
 
     private:
-        set<VNode*> kAllVertices;
-        vector<SteinerTriangle*> kTriangles;
-        set<VNode*> kSteinerPoints;
-        set<VEdge*> kSteinerEdges;
+        set<VNode*> kAllVertices;               // List of all the vertices generated
+        vector<SteinerTriangle*> kTriangles;    // list of triangles
+        set<VNode*> kSteinerPoints;             // list of all candidate nodes generated
+        set<VEdge*> kSteinerEdges;              // list of all edges that include Steiner points
 
+        // convert nodes to triangles
         void generate_triangles(VNode* [], int, int, int, int);
+        // Naive approach to generating steiner points, runs in linear time
         void generate_steiner_intersections_naive();
-
+        // Naive approach to generating steiner points, runs in exponential time
         void generate_steiner_intersections_naive_n_2();
 
+        // Triangle approach to Steiner point generation
         void generate_steiner_points();
+        // check for size of angle being less than 120 degrees
         bool verify_triangle_angles(SteinerTriangle*);
 
+        // calculate the geometric mean of a triangle
         VNode* manhattan_geometric_mean(SteinerTriangle*);
 
+        // euclidean geometric mean
         double euclidean_geometric_mean();
+        // euclidean distance calculation
         double calculate_euclidean_distance(VNode*, VNode*);
+        // Find the appropriate angle
         double find_bigger_angle(double, double, double);
         double find_other_angle(double, double, double);
+        // Find a midpoint between 2 points.
         VEdge* calculate_midpoint(Point, Point);
     };
 }

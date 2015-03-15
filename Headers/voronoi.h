@@ -16,6 +16,10 @@ using boost::polygon::y;
 using boost::polygon::low;
 using boost::polygon::high;
 
+/**
+* Container for the Voronoi boost library.  This takes a set of pins and generates a voronoi diagram from them
+*/
+
 namespace FlowAlgorithms {
 
     // Required to interface with boost

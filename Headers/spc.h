@@ -57,9 +57,9 @@ namespace FlowAlgorithms {
 
     private:
 
-        std::vector<VEdgeWrapper> run_dijkstra(std::vector<VEdgeWrapper>);
+        void run_dijkstra(std::vector<VEdgeWrapper>);
 
-        void run_kruskal(std::vector<VEdgeWrapper>);
+        void run_kruskal();
 
         void generate_dot_file(GRAPH_ALGO);
         void debug_graph_algorithm(GRAPH_ALGO);
@@ -68,7 +68,13 @@ namespace FlowAlgorithms {
         std::vector<int> kD;
         std::vector<vertex_descriptor> kVD;
 
+        // Inputted by elsewhere
         std::vector<VEdgeWrapper> kInputEdges;
+        // output of dijkstra's algorithm
+        std::vector<VEdgeWrapper> kDijkstraEdges;
+        // ouptut of kruskal's algorithm
+        std::vector<VEdgeWrapper> kKruskalEdges;
+        // Map of SPC values to their actual node implimentation
         std::unordered_map<int, VNode*> kHashMap;
         std::string kGraphAlgo[2] = {"Dijkstra", "Kruskal"};
     };

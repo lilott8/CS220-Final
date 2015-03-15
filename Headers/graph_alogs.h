@@ -22,6 +22,11 @@ using namespace Flow;
 
 namespace FlowAlgorithms {
 
+    using graph_t  = boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, boost::no_property, VEdgeWrapper>;
+    using vertex_descriptor = boost::graph_traits<graph_t>::vertex_descriptor;
+    using edge_descriptor   = boost::graph_traits<graph_t>::edge_descriptor;
+    using weight_map_t      = boost::property_map<graph_t, double VEdgeWrapper::*>::type;
+
     class GraphAlgos {
 
 
@@ -42,18 +47,24 @@ namespace FlowAlgorithms {
 
     private:
 
-        void run_dijkstra();
+        void run_dijkstra(std::vector<VEdgeWrapper>);
 
         void run_kruskal();
 
         void generate_dot_file(GRAPH_ALGO);
         void debug_graph_algorithm(GRAPH_ALGO);
 
-        //GAGraph kGraph;
+        graph_t kGraph;
         std::vector<int> kD;
-        //std::vector<GAVertex> kVD;
+        std::vector<vertex_descriptor> kVD;
 
-        std::set<VEdge*> kInputEdges;
+        // Inputted by elsewhere
+        std::vector<VEdgeWrapper> kInputEdges;
+        // output of dijkstra's algorithm
+        std::vector<VEdgeWrapper> kDijkstraEdges;
+        // ouptut of kruskal's algorithm
+        std::vector<VEdgeWrapper> kKruskalEdges;
+        // Map of SPC values to their actual node implimentation
         std::unordered_map<int, VNode*> kHashMap;
         std::string kGraphAlgo[2] = {"Dijkstra", "Kruskal"};
     };

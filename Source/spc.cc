@@ -11,6 +11,7 @@
 #include <boost/range/adaptors.hpp>
 #include <fstream>
 #include <iostream>
+#include "graph_alogs.h"
 #include "../Headers/controller.h"
 
 using namespace FlowAlgorithms;
@@ -21,7 +22,6 @@ using namespace boost::adaptors;
 SPC::SPC(){}
 
 SPC::SPC(std::set<VEdge*> edges) {
-
     int x = 0;
     for(VEdge* e : edges) {
         kInputEdges.push_back({ e->kId, e->kStart->get_id(), e->kEnd->get_id(), (double)e->kCost});
@@ -44,11 +44,11 @@ void SPC::start() {
         switch(step) {
             // generate Dijkstra from subset of InputEdges (G1)
             case ONE:
-                subset = run_dijkstra(kInputEdges);
+                run_dijkstra(kInputEdges);
                 break;
                 // generate Kruskal from Dijkstra outputs (G2)
             case TWO:
-                run_kruskal(subset);
+                run_kruskal();
                 break;
                 // replace edges in G2 with their shortest edge from G (G4)
             case THREE:
@@ -71,14 +71,75 @@ void SPC::start() {
     }
 }
 
-void SPC::run_kruskal(std::vector<VEdgeWrapper> edges) {
+void SPC::run_kruskal() {
     claim("S/run_kruskal: starting boost/kruskal", kDebug);
 
+    typedef adjacency_list<vecS, vecS, undirectedS, no_property,
+            property<edge_weight_t, int> > GAGraph;
+
+    typedef graph_traits<GAGraph>::edge_descriptor GAEdge;
+    typedef graph_traits<GAGraph>::vertex_descriptor GAVertex;
+
+    GAGraph g(kInputEdges.size());
+
+    boost::property_map<GAGraph, boost::edge_weight_t>::type weightmap = boost::get(boost::edge_weight, g);
+    std::vector<GAEdge> spanning_tree;
+
+    int x = 0;
+    for(VEdgeWrapper vw : kDijkstraEdges) {
+        GAEdge gae; bool s;
+        tie(gae, s) = add_edge(vw.source, vw.target, g);
+        weightmap[gae] = vw.weight;
+    }
+
+    kruskal_minimum_spanning_tree(g, back_inserter(spanning_tree));
+
+    std::string d_p = "S/run_kruskal:\nPrint the edges in the MST:";
+    for (std::vector < GAEdge >::iterator ei = spanning_tree.begin();
+         ei != spanning_tree.end(); ++ei) {
+        d_p += to_string(source(*ei, g)) + " <--> " + to_string(target(*ei, g)) +
+                + " with weight of " + to_string(weightmap[*ei]) + "\n";
+    }
+    //claim(d_p, kDebug);
+
+    std::ofstream fout("figs/kruskal-eg.dot");
+    string output = "S/run_kruskal:Kruskal:\ngraph A {\n";
+    output += " rankdir=LR\n";
+    output += " size=\"3,3\"\n";
+    output += " ratio=\"filled\"\n";
+    output += " edge[style=\"bold\"]\n node[shape=\"circle\"]\n";
+
+    fout << "graph A {\n"
+            << " rankdir=LR\n"
+            << " size=\"3,3\"\n"
+            << " ratio=\"filled\"\n"
+            << " edge[style=\"bold\"]\n" << " node[shape=\"circle\"]\n";
+    graph_traits<GAGraph>::edge_iterator eiter, eiter_end;
+    for (boost::tie(eiter, eiter_end) = edges(g); eiter != eiter_end; ++eiter) {
+        fout << source(*eiter, g) << " -- " << target(*eiter, g);
+        output += to_string(source(*eiter, g)) + " -- " + to_string(target(*eiter, g));
+        if (std::find(spanning_tree.begin(), spanning_tree.end(), *eiter)
+                != spanning_tree.end()) {
+            output += "[color=\"black\", label=\"" + to_string(get(edge_weight, g, *eiter)) + "\"];\n";
+            fout << "[color=\"black\", label=\"" << get(edge_weight, g, *eiter)
+                    << "\"];\n";
+        } else {
+            output += "[color=\"gray\", label=\"" + to_string(get(edge_weight, g, *eiter)) + "\"];\n";
+            fout << "[color=\"gray\", label=\"" << get(edge_weight, g, *eiter)
+                    << "\"];\n";
+        }
+    }
+    fout << "}\n";
+    output += "}\n";
+    claim(output, kDebug);
+    claim("S/run_kruskal: =========================================", kDebug);
 }
 
 
-std::vector<VEdgeWrapper> SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
+void SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
     claim("S/run_dijkstra: starting boost/dijkstra", kDebug);
+
+    GRAPH_ALGO a = DIJKSTRA;
 
     std::vector<VEdgeWrapper> result;
 
@@ -97,7 +158,7 @@ std::vector<VEdgeWrapper> SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
     weight_map_t kWeightMap = boost::get(&VEdgeWrapper::weight, kGraph);
 
     vertex_descriptor kS    = vertex(0, kGraph);
-    kVD             = std::vector<vertex_descriptor>(num_vertices(kGraph));
+    kVD                     = std::vector<vertex_descriptor>(num_vertices(kGraph));
     kD                      = std::vector<int>(num_vertices(kGraph));
 
     dijkstra_shortest_paths(
@@ -107,37 +168,15 @@ std::vector<VEdgeWrapper> SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
                     .weight_map(kWeightMap));
 
     boost::graph_traits<graph_t>::edge_iterator ei, ei_end;
-    for (boost::tie(ei, ei_end) = boost::edges(kGraph); ei != ei_end; ++ei) {
+
+    /*for (boost::tie(ei, ei_end) = boost::edges(kGraph); ei != ei_end; ++ei) {
         boost::graph_traits<graph_t>::edge_descriptor e = *ei;
         boost::graph_traits<graph_t>::vertex_descriptor u = source(e, kGraph), v = target(e, kGraph);
 
         // Add the edges of the graph to the output, to prepare for Kruskal
-        VEdgeWrapper vw;
-        vw.id = VEdge::get_next_vedge_id();
-        vw.source = u;
-        vw.target = v;
-        vw.weight = Flow::Controller::calculate_manhattan_distance(kHashMap.at((int) u), kHashMap.at((int) v));
-        result.push_back(vw);
-    }
 
-    //debug_graph_algorithm(DIJKSTRA);
-    generate_dot_file(DIJKSTRA);
+    }*/
 
-    return result;
-}
-
-// TODO: figure out why the output values for distance are the max value of int...
-void SPC::debug_graph_algorithm(GRAPH_ALGO a) {
-    boost::graph_traits<graph_t>::vertex_iterator vi, vend;
-    string output = kGraphAlgo[a] + ": distances and parents:\n";
-    for (boost::tie(vi, vend) = vertices(kGraph); vi != vend; ++vi) {
-        output += "distance(" + to_string(*vi) + ") = " + to_string(kD[*vi]) + ", ";
-        output += "parent(" + to_string(*vi) + ") = " + to_string(kVD[*vi]) + "\n";
-    }
-    claim(output, kDebug);
-}
-
-void SPC::generate_dot_file(GRAPH_ALGO a) {
     std::string output_file_name;
     output_file_name = kGraphAlgo[a] + "-eg.dot";
     weight_map_t weight_map = boost::get(&VEdgeWrapper::weight, kGraph);
@@ -155,16 +194,25 @@ void SPC::generate_dot_file(GRAPH_ALGO a) {
             << "  edge[style=\"bold\"]\n"
             << "  node[shape=\"circle\"]\n";
 
-    boost::graph_traits<graph_t>::edge_iterator ei, ei_end;
+    //boost::graph_traits<graph_t>::edge_iterator ei, ei_end;
     for (boost::tie(ei, ei_end) = boost::edges(kGraph); ei != ei_end; ++ei) {
         boost::graph_traits<graph_t>::edge_descriptor e = *ei;
         boost::graph_traits<graph_t>::vertex_descriptor u = source(e, kGraph), v = target(e, kGraph);
+
         dot_file << u << " -> " << v << "[label=\"" << get(weight_map, e) << "\"";
         output += to_string(u) + " -> " + to_string(v) + "[label=\"" + to_string(get(weight_map, e)) + "\"";
 
         if (kVD[v] == u) {
             dot_file << ", color=\"black\"";
             output += ", color=\"black\"";
+
+            VEdgeWrapper vw;
+            vw.id = VEdge::get_next_vedge_id();
+            vw.source = u;
+            vw.target = v;
+            vw.weight = Flow::Controller::calculate_manhattan_distance(kHashMap.at((int) u), kHashMap.at((int) v));
+            kDijkstraEdges.push_back(vw);
+
         } else {
             dot_file << ", color=\"grey\"";
             output += ", color=\"grey\"";
@@ -177,4 +225,6 @@ void SPC::generate_dot_file(GRAPH_ALGO a) {
 
     claim(output, kDebug);
     dot_file.close();
+
+    claim("S/run_dijkstra: =========================================", kDebug);
 }

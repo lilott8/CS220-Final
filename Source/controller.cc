@@ -73,11 +73,11 @@ void Controller::start() {
 
     //project_vertices_on_map(sp);
     // Step 3
-    GraphAlgos* ga = new GraphAlgos(kSteiner->get_steiner_edges());
-    ga->start();
+    //GraphAlgos* ga = new GraphAlgos(kSteiner->get_steiner_edges());
+    //ga->start();
 
-    //this->kSPC = new SPC(kSteiner->get_steiner_edges());
-    //this->kSPC->start();
+    this->kSPC = new SPC(kSteiner->get_steiner_edges());
+    this->kSPC->start();
 
     //kMap->print_map();
 }

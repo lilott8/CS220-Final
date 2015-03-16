@@ -2,19 +2,21 @@ CS220 Project Framework
 ===============
 #Changelog:
  
-  - paper 5's iterative process is ready, I just have to figure out a few last details
-  - Kruskal's is implemented, the output is correct and able to accept input
-  - Dijkstra's output is correct and prepared for Kruskal's input
-  - retooled the Steiner point generation, the papers are very conservative, so points are only created by means of comparing a node to it's closest neighbor.
-  - Dijkstra's is done
-  - Huge efficiency improvements, instead of creating >600 nodes, I now only create MxN nodes
-  - Using sets for data structures to guarantee uniqueness in lists.
+ - Documented the code
+ - Dijkstra's ports it's output into the kruskals output
+ - generates the graphvice output for answers
   
 ##Done:
 
+ - Kruskal's algorithm is done
+ - Kruskal's is implemented, the output is correct and able to accept input
+ - Dijkstra's is done
+ - Huge efficiency improvements, instead of creating >600 nodes, I now only create MxN nodes
+ - retooled the Steiner point generation, the papers are very conservative, so points are only created by means of comparing a node to it's closest neighbor.
+ - Using sets for data structures to guarantee uniqueness in lists.
  - Dijkstra's is done
  - Steiner point creation
- - Removed the binary tree and added the R* tree from boost.
+ - Removed the binary tree and added the R\* tree from boost.
  - Added the Binary tree interface for running SPC in V+ElogE time
  - Binary tree implemented
  - Boost::Polygon::Voronoi has been "implimented".  This is a loose implementation
@@ -31,8 +33,9 @@ CS220 Project Framework
 
 ##TODO:
  
- - refactor dijkstra so there isn't as much debugging and unnecessary code
- - delete unnecessary edges once created
+ - make steiner points less naive
+ - refactor dijkstra so there isn't as much debugging and unnecessary code *(Resolved)*
+ - delete unnecessary edges once created *(Resolved)*
  - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
  - figure out why the map coords need to be switched in init!
  - fix the output of the dijkstra, so that it can be moved into Kruskal's *(Resolved)*

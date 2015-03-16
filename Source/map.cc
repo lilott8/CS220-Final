@@ -30,7 +30,7 @@ Map::Map(ProblemObject *po) {
 }
 
 /**
-* A trivial implementation of Bresenham's line algorithm
+* Add the blockages to the map
 */
 void Map::set_blockages(vector<Blocker> b) {
     int height;
@@ -59,6 +59,9 @@ void Map::set_blockages(vector<Blocker> b) {
     }
 }
 
+/**
+* add the pins to the map
+*/
 void Map::set_pins(vector<Connection> c) {
     for(int x = 0;x < (int)c.size(); x++) {
         // Declare the pin(s)
@@ -80,14 +83,23 @@ void Map::set_pins(vector<Connection> c) {
     }
 }
 
+/**
+* get the pins that are required for the map object
+*/
 std::set<VNode*> Map::get_pins() {
     return kPins;
 }
 
+/**
+* return the map object
+*/
 vector<vector<VNode*>> Map::get_map() {
     return kMap;
 }
 
+/**
+* begin building our map object from the problem object, first initialize the vectors
+*/
 void Map::initialize_map() {
     for(int y = 0; y < kHeight; y++) {
         vector<VNode*> temp_row;
@@ -101,6 +113,9 @@ void Map::initialize_map() {
     }
 }
 
+/**
+* print the map to std out
+*/
 void Map::print_map() {
     string output = "\t";
     for(int x = 0; x < kHeight; x++) {
@@ -143,14 +158,23 @@ void Map::print_map() {
     claim("\n" + output, kDebug);
 }
 
+/**
+* get the max x
+*/
 int Map::get_x() {
     return kHeight;
 }
 
+/**
+* get the max y
+*/
 int Map::get_y() {
     return kWidth;
 }
 
+/**
+* Debugging method for projecting the voronoi solution onto the map
+*/
 void Map::draw_voronoi_edges(vector<VEdge*> edges) {
     if(!kIsEuclidean) {
         draw_xiaolin_wu_lines(edges);
@@ -161,6 +185,9 @@ void Map::draw_voronoi_edges(vector<VEdge*> edges) {
     draw_bresenham_lines(edges);
 }
 
+/**
+* A trivial implementation of Bresenham's line algorithm
+*/
 void Map::draw_bresenham_lines(vector<VEdge*> edges) {
     for(VEdge *edge : edges) {
         float x1, y1, x2, y2;

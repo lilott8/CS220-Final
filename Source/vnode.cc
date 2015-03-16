@@ -36,19 +36,30 @@ VNode::VNode(Point p, int cost) {
 VNode::~VNode() {
 }
 
+/**
+* return the type of the node
+*/
 VNode::Type VNode::get_type() {
     return this->kType;
 }
 
+/**
+* return the output field, not used here
+*/
 int VNode::get_output() {
     return this->kOutput;
 }
 
+/**
+* set the type that the node is
+*/
 void VNode::set_type(Type t) {
     this->kType = t;
 }
 
-
+/**
+* convert the type to string
+*/
 string VNode::type_to_string(Type t) {
     string output = "";
     switch(t) {
@@ -78,28 +89,46 @@ string VNode::type_to_string(Type t) {
     return output;
 }
 
+/**
+* convert the points data structure to string
+*/
 string VNode::coords_to_string() {
     return "(" + std::to_string(this->get_x()) + ", "
             + std::to_string(this->get_y()) + ")";
 }
 
+/**
+* return the id of the node
+*/
 int VNode::get_id() {
     return this->kId;
 }
 
+/**
+* return the double-x value
+*/
 double VNode::get_dx() {
     return this->kDoubleX;
 }
 
+/**
+* return the double-y value
+*/
 double VNode::get_dy() {
     return this->kDoubleY;
 }
 
+/**
+* convert the node to a string
+*/
 string VNode::vnode_to_string() {
     string ret = "Meta: (ID: " + to_string(kId) + "\tType: " + type_to_string(kType) + ")\t Coords: (" + to_string(get_x()) + ", " + to_string(get_y()) + ")\t";
     return ret;
 }
 
+/**
+* comparator for the set data structure
+*/
 bool VNode::operator==(VNode &other) {
     return ((this->get_x() == other.get_x()) && (this->get_y() == other.get_y()));
 }

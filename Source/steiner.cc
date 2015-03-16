@@ -15,21 +15,33 @@ Steiner::Steiner(set<VNode*> v) {
 Steiner::~Steiner() {
 }
 
-
+/**
+* Generate the steiner points by one of three methods
+*/
 void Steiner::start() {
     claim("S/start: Size of set of pins & voronoi points is: " + to_string(kAllVertices.size()), kDebug);
     //generate_steiner_intersections();
     generate_steiner_intersections_naive();
 }
 
+/**
+* get the individual Steiner points
+*/
 set<VNode*> Steiner::get_steiner_points() {
     return kSteinerPoints;
 }
 
+/**
+* get the Steiner edges
+*/
 set<VEdge*> Steiner::get_steiner_edges() {
     return kSteinerEdges;
 }
 
+/*
+* Build the steiner points based on the midpoint of the edges,
+* this is naive, and operates in O(n) time
+*/
 void Steiner::generate_steiner_intersections_naive() {
     int x = 0;
     VNode* inner;
@@ -47,6 +59,7 @@ void Steiner::generate_steiner_intersections_naive() {
             continue;
         }
 
+        // x-coordinates are the same, so we only care about the y-coordinates
         if(outer->get_x() == inner->get_x()) {
             // Calculate the midpoint
             int midpoint = (outer->get_y() + inner->get_y()) / 2;
@@ -65,6 +78,7 @@ void Steiner::generate_steiner_intersections_naive() {
             kSteinerEdges.insert(new VEdge(
                     Map::get_map().at(inner->get_x()).at(midpoint), inner
             ));
+            // y-coordinates are the same, we only care about the x-coordinates
         } else if(outer->get_y() == inner->get_y()) {
             // Calculate the midpoint
             int midpoint = (outer->get_x() + inner->get_x()) / 2;
@@ -82,6 +96,7 @@ void Steiner::generate_steiner_intersections_naive() {
             kSteinerEdges.insert(new VEdge(
                     Map::get_map().at(midpoint).at(inner->get_y()), inner
             ));
+            // both coordinates are differeing, thus we need to pay attention to both of them
         } else {
             // Generate the x/y of the midpoint
             int mx, my;
@@ -106,6 +121,9 @@ void Steiner::generate_steiner_intersections_naive() {
     }
 }
 
+/**
+* this is a more exhaustive than the naive one, but it runs in O(n^2) time
+*/
 void Steiner::generate_steiner_intersections_naive_n_2() {
     //VNode *node1;
     //VNode *node2;
@@ -116,6 +134,7 @@ void Steiner::generate_steiner_intersections_naive_n_2() {
                 continue;
             }
 
+            // x-coordinates are the same, so we only care about the y-coordinates
             if(outer->get_x() == inner->get_x()) {
                 // Calculate the midpoint
                 int midpoint = (outer->get_y() + inner->get_y()) / 2;
@@ -134,6 +153,7 @@ void Steiner::generate_steiner_intersections_naive_n_2() {
                 kSteinerEdges.insert(new VEdge(
                         Map::get_map().at(inner->get_x()).at(midpoint), inner
                 ));
+                // y-coordinates are the same, we only care about the x-coordinates
             } else if(outer->get_y() == inner->get_y()) {
                 // Calculate the midpoint
                 int midpoint = (outer->get_x() + inner->get_x()) / 2;
@@ -151,6 +171,7 @@ void Steiner::generate_steiner_intersections_naive_n_2() {
                 kSteinerEdges.insert(new VEdge(
                         Map::get_map().at(midpoint).at(inner->get_y()), inner
                 ));
+                // both coordinates are differeing, thus we need to pay attention to both of them
             } else {
                 // Generate the x/y of the midpoint
                 int mx, my;
@@ -182,6 +203,8 @@ void Steiner::generate_steiner_intersections_naive_n_2() {
 /**
 * http://stackoverflow.com/questions/12934213/how-to-find-out-geometric-median
 * http://www.mathblog.dk/project-euler-143-investigating-the-torricelli-point-of-a-triangle/
+*
+* This generates the steiner points based on triangles, very computational expensive
 */
 void Steiner::generate_steiner_points() {
     int y = 0;
@@ -203,6 +226,7 @@ void Steiner::generate_steiner_points() {
 
 /**
 * http://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
+* build the triangles during one pass of the list (O(n))
 */
 void Steiner::generate_triangles(VNode* data[], int start, int end, int index, int combo) {
     // Base case, where we know we need to print create the triangle
@@ -223,16 +247,21 @@ void Steiner::generate_triangles(VNode* data[], int start, int end, int index, i
 
 }
 
+/**
+* Make sure the triangle is less than 120 and is a valid triangle
+*/
 bool Steiner::verify_triangle_angles(SteinerTriangle* t) {
     double angle1, angle2, angle3;
     double total = 0;
 
     int largest_length = 0;
 
+    // distances between each point
     double dist1 = calculate_euclidean_distance(t->p1, t->p2);
     double dist2 = calculate_euclidean_distance(t->p2, t->p3);
     double dist3 = calculate_euclidean_distance(t->p1, t->p3);
 
+    // we know that edge 1 is the largest edge
     if(dist1 > dist2 && dist1 > dist3) {
         angle1 = find_bigger_angle(dist1, dist2, dist3);
         angle2 = find_other_angle(angle1, dist1, dist2);
@@ -242,6 +271,7 @@ bool Steiner::verify_triangle_angles(SteinerTriangle* t) {
         if(total < 180) {
             angle1 = 180 - angle1;
         }
+        // we know that edge 2 is the longest edge
     } else if(dist2 > dist3 && dist2 > dist1) {
         angle2 = find_bigger_angle(dist2, dist1, dist3);
         angle1 = find_other_angle(angle2, dist2, dist1);
@@ -251,6 +281,7 @@ bool Steiner::verify_triangle_angles(SteinerTriangle* t) {
         if(total < 180) {
             angle2 = 180 - angle2;
         }
+        // we know that edge 3 is the longest edge
     } else {
         angle3 = find_bigger_angle(dist3, dist1, dist2);
         angle1 = find_other_angle(angle3, dist3, dist1);
@@ -266,6 +297,9 @@ bool Steiner::verify_triangle_angles(SteinerTriangle* t) {
     return (angle1 > 120 || angle2 > 120 || angle3 > 120);
 }
 
+/**
+* if we are using 2-d, non-euclidean space, then we use this
+*/
 VNode* Steiner::manhattan_geometric_mean(SteinerTriangle* tri) {
     int ax = (tri->p1->get_x() + tri->p2->get_x() + tri->p3->get_x())/3;
     int ay = (tri->p1->get_y() + tri->p2->get_y() + tri->p3->get_y())/3;
@@ -274,10 +308,14 @@ VNode* Steiner::manhattan_geometric_mean(SteinerTriangle* tri) {
     return v;
 }
 
+// not used
 double Steiner::euclidean_geometric_mean() {
 
 }
 
+/**
+* calculate the euclidean distance between 2 nodes
+*/
 double Steiner::calculate_euclidean_distance(VNode* a, VNode* b) {
     double order1, order2;
     order1 = (a->get_x() - b->get_x()) * (a->get_x() - b->get_x());
@@ -286,11 +324,17 @@ double Steiner::calculate_euclidean_distance(VNode* a, VNode* b) {
     return sqrt(order1 + order2);
 }
 
+/**
+* find the angle of the other angles
+*/
 double Steiner::find_other_angle(double l_a, double l_d, double s_d) {
     double angle = s_d * sin(l_a * PI/180);
     return asin((angle/l_d))*180 / PI;
 }
 
+/**
+* get the size of the biggest angle
+*/
 double Steiner::find_bigger_angle(double l_d, double s_d_1, double s_d_2) {
     double angle = pow(s_d_1,2) + pow(s_d_2, 2) - pow(l_d, 2);
     angle = fabs(angle/(2*s_d_1 * s_d_2));

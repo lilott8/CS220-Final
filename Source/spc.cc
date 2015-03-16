@@ -33,6 +33,9 @@ SPC::SPC(std::set<VEdge*> edges) {
 
 SPC::~SPC(){}
 
+/**
+* Start running the SPC paper
+*/
 void SPC::start() {
     claim("S/start: starting SPC", kDebug);
 
@@ -50,18 +53,6 @@ void SPC::start() {
             case TWO:
                 run_kruskal();
                 break;
-                // replace edges in G2 with their shortest edge from G (G4)
-            case THREE:
-
-                break;
-                // generate Kruskal from G4 (G5)
-            case FOUR:
-
-                break;
-                // supposedely delete edges from G4, done!
-            case FIVE:
-
-                break;
                 // noop
             default:
             case ZERO:
@@ -71,20 +62,29 @@ void SPC::start() {
     }
 }
 
+/**
+* Run the boost version of kruskal.  This utilizes the output from the dijkstra's method as input
+*/
 void SPC::run_kruskal() {
     claim("S/run_kruskal: starting boost/kruskal", kDebug);
 
+    /**
+    * build the typdefs required for boost documentation
+    */
     typedef adjacency_list<vecS, vecS, undirectedS, no_property,
             property<edge_weight_t, int> > GAGraph;
 
     typedef graph_traits<GAGraph>::edge_descriptor GAEdge;
     typedef graph_traits<GAGraph>::vertex_descriptor GAVertex;
 
-    GAGraph g(kInputEdges.size());
+    // generate a graph, allocating the adjancency_list of inputedges sizes.
+    GAGraph g(kDijkstraEdges.size());
 
+    // build the spanning_tree vector in which will hold the answer
     boost::property_map<GAGraph, boost::edge_weight_t>::type weightmap = boost::get(boost::edge_weight, g);
     std::vector<GAEdge> spanning_tree;
 
+    // convert the kDijkstraEdges to the input required for the kruskal input
     int x = 0;
     for(VEdgeWrapper vw : kDijkstraEdges) {
         GAEdge gae; bool s;
@@ -92,8 +92,10 @@ void SPC::run_kruskal() {
         weightmap[gae] = vw.weight;
     }
 
+    // run the algorithm based on the input
     kruskal_minimum_spanning_tree(g, back_inserter(spanning_tree));
 
+    // start building the output for the MST
     std::string d_p = "S/run_kruskal:\nPrint the edges in the MST:";
     for (std::vector < GAEdge >::iterator ei = spanning_tree.begin();
          ei != spanning_tree.end(); ++ei) {
@@ -102,6 +104,7 @@ void SPC::run_kruskal() {
     }
     //claim(d_p, kDebug);
 
+    // Generate the graphviz output
     std::ofstream fout("figs/kruskal-eg.dot");
     string output = "S/run_kruskal:Kruskal:\ngraph A {\n";
     output += " rankdir=LR\n";
@@ -135,7 +138,9 @@ void SPC::run_kruskal() {
     claim("S/run_kruskal: =========================================", kDebug);
 }
 
-
+/**
+* run the boost implementation of dijkstra's algorithm
+*/
 void SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
     claim("S/run_dijkstra: starting boost/dijkstra", kDebug);
 
@@ -147,20 +152,25 @@ void SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
 
     size_t max_node;
 
+    // partially sort the list of our input edges, and get them ready for djikstra
     boost::partial_sort_copy(
             edges | transformed([](VEdgeWrapper const &e) -> size_t { return std::max(e.source, e.target); }),
             boost::make_iterator_range(&max_node, &max_node + 1),
             std::greater<size_t>());
 
+    // I'm not going to lie, I don't know exactly what this line does
     auto e = edges | transformed([](VEdgeWrapper const &ve) { return std::make_pair(ve.source, ve.target); });
+    // instantiate the graph object for dijkstra
     kGraph = graph_t(e.begin(), e.end(), edges.begin(), max_node + 1);
 
     weight_map_t kWeightMap = boost::get(&VEdgeWrapper::weight, kGraph);
 
+    // get the itereators and answer containers
     vertex_descriptor kS    = vertex(0, kGraph);
     kVD                     = std::vector<vertex_descriptor>(num_vertices(kGraph));
     kD                      = std::vector<int>(num_vertices(kGraph));
 
+    // run the actual dijkstra's algorithm on our input
     dijkstra_shortest_paths(
             kGraph, kS,
             predecessor_map(boost::make_iterator_property_map(kVD.begin(), get(boost::vertex_index, kGraph)))
@@ -177,6 +187,7 @@ void SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
 
     }*/
 
+    // build the output for the our answer (graphviz is included in this)
     std::string output_file_name;
     output_file_name = kGraphAlgo[a] + "-eg.dot";
     weight_map_t weight_map = boost::get(&VEdgeWrapper::weight, kGraph);
@@ -202,6 +213,7 @@ void SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
         dot_file << u << " -> " << v << "[label=\"" << get(weight_map, e) << "\"";
         output += to_string(u) + " -> " + to_string(v) + "[label=\"" + to_string(get(weight_map, e)) + "\"";
 
+        // we only care about the "important" edges, the secondary routes are irrelevant to us
         if (kVD[v] == u) {
             dot_file << ", color=\"black\"";
             output += ", color=\"black\"";

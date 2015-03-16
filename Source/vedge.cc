@@ -32,16 +32,25 @@ VEdge::~VEdge() {
     delete kDirection;
 }
 
+/**
+* convert the vedge to a string for debug
+*/
 string VEdge::vedge_to_string() {
     string ret = "Id: " + to_string(kId) + " Starting node: " + kStart->vnode_to_string()
             + "\t->\t Ending Node: " + kEnd->vnode_to_string() + " with a cost of: " + to_string(kCost);
     return ret;
 }
 
+/**
+* used for the set comparator
+*/
 bool VEdge::operator==(VEdge &other) {
     return ((this->kStart == other.kStart) && (this->kEnd == other.kEnd));
 }
 
+/**
+* get the next id for the edge, guarantees uniqueness
+*/
 int VEdge::get_next_vedge_id() {
     return ++kLastId;
 }

@@ -42,6 +42,8 @@ namespace Flow {
         string static type_to_string(Type);
         // convert the point to a string
         string coords_to_string();
+        // convert only the important data for .dot notation
+        string vnode_to_dot();
 
         // not needed in this program
         int get_output();

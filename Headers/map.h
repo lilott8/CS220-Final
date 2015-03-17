@@ -48,6 +48,7 @@ namespace Flow {
         // return the map, able to be referenced everywhere
         static vector<vector<VNode*>> get_map();
 
+        void draw_voronoi_edges(vector<VEdge*>);
         // get the dimensions of the map
         int get_x();
         int get_y();

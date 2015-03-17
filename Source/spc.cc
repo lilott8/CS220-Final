@@ -120,7 +120,10 @@ void SPC::run_kruskal() {
     graph_traits<GAGraph>::edge_iterator eiter, eiter_end;
     for (boost::tie(eiter, eiter_end) = edges(g); eiter != eiter_end; ++eiter) {
         fout << source(*eiter, g) << " -- " << target(*eiter, g);
-        output += to_string(source(*eiter, g)) + " -- " + to_string(target(*eiter, g));
+
+        output += kHashMap.at(source(*eiter, g))->vnode_to_dot() + " -- "
+                + kHashMap.at(target(*eiter, g))->vnode_to_dot();
+
         if (std::find(spanning_tree.begin(), spanning_tree.end(), *eiter)
                 != spanning_tree.end()) {
             output += "[color=\"black\", label=\"" + to_string(get(edge_weight, g, *eiter)) + "\"];\n";
@@ -211,7 +214,8 @@ void SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
         boost::graph_traits<graph_t>::vertex_descriptor u = source(e, kGraph), v = target(e, kGraph);
 
         dot_file << u << " -> " << v << "[label=\"" << get(weight_map, e) << "\"";
-        output += to_string(u) + " -> " + to_string(v) + "[label=\"" + to_string(get(weight_map, e)) + "\"";
+        output += kHashMap.at(u)->vnode_to_dot() + " -> " + kHashMap.at(v)->vnode_to_dot()
+                + "[label=\"" + to_string(get(weight_map, e)) + "\"";
 
         // we only care about the "important" edges, the secondary routes are irrelevant to us
         if (kVD[v] == u) {

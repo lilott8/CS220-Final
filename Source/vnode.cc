@@ -98,6 +98,14 @@ string VNode::coords_to_string() {
 }
 
 /**
+* conver the node to a .dot notated syntax
+*/
+string VNode::vnode_to_dot() {
+    return "\"(" + std::to_string(this->get_x()) + ", "
+            + std::to_string(this->get_y()) + ")\t" + type_to_string(kType) + "\"";
+}
+
+/**
 * return the id of the node
 */
 int VNode::get_id() {

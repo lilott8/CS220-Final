@@ -12,6 +12,11 @@ Steiner::Steiner(set<VNode*> v) {
     kAllVertices = v;
 }
 
+Steiner::Steiner(set<VNode*> v, int x) {
+    kAllVertices = v;
+    kSteinerCalculator = x;
+}
+
 Steiner::~Steiner() {
 }
 
@@ -20,8 +25,26 @@ Steiner::~Steiner() {
 */
 void Steiner::start() {
     claim("S/start: Size of set of pins & voronoi points is: " + to_string(kAllVertices.size()), kDebug);
-    //generate_steiner_intersections();
-    generate_steiner_intersections_naive();
+    VNode* data[3];
+    kSteinerCalculator = 3;
+    switch(kSteinerCalculator) {
+        case 1:
+            generate_steiner_midpoint_linear();
+            break;
+        default:
+        case 2:
+            generate_steiner_midpoint_exponential();
+            break;
+        case 3:
+            generate_steiner_triangle_linear();
+            generate_steiner_point_from_triangle();
+            break;
+        case 4:
+            generate_steiner_triangle_exponential(data, 0, kAllVertices.size()-1, 0, 3);
+            generate_steiner_point_from_triangle();
+            break;
+    }
+
 }
 
 /**
@@ -42,7 +65,7 @@ set<VEdge*> Steiner::get_steiner_edges() {
 * Build the steiner points based on the midpoint of the edges,
 * this is naive, and operates in O(n) time
 */
-void Steiner::generate_steiner_intersections_naive() {
+void Steiner::generate_steiner_midpoint_linear() {
     int x = 0;
     VNode* inner;
     VNode* outer;
@@ -124,7 +147,7 @@ void Steiner::generate_steiner_intersections_naive() {
 /**
 * this is a more exhaustive than the naive one, but it runs in O(n^2) time
 */
-void Steiner::generate_steiner_intersections_naive_n_2() {
+void Steiner::generate_steiner_midpoint_exponential() {
     //VNode *node1;
     //VNode *node2;
 
@@ -193,8 +216,6 @@ void Steiner::generate_steiner_intersections_naive_n_2() {
                         Map::get_map().at(mx).at(my), inner
                 ));
             }
-
-
         }
     }
 }
@@ -206,11 +227,12 @@ void Steiner::generate_steiner_intersections_naive_n_2() {
 *
 * This generates the steiner points based on triangles, very computational expensive
 */
-void Steiner::generate_steiner_points() {
+void Steiner::generate_steiner_point_from_triangle() {
     int y = 0;
 
     for(int x = 0; x<(int)kTriangles.size();x++) {
         if (verify_triangle_angles(kTriangles.at(x))) {
+            claim(kTriangles.at(x)->triangle_to_string(), kDebug);
             kSteinerPoints.insert(manhattan_geometric_mean(kTriangles.at(x)));
             y++;
         } else {
@@ -219,8 +241,26 @@ void Steiner::generate_steiner_points() {
             //claim("=======================================", kDebug);
         }
     }
+    claim("S/gneerate_steiner_points_from_triangle: here", kDebug);
     claim("S/generate_steiner_points: " + to_string(y) + "/" + to_string(kTriangles.size()) + " of triangles have steiner points", kDebug);
     claim("S/generate_steiner_points: Total number of Steiner Points: " + to_string(kSteinerPoints.size()), kDebug);
+}
+
+void Steiner::generate_steiner_triangle_linear() {
+    vector<VNode*> temp(kAllVertices.size());
+    // Add the nodes in the set to the vector
+    copy(kAllVertices.begin(), kAllVertices.end(), temp.begin());
+    for(int x = 0; x < temp.size() -1; x++) {
+        if(x+2 < temp.size()-1) {
+            kTriangles.push_back(new SteinerTriangle(temp.at(x), temp.at(x+1), temp.at(x+2)));
+        } else {
+            if(x + 1 < temp.size()-1) {
+                kTriangles.push_back(new SteinerTriangle(temp.at(x), temp.at(x+1), temp.at(0)));
+            } else {
+                kTriangles.push_back(new SteinerTriangle(temp.at(x), temp.at(0), temp.at(1)));
+            }
+        }
+    }
 }
 
 
@@ -228,7 +268,7 @@ void Steiner::generate_steiner_points() {
 * http://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
 * build the triangles during one pass of the list (O(n))
 */
-void Steiner::generate_triangles(VNode* data[], int start, int end, int index, int combo) {
+void Steiner::generate_steiner_triangle_exponential(VNode* data[], int start, int end, int index, int combo) {
     // Base case, where we know we need to print create the triangle
     if(index == combo) {
         kTriangles.push_back(new SteinerTriangle(data[0], data[1], data[2]));
@@ -240,9 +280,12 @@ void Steiner::generate_triangles(VNode* data[], int start, int end, int index, i
     // "end-i+1 >= r-index" makes sure that including one element
     // at index will make a combination with remaining elements
     // at remaining positions
+    set<VNode*>::const_iterator it(kAllVertices.begin());
+    advance(it, start);
     for(int i=start; i<=end && end-i+1 >= combo - index; i++) {
-        //data[index] = kAllVertices.at(i);
-        //generate_triangles(data, i+1, end, index+1, combo);
+        data[index] = *it;
+        advance(it, 1);
+        generate_steiner_triangle_exponential(data, i+1, end, index+1, combo);
     }
 
 }
@@ -292,7 +335,7 @@ bool Steiner::verify_triangle_angles(SteinerTriangle* t) {
             angle3 = 180 - angle3;
         }
     }
-    claim("S/verify_triangle_angles: Size of angles: " + to_string(angle1) + "\t" + to_string(angle2) + "\t" + to_string(angle3), kDebug);
+    //claim("S/verify_triangle_angles: Size of angles: " + to_string(angle1) + "\t" + to_string(angle2) + "\t" + to_string(angle3), kDebug);
 
     return (angle1 > 120 || angle2 > 120 || angle3 > 120);
 }

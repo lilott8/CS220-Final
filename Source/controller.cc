@@ -73,7 +73,7 @@ void Controller::start() {
     project_vertices_on_map(kVertices);
 
     // step 2
-    kSteiner = new Steiner(kVertices);
+    kSteiner = new Steiner(kVertices, kSteinerCalculator);
     kSteiner->start();
     set<VNode*> sp = kSteiner->get_steiner_points();
     claim("there are " + to_string(sp.size()) + " steiner points", kDebug);
@@ -125,4 +125,8 @@ int Controller::calculate_manhattan_distance(VNode* a, VNode* b) {
     order1 = abs(a->get_x() - b->get_x());
     order2 = abs(a->get_y() - b->get_y());
     return order1 + order2;
+}
+
+void Controller::set_steiner_calculator(int x) {
+    kSteinerCalculator = x;
 }

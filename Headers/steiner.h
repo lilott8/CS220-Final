@@ -39,6 +39,7 @@ namespace FlowAlgorithms {
 
         Steiner();
         Steiner(set<VNode*>);
+        Steiner(set<VNode*>, int);
         ~Steiner();
         // Templated entry point for all algorithmic starts
         void start();
@@ -53,16 +54,18 @@ namespace FlowAlgorithms {
         vector<SteinerTriangle*> kTriangles;    // list of triangles
         set<VNode*> kSteinerPoints;             // list of all candidate nodes generated
         set<VEdge*> kSteinerEdges;              // list of all edges that include Steiner points
+        int kSteinerCalculator;                 // determines how to calculate steiner points
 
-        // convert nodes to triangles
-        void generate_triangles(VNode* [], int, int, int, int);
+        // convert nodes to triangles, exponential time
+        void generate_steiner_triangle_exponential(VNode* [], int, int, int, int);
+        void generate_steiner_triangle_linear();
         // Naive approach to generating steiner points, runs in linear time
-        void generate_steiner_intersections_naive();
+        void generate_steiner_midpoint_linear();
         // Naive approach to generating steiner points, runs in exponential time
-        void generate_steiner_intersections_naive_n_2();
+        void generate_steiner_midpoint_exponential();
 
         // Triangle approach to Steiner point generation
-        void generate_steiner_points();
+        void generate_steiner_point_from_triangle();
         // check for size of angle being less than 120 degrees
         bool verify_triangle_angles(SteinerTriangle*);
 

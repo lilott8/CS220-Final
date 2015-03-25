@@ -37,6 +37,8 @@ namespace Flow {
         static int calculate_distance(int, int);
         static int calculate_manhattan_distance(VNode*, VNode*);
 
+        void set_steiner_calculator(int);
+
     private:
         // Map object that is derived from the problem object
         Map *kMap;
@@ -47,6 +49,7 @@ namespace Flow {
         FlowAlgorithms::Steiner *kSteiner;  // Steiner point class which handles all steiner point calculations
         FlowAlgorithms::Voronoi *kVoronoi;  // Voronoi class which generates the Voronoi candidate points
         FlowAlgorithms::SPC *kSPC;          // Handles the Kruskal/Dijkstra algorithms
+        int kSteinerCalculator;             // Determines which steiner algorithm to run
 
         Optimization kOpt;                  // Deprecated, for now
 

@@ -176,16 +176,19 @@ VEdge* Voronoi::create_edge(double start_x, double start_y, double end_x, double
     e->kStart = Map::get_map().at(x1).at(y1);
     //e->kEnd = new VNode(x2, y2, Controller::calculate_distance(x2, y2));
     e->kEnd = Map::get_map().at(x2).at(y2);
-    e->kStart->set_type(VNode::Type::VORONOI);
-    e->kEnd->set_type(VNode::Type::VORONOI);
+
+    if(e->kStart->get_type() == VNode::NONE) {
+        e->kStart->set_type(VNode::Type::VORONOI);
+    }
+
+    if(e->kEnd->get_type() == VNode::NONE) {
+        e->kEnd->set_type(VNode::Type::VORONOI);
+    }
+
     e->kCost = Controller::calculate_manhattan_distance(e->kStart, e->kEnd);
-    // We need to save the individual vertices as well
-    if(!in_vertices(e->kStart)) {
-        kVoronoiVertices.insert(e->kStart);
-    }
-    if(!in_vertices(e->kEnd)) {
-        kVoronoiVertices.insert(e->kEnd);
-    }
+
+    kVoronoiVertices.insert(e->kStart);
+    kVoronoiVertices.insert(e->kEnd);
     //claim("creating a node of: " + e->vedge_to_string(), kDebug);
     //claim("====================================", kDebug);
     return e;

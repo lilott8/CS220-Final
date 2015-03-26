@@ -1,5 +1,6 @@
 #include "../Headers/map.h"
 #include "../Headers/controller.h"
+#include "../Headers/hadlock.h"
 #include "../Headers/spc.h"
 #include "../Headers/node.h"
 #include "../Headers/problem_object.h"
@@ -26,6 +27,7 @@ Controller::Controller(ProblemObject *po) {
     this->kMap = new Map(po);
     kOpt = Controller::Optimization::DEFAULT;
     //kAlgorithm = new Fortune();
+    kHadlock = new Hadlock(kMap);
 }
 
 /**
@@ -37,8 +39,10 @@ Controller::Controller(ProblemObject *po, Controller::AlgoType a, Controller::Op
     // get the pins from the map.
     kVertices = this->kMap->get_pins();
 
-    // This begins our process
+    // Make sure Voronoi has a pointer to the map
     kVoronoi = new Voronoi(this->kMap);
+    // Make sure Hadlock has a pointer to the map
+    kHadlock = new Hadlock(kMap);
 
     //this->set_algorithm(a);
 
@@ -53,6 +57,7 @@ Controller::~Controller() {
     delete kSteiner;
     delete kVoronoi;
     delete kSPC;
+    delete kHadlock;
 }
 
 void Controller::start() {
@@ -126,6 +131,14 @@ int Controller::calculate_manhattan_distance(VNode* a, VNode* b) {
     order1 = abs(a->get_x() - b->get_x());
     order2 = abs(a->get_y() - b->get_y());
     return order1 + order2;
+}
+
+double Controller::calculate_euclidean_distance(VNode* a, VNode* b) {
+    int order1, order2;
+    order1 = (a->get_x() - b->get_x()) * (a->get_x() - b->get_x());
+    order2 = (a->get_y() - b->get_y()) * (a->get_y() - b->get_y());
+    // http://stackoverflow.com/questions/9695329/c-how-to-round-a-double-to-an-int
+    return (sqrt(order1 + order2) + .5);
 }
 
 void Controller::set_steiner_calculator(int x) {

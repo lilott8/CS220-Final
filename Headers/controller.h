@@ -7,6 +7,7 @@
 #include "steiner.h"
 #include "spc.h"
 #include "prim.h"
+#include "hadlock.h"
 
 /**
 * Class which handles the progression of algorithms necessary.
@@ -36,6 +37,7 @@ namespace Flow {
         // static so they are able to be referenced everywhere
         static int calculate_distance(int, int);
         static int calculate_manhattan_distance(VNode*, VNode*);
+        static double calculate_euclidean_distance(VNode*, VNode*);
 
         void set_steiner_calculator(int);
 
@@ -49,6 +51,7 @@ namespace Flow {
         FlowAlgorithms::Steiner *kSteiner;  // Steiner point class which handles all steiner point calculations
         FlowAlgorithms::Voronoi *kVoronoi;  // Voronoi class which generates the Voronoi candidate points
         FlowAlgorithms::SPC *kSPC;          // Handles the Kruskal/Dijkstra algorithms
+        FlowAlgorithms::Hadlock *kHadlock;
         int kSteinerCalculator;             // Determines which steiner algorithm to run
 
         Optimization kOpt;                  // Deprecated, for now

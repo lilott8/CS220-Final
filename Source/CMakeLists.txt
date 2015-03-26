@@ -3,6 +3,7 @@ claim.cc
 controller.cc
 edge.cc
 grid.cc
+hadlock.cc
 map.cc
 netlist.cc
 node.cc

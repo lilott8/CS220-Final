@@ -58,6 +58,8 @@ namespace Flow {
 
         void project_vertices_on_map(set<VNode*>); // Interface for debugging
         void project_edges_on_map(set<VEdge*>);     // Interface for debugging
+        void add_to_all_vertices(set<VNode*>);
+        void add_to_all_edges(set<VEdge*>);
     };
 }
 #endif

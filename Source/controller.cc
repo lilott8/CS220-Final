@@ -54,14 +54,16 @@ Controller::Controller(ProblemObject *po, Controller::AlgoType a, Controller::Op
 * Destructor
 */
 Controller::~Controller() {
-    delete kSteiner;
-    delete kVoronoi;
-    delete kSPC;
+    //delete kSteiner;
+    //delete kVoronoi;
+    //delete kSPC;
     delete kHadlock;
 }
 
 void Controller::start() {
-    kMap->print_map();
+    //kHadlock->start(kMap->get_routes());
+    // This is the initial hanan grid
+    //kEdges = kHadlock->get_edges();
     /**
     * Paper 5 details a multi-step process to generate the OAVG
     *
@@ -72,25 +74,29 @@ void Controller::start() {
     // Step 1
     kVoronoi->start();
     // add the nodes to our vertices
-    std::set<VNode*> temp = kVoronoi->get_vertices();
+
+    add_to_all_vertices(kVoronoi->get_vertices());
     claim("C/start: Number of vertices from voronoi: " + to_string(kVoronoi->get_vertices().size()), kDebug);
     // Combine the voronoie with the pins
-    for(VNode* v : temp) {kVertices.insert(v);}
-    project_vertices_on_map(kVertices);
+    //add_to_all_edges(kVoronoi->get_routes());
 
     // step 2
-    kSteiner = new Steiner(kVertices, kSteinerCalculator);
+    kSteiner = new Steiner(kMap, kSteinerCalculator);
     kSteiner->start();
     set<VNode*> sp = kSteiner->get_steiner_points();
-    claim("there are " + to_string(sp.size()) + " steiner points", kDebug);
-    claim("there are " + to_string(kSteiner->get_steiner_edges().size()) + " steiner edges", kDebug);
+    claim("C/start: there are " + to_string(sp.size()) + " steiner points", kDebug);
 
-    //project_vertices_on_map(sp);
+    // Route all the MapRoutes that need to be routed
+    kHadlock->start(kMap->get_routes());
+    kHadlock->start(kVoronoi->get_routes());
+    //kHadlock->start(kSteiner->get_routes());
+
     // Step 3
-    this->kSPC = new SPC(kSteiner->get_steiner_edges());
+    // kEdges will have all the routeable edges possible
+    this->kSPC = new SPC(kHadlock->get_edges());
     this->kSPC->start();
 
-    //kMap->print_map();
+    kMap->print_map();
 }
 
 /**
@@ -144,3 +150,21 @@ double Controller::calculate_euclidean_distance(VNode* a, VNode* b) {
 void Controller::set_steiner_calculator(int x) {
     kSteinerCalculator = x;
 }
+
+void Controller::add_to_all_vertices(set<VNode*> nodes) {
+    for(auto node : nodes) {
+        kVertices.insert(node);
+    }
+}
+
+void Controller::add_to_all_edges(set<VEdge*> edges) {
+    for(auto edge : edges) {
+        kEdges.insert(edge);
+    }
+}
+
+/*void Controller::add_to_all_routes(set<MapRoute*> routes) {
+    for(auto r : routes) {
+        kRoutes.insert(r);
+    }
+}*/

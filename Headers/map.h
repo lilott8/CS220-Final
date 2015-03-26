@@ -9,11 +9,6 @@
 #include <queue>
 #include "comparators.h"
 #include <set>
-
-#define plot_(X,Y,D) do{ rgb_color f_;				\
-  f_.red = r; f_.green = g; f_.blue = b;			\
-  _dla_plot(img, (X), (Y), &f_, (D)) ; }while(0)
-
 // Swap routine for drawing lines
 #define mapswap(a, b) do{ __typeof__(a) tmp;  tmp = a; a = b; b = tmp; }while(0)
 
@@ -24,12 +19,12 @@ using namespace Utilities;
 */
 
 namespace Flow {
-
     //
-    struct Route {
-        Route(){};
-        VNode pStart;
-        VNode pStop;
+    struct MapRoute {
+        MapRoute(){};
+        MapRoute(VNode* s, VNode* t) {pSource = s; pTarget = t;};
+        VNode* pSource;
+        VNode* pTarget;
     };
 
     class Map {
@@ -45,6 +40,9 @@ namespace Flow {
 
         // get a list of pins that need to be routed
         std::set<VNode*> get_pins();
+        std::set<VNode*> get_corners();
+        vector<MapRoute*> get_routes();
+        VNode* get_closest_node(VNode*);
         // return the map, able to be referenced everywhere
         static vector<vector<VNode*>> get_map();
 
@@ -59,6 +57,8 @@ namespace Flow {
         int kDefaultSize = 10;      // default size if needed
         bool kIsEuclidean;          // is this a euclidean map or not
         std::set<VNode*> kPins;     // list of all the pins
+        std::set<VNode*> kCorners;  // list of all the obstacle corners
+        vector<MapRoute*> kRoutes;
         //static vector<vector<VNode*>> kMap;
 
         // begin building the datastructures to contain the map
@@ -68,8 +68,9 @@ namespace Flow {
         // add the blockages to the map
         void set_blockages(vector<Blocker>);
         // line drawing algorithms
-        void draw_xiaolin_wu_lines(vector<VEdge*>);
         void draw_bresenham_lines(vector<VEdge*>);
+
+        void generate_hanan_grid();
     };
 }
 

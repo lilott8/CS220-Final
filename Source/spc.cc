@@ -222,16 +222,16 @@ void SPC::run_dijkstra(std::vector<VEdgeWrapper> edges) {
             dot_file << ", color=\"black\"";
             output += ", color=\"black\"";
 
+        } else {
+            dot_file << ", color=\"grey\"";
+            output += ", color=\"grey\"";
+
             VEdgeWrapper vw;
             vw.id = VEdge::get_next_vedge_id();
             vw.source = u;
             vw.target = v;
             vw.weight = Flow::Controller::calculate_manhattan_distance(kHashMap.at((int) u), kHashMap.at((int) v));
             kDijkstraEdges.push_back(vw);
-
-        } else {
-            dot_file << ", color=\"grey\"";
-            output += ", color=\"grey\"";
         }
         dot_file << "]";
         output += "]";

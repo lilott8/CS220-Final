@@ -8,12 +8,12 @@ using namespace FlowAlgorithms;
 Steiner::Steiner() {
 }
 
-Steiner::Steiner(set<VNode*> v) {
-    kAllVertices = v;
+Steiner::Steiner(Map* m) {
+    kMap = m;
 }
 
-Steiner::Steiner(set<VNode*> v, int x) {
-    kAllVertices = v;
+Steiner::Steiner(Map* m, int x) {
+    kMap = m;
     kSteinerCalculator = x;
 }
 
@@ -24,9 +24,9 @@ Steiner::~Steiner() {
 * Generate the steiner points by one of three methods
 */
 void Steiner::start() {
-    claim("S/start: Size of set of pins & voronoi points is: " + to_string(kAllVertices.size()), kDebug);
+    claim("S/start: Size of set of pins is: " + to_string(kMap->get_pins().size()), kDebug);
     VNode* data[3];
-    //kSteinerCalculator = 3;
+    kSteinerCalculator = 2;
     switch(kSteinerCalculator) {
         case 1:
             generate_steiner_midpoint_linear();
@@ -36,12 +36,14 @@ void Steiner::start() {
             generate_steiner_midpoint_exponential();
             break;
         case 3:
-            generate_steiner_triangle_linear();
-            generate_steiner_point_from_triangle();
+            //generate_steiner_triangle_linear();
+            //generate_steiner_point_from_triangle();
+            claim("S/start: Disabled for now", kError);
             break;
         case 4:
-            generate_steiner_triangle_exponential(data, 0, kAllVertices.size()-1, 0, 3);
-            generate_steiner_point_from_triangle();
+            //generate_steiner_triangle_exponential(data, 0, kMap->get_pins().size()-1, 0, 3);
+            //generate_steiner_point_from_triangle();
+            claim("S/start: Disabled for now", kError);
             break;
     }
 
@@ -51,7 +53,7 @@ void Steiner::start() {
 * get the individual Steiner points
 */
 set<VNode*> Steiner::get_steiner_points() {
-    return kSteinerPoints;
+    return kSteinerVertices;
 }
 
 /**
@@ -61,20 +63,23 @@ set<VEdge*> Steiner::get_steiner_edges() {
     return kSteinerEdges;
 }
 
+vector<MapRoute*> Steiner::get_routes() {
+    return kRoutes;
+}
+
 /*
 * Build the steiner points based on the midpoint of the edges,
 * this is naive, and operates in O(n) time
 */
 void Steiner::generate_steiner_midpoint_linear() {
-    int x = 0;
     VNode* inner;
     VNode* outer;
 
     std::set<VNode*>::iterator it;
     std::set<VNode*>::iterator it2;
-    for(it = kAllVertices.begin(); it != kAllVertices.end(); ++it) {
+    for(it = kMap->get_pins().begin(); it != kMap->get_pins().end(); ++it) {
         it2 = it;
-        if(++it2 != kAllVertices.end()) {
+        if(it2++ != kMap->get_pins().end()) {
             outer = *it;
             inner = *it2;
         }
@@ -87,59 +92,47 @@ void Steiner::generate_steiner_midpoint_linear() {
             // Calculate the midpoint
             int midpoint = (outer->get_y() + inner->get_y()) / 2;
 
-            // Toggle the point on the map that needs to become a steiner point
-            Map::get_map().at(outer->get_x()).at(midpoint)->set_type(VNode::Type::STEINER);
-            // Add the steiner point to our array of candidate vertices
-            kSteinerPoints.insert(Map::get_map().at(outer->get_x()).at(midpoint));
+            if(kMap->get_map().at(outer->get_x()).at(midpoint)->get_type() == VNode::NONE) {
+                // Toggle the point on the map that needs to become a steiner point
+                kMap->get_map().at(outer->get_x()).at(midpoint)->set_type(VNode::Type::STEINER);
+                // Add the steiner point to our array of candidate vertices
+                kSteinerVertices.insert(kMap->get_map().at(outer->get_x()).at(midpoint));
 
-            // Save point x -> midpoint
-            kSteinerEdges.insert(new VEdge(
-                    outer, Map::get_map().at(outer->get_x()).at(midpoint)
-            ));
-
-            // save midpoint -> point y
-            kSteinerEdges.insert(new VEdge(
-                    Map::get_map().at(inner->get_x()).at(midpoint), inner
-            ));
+                kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(outer->get_x()).at(midpoint)));
+                kRoutes.push_back(new MapRoute(kMap->get_map().at(inner->get_x()).at(midpoint), inner));
+            }
             // y-coordinates are the same, we only care about the x-coordinates
         } else if(outer->get_y() == inner->get_y()) {
             // Calculate the midpoint
             int midpoint = (outer->get_x() + inner->get_x()) / 2;
 
-            // Toggle the point on the map that needs to become a steiner point
-            Map::get_map().at(midpoint).at(outer->get_y())->set_type(VNode::Type::STEINER);
-            // Add the steiner point to our array of candidate vertices
-            kSteinerPoints.insert(Map::get_map().at(midpoint).at(outer->get_y()));
+            if(kMap->get_map().at(midpoint).at(outer->get_y())->get_type() == VNode::NONE) {
+                // Toggle the point on the map that needs to become a steiner point
+                kMap->get_map().at(midpoint).at(outer->get_y())->set_type(VNode::Type::STEINER);
+                // Add the steiner point to our array of candidate vertices
+                kSteinerVertices.insert(kMap->get_map().at(midpoint).at(outer->get_y()));
 
-            // Save point x -> midpoint
-            kSteinerEdges.insert(new VEdge(
-                    outer, Map::get_map().at(midpoint).at(outer->get_y())
-            ));
-            // Save midpoint -> point y
-            kSteinerEdges.insert(new VEdge(
-                    Map::get_map().at(midpoint).at(inner->get_y()), inner
-            ));
-            // both coordinates are differeing, thus we need to pay attention to both of them
+                kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(midpoint).at(outer->get_y())));
+                kRoutes.push_back(new MapRoute(kMap->get_map().at(midpoint).at(inner->get_y()), inner));
+            }
+            // both coordinates differ, thus we need to pay attention to both of them
         } else {
             // Generate the x/y of the midpoint
             int mx, my;
             mx = (outer->get_x() + inner->get_x()) / 2;
             my = (outer->get_y() + inner->get_y()) / 2;
 
-            // Toggle the point on the map that needs to become a steiner point
-            Map::get_map().at(mx).at(my)->set_type(VNode::Type::STEINER);
+            if(kMap->get_map().at(mx).at(my)->get_type() == VNode::NONE) {
+                // Toggle the point on the map that needs to become a steiner point
+                kMap->get_map().at(mx).at(my)->set_type(VNode::Type::STEINER);
 
-            // Add the steiner point to our array of candidate vertices
-            kSteinerPoints.insert(Map::get_map().at(mx).at(my));
+                // Add the steiner point to our array of candidate vertices
+                kSteinerVertices.insert(kMap->get_map().at(mx).at(my));
 
-            // Create the vedges for our new steiner points
-            kSteinerEdges.insert(new VEdge(
-                    outer, Map::get_map().at(mx).at(my)
-            ));
-            // Create the vedges for our new steiner points
-            kSteinerEdges.insert(new VEdge(
-                    Map::get_map().at(mx).at(my), inner
-            ));
+                // Create the routes for this new point
+                kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(mx).at(my)));
+                kRoutes.push_back(new MapRoute(kMap->get_map().at(mx).at(my), inner));
+            }
         }
     }
 }
@@ -151,8 +144,8 @@ void Steiner::generate_steiner_midpoint_exponential() {
     //VNode *node1;
     //VNode *node2;
 
-    for(VNode* outer : kAllVertices) {
-        for(VNode* inner : kAllVertices) {
+    for(VNode* outer : kMap->get_pins()) {
+        for(VNode* inner : kMap->get_pins()) {
             if(outer == inner) {
                 continue;
             }
@@ -162,59 +155,46 @@ void Steiner::generate_steiner_midpoint_exponential() {
                 // Calculate the midpoint
                 int midpoint = (outer->get_y() + inner->get_y()) / 2;
 
-                // Toggle the point on the map that needs to become a steiner point
-                Map::get_map().at(outer->get_x()).at(midpoint)->set_type(VNode::Type::STEINER);
-                // Add the steiner point to our array of candidate vertices
-                kSteinerPoints.insert(Map::get_map().at(outer->get_x()).at(midpoint));
+                if(kMap->get_map().at(outer->get_x()).at(midpoint)->get_type() == VNode::NONE) {
+                    // Toggle the point on the map that needs to become a steiner point
+                    kMap->get_map().at(outer->get_x()).at(midpoint)->set_type(VNode::Type::STEINER);
+                    // Add the steiner point to our array of candidate vertices
+                    kSteinerVertices.insert(kMap->get_map().at(outer->get_x()).at(midpoint));
 
-                // Save point x -> midpoint
-                kSteinerEdges.insert(new VEdge(
-                        outer, Map::get_map().at(outer->get_x()).at(midpoint)
-                ));
-
-                // save midpoint -> point y
-                kSteinerEdges.insert(new VEdge(
-                        Map::get_map().at(inner->get_x()).at(midpoint), inner
-                ));
+                    kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(outer->get_x()).at(midpoint)));
+                    kRoutes.push_back(new MapRoute(kMap->get_map().at(inner->get_x()).at(midpoint), inner));
+                }
                 // y-coordinates are the same, we only care about the x-coordinates
             } else if(outer->get_y() == inner->get_y()) {
                 // Calculate the midpoint
                 int midpoint = (outer->get_x() + inner->get_x()) / 2;
 
-                // Toggle the point on the map that needs to become a steiner point
-                Map::get_map().at(midpoint).at(outer->get_y())->set_type(VNode::Type::STEINER);
-                // Add the steiner point to our array of candidate vertices
-                kSteinerPoints.insert(Map::get_map().at(midpoint).at(outer->get_y()));
+                if(kMap->get_map().at(midpoint).at(outer->get_y())->get_type() == VNode::NONE) {
+                    // Toggle the point on the map that needs to become a steiner point
+                    kMap->get_map().at(midpoint).at(outer->get_y())->set_type(VNode::Type::STEINER);
+                    // Add the steiner point to our array of candidate vertices
+                    kSteinerVertices.insert(kMap->get_map().at(midpoint).at(outer->get_y()));
 
-                // Save point x -> midpoint
-                kSteinerEdges.insert(new VEdge(
-                        outer, Map::get_map().at(midpoint).at(outer->get_y())
-                ));
-                // Save midpoint -> point y
-                kSteinerEdges.insert(new VEdge(
-                        Map::get_map().at(midpoint).at(inner->get_y()), inner
-                ));
-                // both coordinates are differeing, thus we need to pay attention to both of them
+                    kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(midpoint).at(outer->get_y())));
+                    kRoutes.push_back(new MapRoute(kMap->get_map().at(midpoint).at(inner->get_y()), inner));
+                }
+                // both coordinates are differing, thus we need to pay attention to both of them
             } else {
                 // Generate the x/y of the midpoint
                 int mx, my;
                 mx = (outer->get_x() + inner->get_x()) / 2;
                 my = (outer->get_y() + inner->get_y()) / 2;
 
-                // Toggle the point on the map that needs to become a steiner point
-                Map::get_map().at(mx).at(my)->set_type(VNode::Type::STEINER);
+                if(kMap->get_map().at(mx).at(my)->get_type() == VNode::NONE) {
+                    // Toggle the point on the map that needs to become a steiner point
+                    kMap->get_map().at(mx).at(my)->set_type(VNode::Type::STEINER);
 
-                // Add the steiner point to our array of candidate vertices
-                kSteinerPoints.insert(Map::get_map().at(mx).at(my));
+                    // Add the steiner point to our array of candidate vertices
+                    kSteinerVertices.insert(kMap->get_map().at(mx).at(my));
 
-                // Create the vedges for our new steiner points
-                kSteinerEdges.insert(new VEdge(
-                        outer, Map::get_map().at(mx).at(my)
-                ));
-                // Create the vedges for our new steiner points
-                kSteinerEdges.insert(new VEdge(
-                        Map::get_map().at(mx).at(my), inner
-                ));
+                    kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(mx).at(my)));
+                    kRoutes.push_back(new MapRoute(kMap->get_map().at(mx).at(my), inner));
+                }
             }
         }
     }
@@ -233,7 +213,7 @@ void Steiner::generate_steiner_point_from_triangle() {
     for(int x = 0; x<(int)kTriangles.size();x++) {
         if (verify_triangle_angles(kTriangles.at(x))) {
             claim(kTriangles.at(x)->triangle_to_string(), kDebug);
-            kSteinerPoints.insert(manhattan_geometric_mean(kTriangles.at(x)));
+            kSteinerVertices.insert(manhattan_geometric_mean(kTriangles.at(x)));
             y++;
         } else {
             //claim("Angle is greater than 120!", kDebug);
@@ -243,13 +223,13 @@ void Steiner::generate_steiner_point_from_triangle() {
     }
     claim("S/gneerate_steiner_points_from_triangle: here", kDebug);
     claim("S/generate_steiner_points: " + to_string(y) + "/" + to_string(kTriangles.size()) + " of triangles have steiner points", kDebug);
-    claim("S/generate_steiner_points: Total number of Steiner Points: " + to_string(kSteinerPoints.size()), kDebug);
+    claim("S/generate_steiner_points: Total number of Steiner Points: " + to_string(kSteinerVertices.size()), kDebug);
 }
 
 void Steiner::generate_steiner_triangle_linear() {
-    vector<VNode*> temp(kAllVertices.size());
+    vector<VNode*> temp(kMap->get_pins().size());
     // Add the nodes in the set to the vector
-    copy(kAllVertices.begin(), kAllVertices.end(), temp.begin());
+    copy(kMap->get_pins().begin(), kMap->get_pins().end(), temp.begin());
     for(int x = 0; x < temp.size() -1; x++) {
         if(x+2 < temp.size()-1) {
             kTriangles.push_back(new SteinerTriangle(temp.at(x), temp.at(x+1), temp.at(x+2)));
@@ -280,7 +260,7 @@ void Steiner::generate_steiner_triangle_exponential(VNode* data[], int start, in
     // "end-i+1 >= r-index" makes sure that including one element
     // at index will make a combination with remaining elements
     // at remaining positions
-    set<VNode*>::const_iterator it(kAllVertices.begin());
+    set<VNode*>::const_iterator it(kMap->get_pins().begin());
     advance(it, start);
     for(int i=start; i<=end && end-i+1 >= combo - index; i++) {
         data[index] = *it;

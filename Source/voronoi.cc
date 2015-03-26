@@ -77,6 +77,7 @@ void Voronoi::generate_edges() {
         const voronoi_diagram<double>::edge_type* edge = cell.incident_edge();
         kCells.push_back(cell);
         VEdge* vedge;
+        MapRoute* route;
         // This is convenient way to iterate edges around Voronoi cell.
         do {
             if (edge->is_primary()) {
@@ -84,11 +85,19 @@ void Voronoi::generate_edges() {
                     // With this check, we are insuring that each edge is only drawn once,
                     // because the edge could be a half edge, and this roots out half edges
                     if(edge->cell()->source_index() < edge->twin()->cell()->source_index()) {
-                        vedge = create_edge(edge->vertex0()->x(), edge->vertex0()->y(),
-                                edge->vertex1()->x(), edge->vertex1()->y());
+                        //vedge = create_edge(edge->vertex0()->x(), edge->vertex0()->y(),
+                        //        edge->vertex1()->x(), edge->vertex1()->y());
+
+                        if((route = create_source_target_pair(edge->vertex0()->x(), edge->vertex0()->y())) != NULL) {
+                            kRoutes.push_back(route);
+                        }
+
+                        if((route = create_source_target_pair(edge->vertex1()->x(), edge->vertex1()->y())) != NULL) {
+                            kRoutes.push_back(route);
+                        }
 
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
-                        kVoronoiEdges.insert(vedge);
+                        //kVoronoiEdges.insert(vedge);
                         //claim("F/generate_edgs: Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
                 } else {
@@ -104,9 +113,18 @@ void Voronoi::generate_edges() {
                         double end_x = (p1.b - p2.b) * 640;
                         double end_y = (p1.a - p2.b) * -640;
 
-                        vedge = create_edge(v0->x(), v0->y(), end_x, end_y);
+                        if((route = create_source_target_pair(v0->x(), v0->y())) != NULL) {
+                            kRoutes.push_back(route);
+                        }
+
+                        if((route = create_source_target_pair(end_x, end_y)) != NULL) {
+                            kRoutes.push_back(route);
+                        }
+
+
+                        //vedge = create_edge(v0->x(), v0->y(), end_x, end_y);
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
-                        kVoronoiEdges.insert(vedge);
+                        //kVoronoiEdges.insert(vedge);
                         //claim("F/generate_edgs: *Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
                 }
@@ -131,6 +149,10 @@ set<VEdge*> Voronoi::get_edges() {
 */
 set<VNode*> Voronoi::get_vertices() {
     return this->kVoronoiVertices;
+}
+
+vector<MapRoute*> Voronoi::get_routes() {
+    return this->kRoutes;
 }
 
 /**
@@ -167,6 +189,7 @@ VEdge* Voronoi::create_edge(double start_x, double start_y, double end_x, double
     else if (end_y > kMaxHeight) {y2 = kMaxHeight;}
     else {y2 = round(end_y);}
 
+
     VEdge *e = new VEdge();
 
 
@@ -188,5 +211,29 @@ VEdge* Voronoi::create_edge(double start_x, double start_y, double end_x, double
     //claim("creating a node of: " + e->vedge_to_string(), kDebug);
     //claim("====================================", kDebug);
     return e;
+}
+
+MapRoute* Voronoi::create_source_target_pair(double edge_x, double edge_y) {
+    int x1, y1;
+
+    /**
+    * Min height/widths are assumed 0 in this case
+    */
+    if (edge_x < 0) {x1 = kMinWidth;}
+    else if (edge_x > kMaxWidth) {x1 = kMaxWidth;}
+    else {x1 = round(edge_x);}
+
+    if (edge_y < 0) {y1 = kMinHeight;}
+    else if (edge_y > kMaxHeight) {y1 = kMaxHeight;}
+    else {y1 = round(edge_y);}
+
+    VNode* n = kMap->get_closest_node(kMap->get_map().at(x1).at(y1));
+
+    if(kMap->get_map().at(x1).at(y1)->get_type() == VNode::NONE
+            && n != kMap->get_map().at(x1).at(y1)) {
+        return new MapRoute(kMap->get_map().at(x1).at(y1), n);
+    } else {
+        return NULL;
+    }
 }
 

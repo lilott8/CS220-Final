@@ -27,6 +27,7 @@ Map::Map(ProblemObject *po) {
     initialize_map();
     set_blockages(po->get_blockers());
     set_pins(po->get_connections());
+    generate_hanan_grid();
 }
 
 /**
@@ -67,7 +68,7 @@ void Map::set_blockages(vector<Blocker> b) {
         if(start.x - 1 > 0 && start.y - 1 > 0) {
             if(kMap.at(start.x).at(start.y)->get_type() == VNode::NONE) {
                 kMap.at(start.x).at(start.y)->set_type(VNode::CORNER);
-                kPins.insert(kMap.at(start.x-1).at(start.y-1));
+                kCorners.insert(kMap.at(start.x-1).at(start.y-1));
             }
         }
 
@@ -75,7 +76,7 @@ void Map::set_blockages(vector<Blocker> b) {
         if((start.x + (width-1)) + 1 < kWidth && start.y - 1 > 0) {
             if(kMap.at(start.x+(width-1)+1).at(start.y-1)->get_type() == VNode::NONE) {
                 kMap.at(start.x+(width-1)+1).at(start.y-1)->set_type(VNode::CORNER);
-                kPins.insert(kMap.at(start.x+(width-1)+1).at(start.y-1));
+                kCorners.insert(kMap.at(start.x+(width-1)+1).at(start.y-1));
             }
         }
 
@@ -83,7 +84,7 @@ void Map::set_blockages(vector<Blocker> b) {
         if(start.x - 1 > 0 && (start.y + height) + 1 < kHeight) {
             if(kMap.at(start.x-1).at(start.y+(height-1)+1)->get_type() == VNode::NONE) {
                 kMap.at(start.x-1).at(start.y+(height-1)+1)->set_type(VNode::CORNER);
-                kPins.insert(kMap.at(start.x-1).at(start.y+(height-1)+1));
+                kCorners.insert(kMap.at(start.x-1).at(start.y+(height-1)+1));
             }
         }
 
@@ -91,7 +92,7 @@ void Map::set_blockages(vector<Blocker> b) {
         if((start.x + width) + 1 < kWidth && (start.y + height) + 1 < kHeight) {
             if(kMap.at(start.x+(width-1)+1).at(start.y+(height-1)+1)->get_type() == VNode::NONE) {
                 kMap.at(start.x + (width - 1) + 1).at(start.y + (height - 1) + 1)->set_type(VNode::CORNER);
-                kPins.insert(kMap.at(start.x + (width - 1) + 1).at(start.y + (height - 1) + 1));
+                kCorners.insert(kMap.at(start.x + (width - 1) + 1).at(start.y + (height - 1) + 1));
             }
         }
     }
@@ -128,11 +129,33 @@ std::set<VNode*> Map::get_pins() {
     return kPins;
 }
 
+std::set<VNode*> Map::get_corners() {
+    return kCorners;
+}
+
 /**
 * return the map object
 */
 vector<vector<VNode*>> Map::get_map() {
     return kMap;
+}
+
+/**
+* get the max x
+*/
+int Map::get_x() {
+    return kHeight;
+}
+
+/**
+* get the max y
+*/
+int Map::get_y() {
+    return kWidth;
+}
+
+vector<MapRoute*> Map::get_routes() {
+    return kRoutes;
 }
 
 /**
@@ -198,29 +221,9 @@ void Map::print_map() {
 }
 
 /**
-* get the max x
-*/
-int Map::get_x() {
-    return kHeight;
-}
-
-/**
-* get the max y
-*/
-int Map::get_y() {
-    return kWidth;
-}
-
-/**
 * Debugging method for projecting the voronoi solution onto the map
 */
 void Map::draw_voronoi_edges(vector<VEdge*> edges) {
-    if(!kIsEuclidean) {
-        draw_xiaolin_wu_lines(edges);
-    } else {
-        draw_bresenham_lines(edges);
-    }
-    claim("M/draw_voronoi_edges: still using bresenham lines!", kNote);
     draw_bresenham_lines(edges);
 }
 
@@ -282,72 +285,16 @@ void Map::set(VNode* node) {
     }
 }
 
-
-/**
-* http://rosettacode.org/wiki/Xiaolin_Wu%27s_line_algorithm#C
-*/
-
-void Map::draw_xiaolin_wu_lines(vector<VEdge *> edges) {/*
-    double dx = (double)x2 - (double)x1;
-    double dy = (double)y2 - (double)y1;
-    if ( fabs(dx) > fabs(dy) ) {
-        if ( x2 < x1 ) {
-            swap_(x1, x2);
-            swap_(y1, y2);
-        }
-        double gradient = dy / dx;
-        double xend = round(x1);
-        double yend = y1 + gradient*(xend - x1);
-        double xgap = rfpart_(x1 + 0.5);
-        int xpxl1 = xend;
-        int ypxl1 = round(yend);
-        plot_(xpxl1, ypxl1, rfpart_(yend)*xgap);
-        plot_(xpxl1, ypxl1+1, fpart_(yend)*xgap);
-        double intery = yend + gradient;
-
-        xend = round(x2);
-        yend = y2 + gradient*(xend - x2);
-        xgap = fpart_(x2+0.5);
-        int xpxl2 = xend;
-        int ypxl2 = round(yend);
-        plot_(xpxl2, ypxl2, rfpart_(yend) * xgap);
-        plot_(xpxl2, ypxl2 + 1, fpart_(yend) * xgap);
-
-        int x;
-        for(x=xpxl1+1; x <= (xpxl2-1); x++) {
-            plot_(x, round(intery), rfpart_(intery));
-            plot_(x, round(intery) + 1, fpart_(intery));
-            intery += gradient;
-        }
-    } else {
-        if ( y2 < y1 ) {
-            swap_(x1, x2);
-            swap_(y1, y2);
-        }
-        double gradient = dx / dy;
-        double yend = round(y1);
-        double xend = x1 + gradient*(yend - y1);
-        double ygap = rfpart_(y1 + 0.5);
-        int ypxl1 = yend;
-        int xpxl1 = round(xend);
-        plot_(xpxl1, ypxl1, rfpart_(xend)*ygap);
-        plot_(xpxl1, ypxl1+1, fpart_(xend)*ygap);
-        double interx = xend + gradient;
-
-        yend = round(y2);
-        xend = x2 + gradient*(yend - y2);
-        ygap = fpart_(y2+0.5);
-        int ypxl2 = yend;
-        int xpxl2 = round(xend);
-        plot_(xpxl2, ypxl2, rfpart_(xend) * ygap);
-        plot_(xpxl2, ypxl2 + 1, fpart_(xend) * ygap);
-
-        int y;
-        for(y=ypxl1+1; y <= (ypxl2-1); y++) {
-            plot_(round(interx), y, rfpart_(interx));
-            plot_(round(interx) + 1, y, fpart_(interx));
-            interx += gradient;
+void Map::generate_hanan_grid() {
+    for(auto pin : kPins) {
+        for(auto c : kCorners) {
+            if(pin != c) {
+                kRoutes.push_back(new MapRoute(pin, c));
+            }
         }
     }
-    */
+}
+
+VNode* Map::get_closest_node(VNode* n) {
+    return *(kPins.lower_bound(n));
 }

@@ -22,19 +22,33 @@ void Hadlock::route(VNode* s, VNode* t) {
     kSource = s;
     kTarget = t;
 
+    kWaveFrontPQ.push(s);
+
     route_recursive();
+
+    build_edges();
+
+    clear_queues();
+}
+
+void Hadlock::start(vector<MapRoute*> routes) {
+
+    claim("H/start: Size of routes: " + to_string(routes.size()), kDebug);
+
+    for(int x = 0; x < routes.size(); x++) {
+        route(routes.at(x)->pSource, routes.at(x)->pTarget);
+    }
 }
 
 void Hadlock::route_recursive() {
-    //claim("size of queue: " + to_string(kWaveFrontSourcePQ.size()), kDebug);
+
     // Base case 1: Not finding a solution
     if (kWaveFrontPQ.size() < 1) {
-        claim("We could not successfully route: "
+        claim("H/route_recursive: We could not successfully route: "
                 + kSource->coords_to_string() + "->"
                 + kTarget->coords_to_string(), kWarning);
         return;
     }
-
     // Grab the first record
     VNode* curr = kWaveFrontPQ.top();
     // pop off the first record
@@ -44,8 +58,6 @@ void Hadlock::route_recursive() {
     if (curr == kTarget) {
         // add the sink to the trace_back
         kTraceBack.push_back(curr);
-        //successful_routing = true;
-        //claim("We found the sink!", kDebug);
         return;
     }
 
@@ -64,14 +76,18 @@ void Hadlock::route_recursive() {
     route_recursive();
 
     // Handle the trace_back generation for the algorithm
-    if (kTraceBack.size() > 0
+    if ((kTraceBack.size() > 0
             && is_adjacent(curr, kTraceBack.back())
-            && curr->get_cost() <= kTraceBack.back()->get_cost()
-            ) {
+            && curr->get_cost() <= kTraceBack.back()->get_cost())
+            || curr == kSource) {
         kTraceBack.push_back(curr);
     }
 
     return;
+}
+
+std::set<VEdge*> Hadlock::get_edges() {
+    return kEdges;
 }
 
 bool Hadlock::is_adjacent(VNode* a, VNode* b) {
@@ -100,8 +116,9 @@ bool Hadlock::is_placeable(int x, int y) {
     if(kTarget->get_x() == x && kTarget->get_y() == y) {
         return true;
     }
-    if(kMap->get_map().at(x).at(y)->get_type() != VNode::BLOCKED) {
-        return true;
+    // It doesn't matter type the node is as long as it's not a blockage
+    if(kMap->get_map().at(x).at(y)->get_type() == VNode::BLOCKED) {
+        return false;
     }
     return true;
 }
@@ -117,7 +134,6 @@ bool Hadlock::is_in_queue(VNode* a) {
 
 vector<VNode*> Hadlock::get_adjacent_nodes(VNode* c) {
     vector<VNode*> results;
-    VNode* temp = c;
 
     // (x, y+1)
     if (is_placeable(c->get_x(), c->get_y() + 1)) {
@@ -166,4 +182,59 @@ int Hadlock::calculate_metric(VNode* curr, VNode* prev) {
     } else {
         return prev->get_cost() + 1;
     }
+}
+
+
+void Hadlock::build_edges() {
+
+    VNode* edge_start = kTraceBack.front();
+    kTraceBack.pop_front();
+
+    VNode* next_edge = kTraceBack.front();
+    kTraceBack.pop_front();
+
+    Direction dir = edge_start->get_x() - next_edge->get_x() == 0 ? Direction::HORIZONTAL : Direction::VERTICAL;
+    Direction new_dir;
+
+    //claim("Size of ktraceback after pops: " + to_string(kTraceBack.size()), kDebug);
+
+    // We take the first value, so we don't need to inspect it again
+    for(int x=0;x<kTraceBack.size();x++) {
+        next_edge = kTraceBack.at(x);
+        new_dir = edge_start->get_x() - next_edge->get_x() == 0 ? Direction::HORIZONTAL : Direction::VERTICAL;
+
+        if(dir != new_dir) {
+            //claim("We switched from: " + to_string(dir) + " to " + to_string(new_dir), kDebug);
+            //claim(edge_start->vnode_to_string() + "->" + kTraceBack.at(x-1)->vnode_to_string(), kDebug);
+            // Create the edge from the start to the n-1 element
+            if (x - 1 > 0) {
+                kEdges.insert(new VEdge(edge_start, kTraceBack.at(x - 1)));
+                //claim("adding edge: " + edge_start->vnode_to_string() + "\t -> \t" + kTraceBack.at(x-1)->vnode_to_string(), kDebug);
+                // Our new start is the n-1 element, because that is the
+                // intersecting element at the direction change
+                edge_start = kTraceBack.at(x - 1);
+                // Change the direction
+                dir = new_dir;
+            } else {
+                //claim("adding edge: " + edge_start->vnode_to_string() + "\t -> \t" + kTraceBack.at(x)->vnode_to_string(), kDebug);
+                kEdges.insert(new VEdge(edge_start, kTraceBack.at(x)));
+                edge_start = kTraceBack.at(x);
+                dir = new_dir;
+            }
+        }
+
+        // Last case for when we are done iterating all our edges.
+        if(next_edge == kSource) {
+            //claim("adding edge: " + edge_start->vnode_to_string() + "\t -> \t" + next_edge->vnode_to_string(), kDebug);
+            kEdges.insert(new VEdge(edge_start, next_edge));
+        }
+    }
+    //claim("=========================================", kDebug);
+}
+
+void Hadlock::clear_queues() {
+    kTraceBack.clear();
+    kWaveFront.clear();
+    // ...
+    kWaveFrontPQ = std::priority_queue<VNode*, vector<VNode*>, CompareNodes>();
 }

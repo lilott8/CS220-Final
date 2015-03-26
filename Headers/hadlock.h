@@ -20,31 +20,39 @@ namespace FlowAlgorithms {
             }
         };
 
+        enum Direction {HORIZONTAL, VERTICAL};
+
     public:
         Hadlock();
         Hadlock(Map*);
         ~Hadlock();
 
-        void route(VNode*, VNode*);
+        void start(vector<MapRoute*>);
+
+        set<VEdge*> get_edges();
+
     private:
         Map* kMap;
         VNode* kSource;
         VNode* kTarget;
-
         std::priority_queue<VNode*, vector<VNode*>, CompareNodes> kWaveFrontPQ;
+
         std::deque<VNode*> kTraceBack;
         std::deque<VNode*> kWaveFront;
-
+        std::set<VEdge*> kEdges;
         std::vector<VNode*> get_adjacent_nodes(VNode*);
+
         int calculate_metric(VNode*, VNode*);
 
         void route_recursive();
+        void route(VNode*, VNode*);
+        void build_edges();
+        void clear_queues();
 
+        bool is_in_queue(VNode*);
         bool is_placeable(VNode*);
         bool is_placeable(int, int);
         bool is_adjacent(VNode*, VNode*);
-
-        bool is_in_queue(VNode*);
     };
 }
 

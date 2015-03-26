@@ -38,8 +38,8 @@ namespace FlowAlgorithms {
         const double PI=3.14159265358979323846;
 
         Steiner();
-        Steiner(set<VNode*>);
-        Steiner(set<VNode*>, int);
+        Steiner(Map*);
+        Steiner(Map*, int);
         ~Steiner();
         // Templated entry point for all algorithmic starts
         void start();
@@ -48,12 +48,14 @@ namespace FlowAlgorithms {
         // Return steiner variables
         set<VNode*> get_steiner_points();
         set<VEdge*> get_steiner_edges();
+        vector<MapRoute*> get_routes();
 
     private:
-        set<VNode*> kAllVertices;               // List of all the vertices generated
         vector<SteinerTriangle*> kTriangles;    // list of triangles
-        set<VNode*> kSteinerPoints;             // list of all candidate nodes generated
+        set<VNode*> kSteinerVertices;             // list of all candidate nodes generated
         set<VEdge*> kSteinerEdges;              // list of all edges that include Steiner points
+        vector<MapRoute*> kRoutes;
+        Map* kMap;
         int kSteinerCalculator;                 // determines how to calculate steiner points
 
         // convert nodes to triangles, exponential time

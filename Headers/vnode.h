@@ -20,7 +20,7 @@ namespace Flow {
         // What direction is this map "pointing" (not used)
         enum Direction {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST};
         // What is the type of this node
-        enum Type {PIN, BLOCKED, PATH, EDGE, NONE, STEINER, VORONOI};
+        enum Type {PIN, BLOCKED, PATH, EDGE, NONE, STEINER, VORONOI, CORNER};
 
         VNode();
         VNode(double, double, int cost = 0);

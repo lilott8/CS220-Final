@@ -37,15 +37,18 @@ void Map::set_blockages(vector<Blocker> b) {
     int width;
     Point start;
 
+    // For all the blockages in our problem object
     for(int x = 0;x < (int)b.size();x++) {
         height = b.at(x).height;
         width = b.at(x).width;
         start = b.at(x).location;
 
+        // Check to see if we can place the blockage!
         if(width + start.x > kWidth || height + start.y > kHeight) {
             claim("M/set_blockages: We cannot create the map: invalid blockage size", kError);
         }
 
+        // Place the blockage first
         int h = 0;
         int w = 0;
         while (w < width) {
@@ -56,6 +59,41 @@ void Map::set_blockages(vector<Blocker> b) {
             h = 0;
             w++;
         }
+
+        /**
+        * Now we can check to see if we can add the corner places
+        */
+        // up and left from beginning of blockage (top left corner)
+        if(start.x - 1 > 0 && start.y - 1 > 0) {
+            if(kMap.at(start.x).at(start.y)->get_type() == VNode::NONE) {
+                kMap.at(start.x).at(start.y)->set_type(VNode::CORNER);
+                kPins.insert(kMap.at(start.x-1).at(start.y-1));
+            }
+        }
+
+        // width of blockage, y (top right corner)
+        if((start.x + (width-1)) + 1 < kWidth && start.y - 1 > 0) {
+            if(kMap.at(start.x+(width-1)+1).at(start.y-1)->get_type() == VNode::NONE) {
+                kMap.at(start.x+(width-1)+1).at(start.y-1)->set_type(VNode::CORNER);
+                kPins.insert(kMap.at(start.x+(width-1)+1).at(start.y-1));
+            }
+        }
+
+        // start x, height of blockage (bottom left corner)
+        if(start.x - 1 > 0 && (start.y + height) + 1 < kHeight) {
+            if(kMap.at(start.x-1).at(start.y+(height-1)+1)->get_type() == VNode::NONE) {
+                kMap.at(start.x-1).at(start.y+(height-1)+1)->set_type(VNode::CORNER);
+                kPins.insert(kMap.at(start.x-1).at(start.y+(height-1)+1));
+            }
+        }
+
+        // width of blockage, height of blockage (bottom right corner)
+        if((start.x + width) + 1 < kWidth && (start.y + height) + 1 < kHeight) {
+            if(kMap.at(start.x+(width-1)+1).at(start.y+(height-1)+1)->get_type() == VNode::NONE) {
+                kMap.at(start.x + (width - 1) + 1).at(start.y + (height - 1) + 1)->set_type(VNode::CORNER);
+                kPins.insert(kMap.at(start.x + (width - 1) + 1).at(start.y + (height - 1) + 1));
+            }
+        }
     }
 }
 
@@ -65,7 +103,7 @@ void Map::set_blockages(vector<Blocker> b) {
 void Map::set_pins(vector<Connection> c) {
     for(int x = 0;x < (int)c.size(); x++) {
         // Declare the pin(s)
-        if(kMap.at(c.at(x).source.x).at(c.at(x).source.y)->get_type() == VNode::Type::NONE) {
+        if(kMap.at(c.at(x).source.x).at(c.at(x).source.y)->get_type() != VNode::Type::BLOCKED) {
             kMap.at(c.at(x).source.x).at(c.at(x).source.y)->set_type(VNode::Type::PIN);
             kPins.insert(kMap.at(c.at(x).source.x).at(c.at(x).source.y));
         } else {
@@ -73,7 +111,7 @@ void Map::set_pins(vector<Connection> c) {
                     + " something was already there!", kWarning);
         }
 
-        if(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->get_type() == VNode::Type::NONE) {
+        if(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->get_type() != VNode::Type::BLOCKED) {
             kMap.at(c.at(x).sink.x).at(c.at(x).sink.y)->set_type(VNode::Type::PIN);
             kPins.insert(kMap.at(c.at(x).sink.x).at(c.at(x).sink.y));
         } else {
@@ -143,7 +181,8 @@ void Map::print_map() {
                     kMap.at(x).at(y)->get_type() == VNode::Type::PATH ||
                     kMap.at(x).at(y)->get_type() == VNode::Type::EDGE ||
                     kMap.at(x).at(y)->get_type() == VNode::Type::STEINER ||
-                    kMap.at(x).at(y)->get_type() == VNode::Type::VORONOI) {
+                    kMap.at(x).at(y)->get_type() == VNode::Type::VORONOI ||
+                    kMap.at(x).at(y)->get_type() == VNode::Type::CORNER) {
                 output += VNode::type_to_string(kMap.at(x).at(y)->get_type()) + "\t";
             } else {
                 if(kMap.at(x).at(y)->get_output() == 0) {

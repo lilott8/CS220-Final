@@ -26,7 +26,7 @@ Steiner::~Steiner() {
 void Steiner::start() {
     claim("S/start: Size of set of pins & voronoi points is: " + to_string(kAllVertices.size()), kDebug);
     VNode* data[3];
-    kSteinerCalculator = 3;
+    //kSteinerCalculator = 3;
     switch(kSteinerCalculator) {
         case 1:
             generate_steiner_midpoint_linear();

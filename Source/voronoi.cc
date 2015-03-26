@@ -88,9 +88,7 @@ void Voronoi::generate_edges() {
                                 edge->vertex1()->x(), edge->vertex1()->y());
 
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
-                        if(!in_edges(vedge)) {
-                            kVoronoiEdges.insert(vedge);
-                        }
+                        kVoronoiEdges.insert(vedge);
                         //claim("F/generate_edgs: Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
                 } else {
@@ -108,9 +106,7 @@ void Voronoi::generate_edges() {
 
                         vedge = create_edge(v0->x(), v0->y(), end_x, end_y);
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
-                        if(!in_edges(vedge)) {
-                            kVoronoiEdges.insert(vedge);
-                        }
+                        kVoronoiEdges.insert(vedge);
                         //claim("F/generate_edgs: *Edge: " + vedge->kStart->coords_to_string() + " to " + vedge->kEnd->coords_to_string(), kDebug);
                     }
                 }
@@ -172,9 +168,9 @@ VEdge* Voronoi::create_edge(double start_x, double start_y, double end_x, double
     else {y2 = round(end_y);}
 
     VEdge *e = new VEdge();
-    //e->kStart = new VNode(x1, y1, Controller::calculate_distance(x1, y1));
+
+
     e->kStart = Map::get_map().at(x1).at(y1);
-    //e->kEnd = new VNode(x2, y2, Controller::calculate_distance(x2, y2));
     e->kEnd = Map::get_map().at(x2).at(y2);
 
     if(e->kStart->get_type() == VNode::NONE) {
@@ -194,26 +190,3 @@ VEdge* Voronoi::create_edge(double start_x, double start_y, double end_x, double
     return e;
 }
 
-/**
-* TODO: Use a datastructure where find() isn't O(n)
-*/
-bool Voronoi::in_vertices(VNode* node) {
-    for(VNode* element : kVoronoiVertices) {
-        if(*node == *element) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
-* TODO: Use a datastructure where find() isn't O(n)
-*/
-bool Voronoi::in_edges(VEdge* edge) {
-    for(VEdge* e : kVoronoiEdges) {
-        if(*edge == *e) {
-            return true;
-        }
-    }
-    return false;
-}

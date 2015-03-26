@@ -64,7 +64,7 @@ string VNode::type_to_string(Type t) {
     string output = "";
     switch(t) {
         case PIN:
-            output = "pin";
+            output = "p";
             break;
         case BLOCKED:
             output = "x";
@@ -80,6 +80,9 @@ string VNode::type_to_string(Type t) {
             break;
         case VORONOI:
             output = "v";
+            break;
+        case CORNER:
+            output = "c";
             break;
         case NONE:
         default:

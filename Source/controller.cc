@@ -56,6 +56,7 @@ Controller::~Controller() {
 }
 
 void Controller::start() {
+    kMap->print_map();
     /**
     * Paper 5 details a multi-step process to generate the OAVG
     *

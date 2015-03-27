@@ -154,7 +154,7 @@ int Map::get_y() {
     return kWidth;
 }
 
-vector<MapRoute*> Map::get_routes() {
+std::set<MapRoute*> Map::get_routes() {
     return kRoutes;
 }
 
@@ -289,7 +289,12 @@ void Map::generate_hanan_grid() {
     for(auto pin : kPins) {
         for(auto c : kCorners) {
             if(pin != c) {
-                kRoutes.push_back(new MapRoute(pin, c));
+                kRoutes.insert(new MapRoute(pin, c));
+            }
+        }
+        for(auto p : kPins) {
+            if(p != pin) {
+                kRoutes.insert(new MapRoute(pin, p));
             }
         }
     }

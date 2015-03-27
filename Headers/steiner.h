@@ -48,13 +48,13 @@ namespace FlowAlgorithms {
         // Return steiner variables
         set<VNode*> get_steiner_points();
         set<VEdge*> get_steiner_edges();
-        vector<MapRoute*> get_routes();
+        set<MapRoute*> get_routes();
 
     private:
         vector<SteinerTriangle*> kTriangles;    // list of triangles
         set<VNode*> kSteinerVertices;             // list of all candidate nodes generated
         set<VEdge*> kSteinerEdges;              // list of all edges that include Steiner points
-        vector<MapRoute*> kRoutes;
+        set<MapRoute*> kRoutes;
         Map* kMap;
         int kSteinerCalculator;                 // determines how to calculate steiner points
 

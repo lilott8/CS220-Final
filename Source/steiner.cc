@@ -63,7 +63,7 @@ set<VEdge*> Steiner::get_steiner_edges() {
     return kSteinerEdges;
 }
 
-vector<MapRoute*> Steiner::get_routes() {
+set<MapRoute*> Steiner::get_routes() {
     return kRoutes;
 }
 
@@ -98,8 +98,8 @@ void Steiner::generate_steiner_midpoint_linear() {
                 // Add the steiner point to our array of candidate vertices
                 kSteinerVertices.insert(kMap->get_map().at(outer->get_x()).at(midpoint));
 
-                kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(outer->get_x()).at(midpoint)));
-                kRoutes.push_back(new MapRoute(kMap->get_map().at(inner->get_x()).at(midpoint), inner));
+                kRoutes.insert(new MapRoute(outer, kMap->get_map().at(outer->get_x()).at(midpoint)));
+                kRoutes.insert(new MapRoute(kMap->get_map().at(inner->get_x()).at(midpoint), inner));
             }
             // y-coordinates are the same, we only care about the x-coordinates
         } else if(outer->get_y() == inner->get_y()) {
@@ -112,8 +112,8 @@ void Steiner::generate_steiner_midpoint_linear() {
                 // Add the steiner point to our array of candidate vertices
                 kSteinerVertices.insert(kMap->get_map().at(midpoint).at(outer->get_y()));
 
-                kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(midpoint).at(outer->get_y())));
-                kRoutes.push_back(new MapRoute(kMap->get_map().at(midpoint).at(inner->get_y()), inner));
+                kRoutes.insert(new MapRoute(outer, kMap->get_map().at(midpoint).at(outer->get_y())));
+                kRoutes.insert(new MapRoute(kMap->get_map().at(midpoint).at(inner->get_y()), inner));
             }
             // both coordinates differ, thus we need to pay attention to both of them
         } else {
@@ -130,8 +130,8 @@ void Steiner::generate_steiner_midpoint_linear() {
                 kSteinerVertices.insert(kMap->get_map().at(mx).at(my));
 
                 // Create the routes for this new point
-                kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(mx).at(my)));
-                kRoutes.push_back(new MapRoute(kMap->get_map().at(mx).at(my), inner));
+                kRoutes.insert(new MapRoute(outer, kMap->get_map().at(mx).at(my)));
+                kRoutes.insert(new MapRoute(kMap->get_map().at(mx).at(my), inner));
             }
         }
     }
@@ -161,8 +161,8 @@ void Steiner::generate_steiner_midpoint_exponential() {
                     // Add the steiner point to our array of candidate vertices
                     kSteinerVertices.insert(kMap->get_map().at(outer->get_x()).at(midpoint));
 
-                    kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(outer->get_x()).at(midpoint)));
-                    kRoutes.push_back(new MapRoute(kMap->get_map().at(inner->get_x()).at(midpoint), inner));
+                    kRoutes.insert(new MapRoute(outer, kMap->get_map().at(outer->get_x()).at(midpoint)));
+                    kRoutes.insert(new MapRoute(kMap->get_map().at(inner->get_x()).at(midpoint), inner));
                 }
                 // y-coordinates are the same, we only care about the x-coordinates
             } else if(outer->get_y() == inner->get_y()) {
@@ -175,8 +175,8 @@ void Steiner::generate_steiner_midpoint_exponential() {
                     // Add the steiner point to our array of candidate vertices
                     kSteinerVertices.insert(kMap->get_map().at(midpoint).at(outer->get_y()));
 
-                    kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(midpoint).at(outer->get_y())));
-                    kRoutes.push_back(new MapRoute(kMap->get_map().at(midpoint).at(inner->get_y()), inner));
+                    kRoutes.insert(new MapRoute(outer, kMap->get_map().at(midpoint).at(outer->get_y())));
+                    kRoutes.insert(new MapRoute(kMap->get_map().at(midpoint).at(inner->get_y()), inner));
                 }
                 // both coordinates are differing, thus we need to pay attention to both of them
             } else {
@@ -192,8 +192,8 @@ void Steiner::generate_steiner_midpoint_exponential() {
                     // Add the steiner point to our array of candidate vertices
                     kSteinerVertices.insert(kMap->get_map().at(mx).at(my));
 
-                    kRoutes.push_back(new MapRoute(outer, kMap->get_map().at(mx).at(my)));
-                    kRoutes.push_back(new MapRoute(kMap->get_map().at(mx).at(my), inner));
+                    kRoutes.insert(new MapRoute(outer, kMap->get_map().at(mx).at(my)));
+                    kRoutes.insert(new MapRoute(kMap->get_map().at(mx).at(my), inner));
                 }
             }
         }

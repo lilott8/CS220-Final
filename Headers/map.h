@@ -25,6 +25,9 @@ namespace Flow {
         MapRoute(VNode* s, VNode* t) {pSource = s; pTarget = t;};
         VNode* pSource;
         VNode* pTarget;
+        bool operator==(MapRoute&) {
+            return (this->pSource == this->pTarget);
+        }
     };
 
     class Map {
@@ -41,7 +44,7 @@ namespace Flow {
         // get a list of pins that need to be routed
         std::set<VNode*> get_pins();
         std::set<VNode*> get_corners();
-        vector<MapRoute*> get_routes();
+        std::set<MapRoute*> get_routes();
         VNode* get_closest_node(VNode*);
         // return the map, able to be referenced everywhere
         static vector<vector<VNode*>> get_map();
@@ -58,7 +61,7 @@ namespace Flow {
         bool kIsEuclidean;          // is this a euclidean map or not
         std::set<VNode*> kPins;     // list of all the pins
         std::set<VNode*> kCorners;  // list of all the obstacle corners
-        vector<MapRoute*> kRoutes;
+        std::set<MapRoute*> kRoutes;
         //static vector<vector<VNode*>> kMap;
 
         // begin building the datastructures to contain the map

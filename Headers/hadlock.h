@@ -27,7 +27,7 @@ namespace FlowAlgorithms {
         Hadlock(Map*);
         ~Hadlock();
 
-        void start(vector<MapRoute*>);
+        void start(set<MapRoute*>);
 
         set<VEdge*> get_edges();
 

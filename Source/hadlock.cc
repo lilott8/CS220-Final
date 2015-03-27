@@ -31,12 +31,12 @@ void Hadlock::route(VNode* s, VNode* t) {
     clear_queues();
 }
 
-void Hadlock::start(vector<MapRoute*> routes) {
+void Hadlock::start(set<MapRoute*> routes) {
 
     claim("H/start: Size of routes: " + to_string(routes.size()), kDebug);
 
-    for(int x = 0; x < routes.size(); x++) {
-        route(routes.at(x)->pSource, routes.at(x)->pTarget);
+    for(auto r : routes) {
+        route(r->pSource, r->pTarget);
     }
 }
 

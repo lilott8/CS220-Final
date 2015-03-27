@@ -61,9 +61,6 @@ Controller::~Controller() {
 }
 
 void Controller::start() {
-    //kHadlock->start(kMap->get_routes());
-    // This is the initial hanan grid
-    //kEdges = kHadlock->get_edges();
     /**
     * Paper 5 details a multi-step process to generate the OAVG
     *
@@ -73,30 +70,25 @@ void Controller::start() {
     */
     // Step 1
     kVoronoi->start();
-    // add the nodes to our vertices
-
-    add_to_all_vertices(kVoronoi->get_vertices());
-    claim("C/start: Number of vertices from voronoi: " + to_string(kVoronoi->get_vertices().size()), kDebug);
-    // Combine the voronoie with the pins
-    //add_to_all_edges(kVoronoi->get_routes());
+    add_to_all_routes(kVoronoi->get_routes());
 
     // step 2
     kSteiner = new Steiner(kMap, kSteinerCalculator);
     kSteiner->start();
-    set<VNode*> sp = kSteiner->get_steiner_points();
-    claim("C/start: there are " + to_string(sp.size()) + " steiner points", kDebug);
+    add_to_all_routes(kSteiner->get_routes());
 
     // Route all the MapRoutes that need to be routed
-    kHadlock->start(kMap->get_routes());
-    kHadlock->start(kVoronoi->get_routes());
-    //kHadlock->start(kSteiner->get_routes());
+    add_to_all_routes(kMap->get_routes());
+
+    // create edges for all the routes
+    kHadlock->start(kRoutes);
 
     // Step 3
     // kEdges will have all the routeable edges possible
     this->kSPC = new SPC(kHadlock->get_edges());
     this->kSPC->start();
 
-    kMap->print_map();
+    //kMap->print_map();
 }
 
 /**
@@ -163,8 +155,8 @@ void Controller::add_to_all_edges(set<VEdge*> edges) {
     }
 }
 
-/*void Controller::add_to_all_routes(set<MapRoute*> routes) {
+void Controller::add_to_all_routes(set<MapRoute*> routes) {
     for(auto r : routes) {
         kRoutes.insert(r);
     }
-}*/
+}

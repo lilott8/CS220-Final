@@ -47,6 +47,7 @@ namespace Flow {
 
         set<VEdge*> kEdges;          // generated edges
         set<VNode*> kVertices;      // list of all nodes, steiner and points
+        set<MapRoute*> kRoutes;
 
         FlowAlgorithms::Steiner *kSteiner;  // Steiner point class which handles all steiner point calculations
         FlowAlgorithms::Voronoi *kVoronoi;  // Voronoi class which generates the Voronoi candidate points
@@ -60,6 +61,7 @@ namespace Flow {
         void project_edges_on_map(set<VEdge*>);     // Interface for debugging
         void add_to_all_vertices(set<VNode*>);
         void add_to_all_edges(set<VEdge*>);
+        void add_to_all_routes(set<MapRoute*>);
     };
 }
 #endif

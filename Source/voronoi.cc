@@ -89,11 +89,11 @@ void Voronoi::generate_edges() {
                         //        edge->vertex1()->x(), edge->vertex1()->y());
 
                         if((route = create_source_target_pair(edge->vertex0()->x(), edge->vertex0()->y())) != NULL) {
-                            kRoutes.push_back(route);
+                            kRoutes.insert(route);
                         }
 
                         if((route = create_source_target_pair(edge->vertex1()->x(), edge->vertex1()->y())) != NULL) {
-                            kRoutes.push_back(route);
+                            kRoutes.insert(route);
                         }
 
                         //claim("F/generate_edges: inserting a record of " + to_string(id), kDebug);
@@ -114,11 +114,11 @@ void Voronoi::generate_edges() {
                         double end_y = (p1.a - p2.b) * -640;
 
                         if((route = create_source_target_pair(v0->x(), v0->y())) != NULL) {
-                            kRoutes.push_back(route);
+                            kRoutes.insert(route);
                         }
 
                         if((route = create_source_target_pair(end_x, end_y)) != NULL) {
-                            kRoutes.push_back(route);
+                            kRoutes.insert(route);
                         }
 
 
@@ -151,7 +151,7 @@ set<VNode*> Voronoi::get_vertices() {
     return this->kVoronoiVertices;
 }
 
-vector<MapRoute*> Voronoi::get_routes() {
+set<MapRoute*> Voronoi::get_routes() {
     return this->kRoutes;
 }
 

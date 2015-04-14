@@ -1,57 +1,85 @@
 CS220 Project Framework
 ===============
-#Changelog:
+
+### Project Usage
+
+`./final {location to problem object JSON file} {SPC thoroughness 1-4}`
+
+`./final ../input/input.json 1`
+
+### Project Summary
+
+This project uses Steiner points to successfully connect all source/sink pairs using the minimum amount of channeling possible.  To do this the project utilizes several routines taken from different research efforts.  To read those papers please refer to the project specs.
+
+This implementation works in several different phases.  Each phase is discrete and can be skipped or altered as they are completely self contained and independent of each other.  The general phases are as follows: 
+
+ 1. [Generate Steiner points from a Voronoi calculation](#step-one)
+ 2. [Generate a Hanan grid using other, calculated Steiner points (SPC phase)](#step-two)
+ 3. [Combine all vertice pairs into edges](#step-three)
+ 4. [Use Dijstra to calculate the shortest path through the graph](#step-four)
+ 5. [Use Kruskal to calculate the minimum connections needed to connect the graph](#step-five)
+
+#### Step One:<a name="step-one"></a>
  
- - Documented the code
- - Dijkstra's ports it's output into the kruskals output
- - generates the graphvice output for answers
+ Relying on Boost's Voronoi library, I generate a Voronoi graph and properly route around obstacles.  From there I pair Voronoi vertices to their closest sink/source point.
+ 
+ **Input:** Set of sink/sources
+ 
+ **Output:** Set of edges or vertices, The edge/vertice retrieval is a simple method call to the Voronoi class: `get_edges` or `get_vertices`
+ 
+#### Step Two:<a name="step-two"></a>
+
+ From here, the remainder of the SPC points are generated to help guarantee the shortest point path is found using Dijkstra's/Kruskal's algorithms.  The thoroughness is defined as follows:
+ 
+ 1. Naive, Midpoint approach.  This level will combine each element with only its successive element and use a manhattan midpoint calculation to determine Steiner point placement
+    * Suppose elements 1,2,3,4 this SPC level will only calculate Steiner points for: 1-2, 2-3, 3-4
+ 2. Exhaustive, Midpoint approach.  This level will combine every element with every other element and use a manhattan midpoint calculation to determine Steiner point placement
+ 3. Naive, Geometric approach.  This level using the same combinatorial logic as step one, but instead of the manhattan midpoint it uses a complicated triangulation method to determine Steiner point placement\*
+ 4. Exhaustive, Geometric approach.  This level uses the combinatorial logic as step 2, but uses the same triangulation method as step 3 for Steiner point placement\*
+ 
+ \* *Please note:* that these steps are extremely computationally expensive and can have inaccuracies caused by rounding. The geometric calculations are float based, while the problem space is defined in integers
+ 
+ **Input:** Set of Vertices that need Steiner points generated
+ 
+ **Output:** Set of Steiner points
+ 
+##### Step Three:<a href="step-three"></a>
+
+ Because the input for steps 4 and 5 are edges, we must take all the vertex pairs and transform them to edges but we must create a valid path between point a and point b.  To do so, we route each pair through Hadlock's algorithm to ensure a valid path exists and we then output that valid path as a series of edges.
+ 
+ **Input:** Set of Source/Target nodes that need to be routed
+ 
+ **Output:** Set of edges that route the Source/Target pairs
+ 
+#### Step Four:<a href="step-four"></a>
+ 
+ I leverage Boost's implementation of Dijkstra's algorithm.  This will output a .dot notated text to the std out.
+ 
+ **Input:** Set of edges that comprise the graph
+ 
+ **Output:** Set of edges that form the shortest path through the graph _and_ .dot notated text to std out
+ 
+#### Step Five:<a href="step-five"></a>
+
+ I leverage Boost's implementation of Kruskal's algorithm.  This will output a .dot notated text to the std out.
+ 
+  **Input:** List of edges from [Step Four](#step-four)
   
-##Done:
-
- - Kruskal's algorithm is done
- - Kruskal's is implemented, the output is correct and able to accept input
- - Dijkstra's is done
- - Huge efficiency improvements, instead of creating >600 nodes, I now only create MxN nodes
- - retooled the Steiner point generation, the papers are very conservative, so points are only created by means of comparing a node to it's closest neighbor.
- - Using sets for data structures to guarantee uniqueness in lists.
- - Dijkstra's is done
- - Steiner point creation
- - Removed the binary tree and added the R\* tree from boost.
- - Added the Binary tree interface for running SPC in V+ElogE time
- - Binary tree implemented
- - Boost::Polygon::Voronoi has been "implimented".  This is a loose implementation
- - Got line drawing done, but it doesn't follow a complete rectilinear fashion
- - implementing boost's voronoi diagram generator
- - aliased line drawing
- - Fortune's is done
- - mapping is working
- - converted my child node class to fit this problem description
- - added a controller to abstract and encapsulate the logic of my implementation
- - laid the groundwork for the algorithms to be implemented
- - controller framework is as I want it, beginning the fortune algorithm
- - Use the output from the voronoi to draw on the graph
-
-##TODO:
+  **Output:** .dot notated text to std out
  
- - make steiner points less naive
- - refactor dijkstra so there isn't as much debugging and unnecessary code *(Resolved)*
- - delete unnecessary edges once created *(Resolved)*
- - implement an anti-aliasing line drawing algorithm so that it adheres to rectilinear expectations
- - figure out why the map coords need to be switched in init!
- - fix the output of the dijkstra, so that it can be moved into Kruskal's *(Resolved)*
- - place edges into btree *(Resolved)*
- - Rectify the Steiner::find_angle_size() method, it isn't behaving completely correctly *(Resolved)*
- - Test binary tree *(Resolved)*
- - Project just the vertices onto the map for testing purposes *(Resolved)*
- - Implement the nlogn Voronoi grapher *(Resolved)*
- - Understand how to adequately clip an infinite line from the output*(Resolved)*
- - Create a data structure to hold a Voronoi sector *(Resolved)*
- - derive a good compare function for the beachline rb-tree *(Resolved)*
- - why can't vedge and arch have pointers to each other?? *(Resolved)*
- - Figure out what, exactly the output means and make it useful *(Resolved)*
- - Implement my datastructures with the Boost::Voronoi algorithm *(Resolved)*
+---
+
+### Project Output
+
+ The output of this project are 2 dot compatible elements that are output through std out.  The first one is the state of the solution when Dijkstra's algorithm is applied.  The second is the proposed solution after Kruskal's algorithm is applied
  
-http://people.cs.pitt.edu/~alanjawi/cs449/code/shell/UnixSignals.htm 
+### Project Problems
+
+ As of writing there is only one known "bug".  Because of the way the Voronoi algorithm works, it is not easy to discern which 2 points the vertex resides between.  I properly identify one of the points but cannot adequately discern the second one.  The implications this has on the answer is that there are points in the Kruskal output that can end in Steiner points and not sink/source elements.  This can be easily solved in the output stage of Kruskal's algorithm.
+ 
+ This isn't techincally a problem, but during some of the transformations, mainly for the Dijkstra and Kruskal usages, there is quite a bit of wasted computation.  This is a result of the esoteric, inconsistent implementation of the boost graph library.  I'm sure there are more efficient ways to do this, I'm just not smart enough to understand the boost documentation.
+
+---
  
 ## Project Overview
 

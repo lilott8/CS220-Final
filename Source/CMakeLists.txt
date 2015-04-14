@@ -2,22 +2,15 @@ set(LIB_SOURCE
 claim.cc
 controller.cc
 edge.cc
-grid.cc
 hadlock.cc
 map.cc
-netlist.cc
 node.cc
-path.cc
 problem_object.cc
-pathsegment.cc
-prim.cc
-segmentgroup.cc
 steiner.cc
 spc.cc
 vedge.cc
 vnode.cc
 voronoi.cc
-vpath.cc
 )
 
 add_library(SOURCE_LIB ${LIB_SOURCE})

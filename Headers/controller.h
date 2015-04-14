@@ -6,7 +6,6 @@
 #include "problem_object.h"
 #include "steiner.h"
 #include "spc.h"
-#include "prim.h"
 #include "hadlock.h"
 
 /**

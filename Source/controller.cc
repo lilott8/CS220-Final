@@ -6,10 +6,8 @@
 #include "../Headers/problem_object.h"
 #include "../Headers/claim.h"
 #include "../Headers/steiner.h"
-#include "../Headers/prim.h"
 #include <vector>
 #include <set>
-#include "../Headers/graph_alogs.h"
 
 using namespace Utilities;
 using namespace FlowAlgorithms;

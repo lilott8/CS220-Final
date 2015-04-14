@@ -1,5 +1,4 @@
 
-#include "../Headers/grid.h"
 #include "../Headers/problem_object.h"
 #include "../Headers/map.h"
 #include "../Headers/controller.h"

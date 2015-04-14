@@ -129,6 +129,9 @@ std::set<VNode*> Map::get_pins() {
     return kPins;
 }
 
+/**
+ * Get the corner Steiner points
+ */
 std::set<VNode*> Map::get_corners() {
     return kCorners;
 }
@@ -154,6 +157,9 @@ int Map::get_y() {
     return kWidth;
 }
 
+/**
+ * Get the routes that need to be connected
+ */
 std::set<MapRoute*> Map::get_routes() {
     return kRoutes;
 }
@@ -278,6 +284,9 @@ void Map::draw_bresenham_lines(vector<VEdge*> edges) {
     }
 }
 
+/**
+ * Alter the state of a node
+ */
 void Map::set(VNode* node) {
     if(kMap.at(node->get_x()).at(node->get_y())->get_type() == VNode::Type::NONE) {
         //claim("M/set: Setting: " + node->vnode_to_string() + " to: " + node->type_to_string(node->get_type()), kDebug);
@@ -285,6 +294,9 @@ void Map::set(VNode* node) {
     }
 }
 
+/**
+ * Create the Hanan grid that is required by the paper
+ */
 void Map::generate_hanan_grid() {
     for(auto pin : kPins) {
         for(auto c : kCorners) {
@@ -300,6 +312,9 @@ void Map::generate_hanan_grid() {
     }
 }
 
+/**
+ * Get the node that is closest to the input
+ */
 VNode* Map::get_closest_node(VNode* n) {
     return *(kPins.lower_bound(n));
 }

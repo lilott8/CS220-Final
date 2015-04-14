@@ -17,7 +17,9 @@ Hadlock::Hadlock(Map* m) {
 
 Hadlock::~Hadlock() {}
 
-
+/**
+ * Route two arbitrary nodes
+ */
 void Hadlock::route(VNode* s, VNode* t) {
     kSource = s;
     kTarget = t;
@@ -31,6 +33,9 @@ void Hadlock::route(VNode* s, VNode* t) {
     clear_queues();
 }
 
+/**
+ * Route a set of nodes
+ */
 void Hadlock::start(set<MapRoute*> routes) {
 
     claim("H/start: Size of routes: " + to_string(routes.size()), kDebug);
@@ -40,6 +45,9 @@ void Hadlock::start(set<MapRoute*> routes) {
     }
 }
 
+/**
+ * Recursive algorithm using hadlock's algorithm for finding the path between two nodes
+ */
 void Hadlock::route_recursive() {
 
     // Base case 1: Not finding a solution
@@ -86,10 +94,16 @@ void Hadlock::route_recursive() {
     return;
 }
 
+/**
+ * Get the edges generated from all the routes
+ */
 std::set<VEdge*> Hadlock::get_edges() {
     return kEdges;
 }
 
+/**
+ * Determines if two nodes are adjacent in manhattan space (left, right, up, down only)
+ */
 bool Hadlock::is_adjacent(VNode* a, VNode* b) {
     int delta_x, delta_y;
     double result = Controller::calculate_manhattan_distance(a, b);
@@ -101,8 +115,14 @@ bool Hadlock::is_adjacent(VNode* a, VNode* b) {
     return result <= 1 && (delta_x == 1 || delta_y == 1);
 }
 
+/*
+ * Wrapper method for is_placeable
+ */
 bool Hadlock::is_placeable(VNode* v) { return is_placeable(v->get_x(), v->get_y());}
 
+/*
+ * Determines the placeability of the coordinates on a euclidean space
+ */
 bool Hadlock::is_placeable(int x, int y) {
     if (x > kMap->get_x() - 1 || x < 0) {
         return false;
@@ -123,6 +143,9 @@ bool Hadlock::is_placeable(int x, int y) {
     return true;
 }
 
+/**
+ * Have we seen this node before
+ */
 bool Hadlock::is_in_queue(VNode* a) {
     for(auto it = kWaveFront.begin(); it < kWaveFront.end(); ++it) {
         if(*it == a) {
@@ -132,6 +155,9 @@ bool Hadlock::is_in_queue(VNode* a) {
     return false;
 }
 
+/**
+ * Return the nodes that are up, down, left, and right to the current position
+ */
 vector<VNode*> Hadlock::get_adjacent_nodes(VNode* c) {
     vector<VNode*> results;
 
@@ -174,6 +200,9 @@ vector<VNode*> Hadlock::get_adjacent_nodes(VNode* c) {
     return results;
 }
 
+/**
+ * Calculate the distance in an appropriate manner, given the plane we have created
+ */
 int Hadlock::calculate_metric(VNode* curr, VNode* prev) {
     double previous_distance = Controller::calculate_euclidean_distance(prev, kTarget);
 
@@ -184,7 +213,9 @@ int Hadlock::calculate_metric(VNode* curr, VNode* prev) {
     }
 }
 
-
+/**
+ * Create the edges between the two routed nodes
+ */
 void Hadlock::build_edges() {
 
     VNode* edge_start = kTraceBack.front();
@@ -232,6 +263,9 @@ void Hadlock::build_edges() {
     //claim("=========================================", kDebug);
 }
 
+/**
+ * Simple way to wipe the container data structures and start fresh
+ */
 void Hadlock::clear_queues() {
     kTraceBack.clear();
     kWaveFront.clear();

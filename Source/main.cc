@@ -15,7 +15,6 @@ using std::endl;
 using namespace Flow;
 using namespace Utilities;
 
-Controller::AlgoType resolve_algorithm(string);
 Controller::Optimization resolve_optimization(string);
 
 int main(int argc,char* argv[]) {
@@ -33,18 +32,18 @@ int main(int argc,char* argv[]) {
 				<< "While 3 | 4 are O(n) | O(n^2) implementations that" << endl;
 		cout << "utilize triangulation to calculate the steiner point." << endl;
 
-		//cout << "<Algorithm> fortune | spm" << endl;
 		//cout << "<Kruskal's Optimization> d | h | u" << endl;
 		exit(1);
 	}
 
-	//Controller* controller = new Controller(first_problem);
-
-	Controller::AlgoType a_type = Controller::AlgoType::FORTUNE;
+	// Set the optimization we will be using
 	Controller::Optimization  o_type = Controller::Optimization::DEFAULT;
+	// determine which steiner calculation method we will use
 	int steiner_calculation = 2;
+	// default location of the problem object
 	string file = "../Tests/debug_small.json";
 
+	// Parse the args
 	switch(argc) {
 		case 4:
 			o_type = resolve_optimization(argv[3]);
@@ -55,31 +54,30 @@ int main(int argc,char* argv[]) {
 			file = argv[1];
 	}
 
+	// Create the problem object
 	Utilities::ProblemObject* first_problem = new Utilities::ProblemObject(file);
-	Controller* controller = new Controller(first_problem, a_type, o_type);
+	// Create the controller
+	Controller* controller = new Controller(first_problem, o_type);
+	// Set the steiner point generation
 	controller->set_steiner_calculator(steiner_calculation);
 
+	// Set the id of the last vnode
 	VNode::kLastId = 0;
 
-	//controller->print_map();
+	// Begin execution of the program!
 	controller->start();
 
+	// Delete all the things!
 	delete controller;
 	delete first_problem;
 
 	return 0;
 }
 
-Controller::AlgoType resolve_algorithm(string s) {
-	Controller::AlgoType result = Controller::AlgoType::FORTUNE;
-	if(s.compare("fortune") == 0) {
-		result = Controller::AlgoType::FORTUNE;
-	} else if(s.compare("spm") == 0) {
-		result = Controller::AlgoType::SPM;
-	}
-	return result;
-}
-
+/**
+ * Determine the type of Kruskal optimization you want to use
+ * Deprecated but still here due to project scope alterations
+ */
 Controller::Optimization resolve_optimization(string s) {
 	Controller::Optimization result = Controller::Optimization::DEFAULT;
 	if(s.compare("h") == 0) {

@@ -18,14 +18,12 @@ namespace Flow {
 
     class Controller {
     public:
-        // For output and iteration
-        enum AlgoType {KRUSKAL, FORTUNE, SPM};      // algorithm enum
         // Deprecated for right now
         enum Optimization {H_OPT, U_OPT, DEFAULT};  // kruskal's optimization enum
 
         Controller();
         Controller(ProblemObject*);
-        Controller(ProblemObject*, AlgoType, Optimization);
+        Controller(ProblemObject*, Optimization);
         ~Controller();
 
         // "Templated" method to start the program

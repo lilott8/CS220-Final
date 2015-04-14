@@ -24,14 +24,13 @@ Controller::Controller() {
 Controller::Controller(ProblemObject *po) {
     this->kMap = new Map(po);
     kOpt = Controller::Optimization::DEFAULT;
-    //kAlgorithm = new Fortune();
     kHadlock = new Hadlock(kMap);
 }
 
 /**
 * Alternate constructor
 */
-Controller::Controller(ProblemObject *po, Controller::AlgoType a, Controller::Optimization o) {
+Controller::Controller(ProblemObject *po, Controller::Optimization o) {
     // init our map
     this->kMap = new Map(po);
     // get the pins from the map.
@@ -52,9 +51,9 @@ Controller::Controller(ProblemObject *po, Controller::AlgoType a, Controller::Op
 * Destructor
 */
 Controller::~Controller() {
-    //delete kSteiner;
-    //delete kVoronoi;
-    //delete kSPC;
+    delete kSteiner;
+    delete kVoronoi;
+    delete kSPC;
     delete kHadlock;
 }
 
@@ -129,6 +128,9 @@ int Controller::calculate_manhattan_distance(VNode* a, VNode* b) {
     return order1 + order2;
 }
 
+/**
+ * Calculating the euclidean distance of two nodes
+ */
 double Controller::calculate_euclidean_distance(VNode* a, VNode* b) {
     int order1, order2;
     order1 = (a->get_x() - b->get_x()) * (a->get_x() - b->get_x());
@@ -137,22 +139,34 @@ double Controller::calculate_euclidean_distance(VNode* a, VNode* b) {
     return (sqrt(order1 + order2) + .5);
 }
 
+/**
+ * What level of Steiner thoroughness are you planning on using
+ */
 void Controller::set_steiner_calculator(int x) {
     kSteinerCalculator = x;
 }
 
+/**
+ * Interface to easily add vertices that may be needed to draw edges for
+ */
 void Controller::add_to_all_vertices(set<VNode*> nodes) {
     for(auto node : nodes) {
         kVertices.insert(node);
     }
 }
 
+/**
+ * Interface to easily add edges that need to be used in the graphing algorithms
+ */
 void Controller::add_to_all_edges(set<VEdge*> edges) {
     for(auto edge : edges) {
         kEdges.insert(edge);
     }
 }
 
+/**
+ * Interface to easily add elements that need to be routed, to be routed
+ */
 void Controller::add_to_all_routes(set<MapRoute*> routes) {
     for(auto r : routes) {
         kRoutes.insert(r);

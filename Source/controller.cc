@@ -86,9 +86,7 @@ void Controller::start() {
     // Step 3
     // kEdges will have all the routeable edges possible
     this->kSPC = new SPC(kHadlock->get_edges());
-    //this->kSPC->start();
-
-    kMap->print_map();
+    this->kSPC->start();
 }
 
 /**

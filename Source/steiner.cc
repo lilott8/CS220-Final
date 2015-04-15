@@ -25,7 +25,6 @@ Steiner::~Steiner() {
 */
 void Steiner::start() {
     claim("S/start: Size of set of pins is: " + to_string(kMap->get_pins().size()), kDebug);
-    kSteinerCalculator = 2;
     switch(kSteinerCalculator) {
         case 1:
             generate_steiner_midpoint_linear();
@@ -208,24 +207,6 @@ void Steiner::generate_steiner_midpoint_exponential() {
  ************************************************************/
 
 /**
-* http://stackoverflow.com/questions/12934213/how-to-find-out-geometric-median
-* http://www.mathblog.dk/project-euler-143-investigating-the-torricelli-point-of-a-triangle/
-*
-* This generates the steiner points based on triangles, very computational expensive
-*/
-void Steiner::generate_steiner_point_from_triangle() {
-    int y = 0;
-
-    for(int x = 0; x<(int)kTriangles.size();x++) {
-        if (verify_triangle_angles(kTriangles.at(x))) {
-            claim(kTriangles.at(x)->triangle_to_string(), kDebug);
-            kSteinerVertices.insert(manhattan_geometric_mean(kTriangles.at(x)));
-            y++;
-        }
-    }
-}
-
-/**
  * Calculates the Steiner points using a single pass combinatorial combined with a geometric calculation
  * Runs in O(n) time
  */
@@ -263,12 +244,30 @@ void Steiner::build_steiner_points() {
     for(auto triangle : kTriangles) {
         // Calculate the steiner point between 3 points
         VNode* node = manhattan_geometric_mean(triangle);
-        // Add the vertice to the set of Steiner points
-        kSteinerVertices.insert(node);
-        // add a needed route between the all the points
-        kRoutes.insert(new MapRoute(triangle->p1, node));
-        kRoutes.insert(new MapRoute(triangle->p2, node));
-        kRoutes.insert(new MapRoute(triangle->p3, node));
+        if(node != NULL) {
+        // only look at nodes that arent' blocked
+            if(kMap->get_map().at(node->get_x()).at(node->get_y())->get_type() != VNode::Type::BLOCKED) {
+                // We only want to alter the node if it's equal to nothing
+                if(kMap->get_map().at(node->get_x()).at(node->get_y())->get_type() == VNode::Type::NONE) {
+                    kMap->get_map().at(node->get_x()).at(node->get_y())->set_type(VNode::Type::STEINER);
+                }
+                // Add the vertice to the set of Steiner points
+                kSteinerVertices.insert(node);
+                // add a needed route between the all the points
+                if(kMap->get_map().at(triangle->p1->get_x()).at(triangle->p1->get_y()) != node) {
+                    kRoutes.insert(
+                            new MapRoute(kMap->get_map().at(triangle->p1->get_x()).at(triangle->p1->get_y()), node));
+                }
+                if(kMap->get_map().at(triangle->p2->get_x()).at(triangle->p2->get_y()) != node) {
+                    kRoutes.insert(
+                            new MapRoute(kMap->get_map().at(triangle->p2->get_x()).at(triangle->p2->get_y()), node));
+                }
+                if(kMap->get_map().at(triangle->p3->get_x()).at(triangle->p3->get_y()) != node) {
+                        kRoutes.insert(new MapRoute(kMap->get_map().at(triangle->p3->get_x()).at(triangle->p3->get_y()),
+                                                    node));
+                   }
+            }
+        }
     }
 }
 
@@ -356,9 +355,7 @@ bool Steiner::verify_triangle_angles(SteinerTriangle* t) {
 VNode* Steiner::manhattan_geometric_mean(SteinerTriangle* tri) {
     int ax = (tri->p1->get_x() + tri->p2->get_x() + tri->p3->get_x())/3;
     int ay = (tri->p1->get_y() + tri->p2->get_y() + tri->p3->get_y())/3;
-    VNode* v = new VNode(ax, ay);
-    v->set_type(VNode::Type::STEINER);
-    return v;
+    return kMap->get_map().at(ax).at(ay);
 }
 
 // not used
@@ -392,5 +389,24 @@ double Steiner::find_bigger_angle(double l_d, double s_d_1, double s_d_2) {
     double angle = pow(s_d_1,2) + pow(s_d_2, 2) - pow(l_d, 2);
     angle = fabs(angle/(2*s_d_1 * s_d_2));
     return acos(angle) * 180 / PI;
+}
+
+
+/**
+* http://stackoverflow.com/questions/12934213/how-to-find-out-geometric-median
+* http://www.mathblog.dk/project-euler-143-investigating-the-torricelli-point-of-a-triangle/
+*
+* This generates the steiner points based on triangles, very computational expensive
+*/
+void Steiner::generate_steiner_point_from_triangle() {
+    int y = 0;
+
+    for(int x = 0; x<(int)kTriangles.size();x++) {
+        if (verify_triangle_angles(kTriangles.at(x))) {
+            claim(kTriangles.at(x)->triangle_to_string(), kDebug);
+            kSteinerVertices.insert(manhattan_geometric_mean(kTriangles.at(x)));
+            y++;
+        }
+    }
 }
 

@@ -25,7 +25,6 @@ Steiner::~Steiner() {
 */
 void Steiner::start() {
     claim("S/start: Size of set of pins is: " + to_string(kMap->get_pins().size()), kDebug);
-    kSteinerCalculator = 1;
     switch(kSteinerCalculator) {
         case 1:
             generate_steiner_midpoint_linear();

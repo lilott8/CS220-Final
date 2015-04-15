@@ -35,6 +35,8 @@ namespace FlowAlgorithms {
         Map* kMap;
         VNode* kSource;
         VNode* kTarget;
+        int kUnroutable;
+        int kRoutable;
         std::priority_queue<VNode*, vector<VNode*>, CompareNodes> kWaveFrontPQ;
 
         std::deque<VNode*> kTraceBack;

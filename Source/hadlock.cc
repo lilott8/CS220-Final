@@ -13,6 +13,8 @@ Hadlock::Hadlock(){}
 
 Hadlock::Hadlock(Map* m) {
     kMap = m;
+    kUnroutable = 0;
+    kRoutable = 0;
 }
 
 Hadlock::~Hadlock() {}
@@ -55,6 +57,7 @@ void Hadlock::route_recursive() {
         claim("H/route_recursive: We could not successfully route: "
                 + kSource->coords_to_string() + "->"
                 + kTarget->coords_to_string(), kWarning);
+        kUnroutable++;
         return;
     }
     // Grab the first record

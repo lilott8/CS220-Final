@@ -25,6 +25,7 @@ Steiner::~Steiner() {
 */
 void Steiner::start() {
     claim("S/start: Size of set of pins is: " + to_string(kMap->get_pins().size()), kDebug);
+    kSteinerCalculator = 2;
     switch(kSteinerCalculator) {
         case 1:
             generate_steiner_midpoint_linear();
@@ -35,11 +36,13 @@ void Steiner::start() {
             break;
         case 3:
             generate_steiner_triangle_linear();
+            build_steiner_points();
             break;
         case 4:
-            //generate_steiner_triangle_exponential(data, 0, kMap->get_pins().size()-1, 0, 3);
-            //generate_steiner_point_from_triangle();
-            claim("S/start: Disabled for now", kError);
+            VNode* data[3];
+            kPins = kMap->get_pins();
+            generate_steiner_triangle_exponential(data, 0, kMap->get_pins().size()-1, 0, 3);
+            build_steiner_points();
             break;
     }
 
@@ -254,7 +257,9 @@ void Steiner::generate_steiner_triangle_linear() {
             }
         }
     }
+}
 
+void Steiner::build_steiner_points() {
     for(auto triangle : kTriangles) {
         // Calculate the steiner point between 3 points
         VNode* node = manhattan_geometric_mean(triangle);
@@ -284,7 +289,7 @@ void Steiner::generate_steiner_triangle_exponential(VNode* data[], int start, in
     // "end-i+1 >= r-index" makes sure that including one element
     // at index will make a combination with remaining elements
     // at remaining positions
-    set<VNode*>::const_iterator it(kMap->get_pins().begin());
+    set<VNode*>::const_iterator it(kPins.begin());
     advance(it, start);
     for(int i=start; i<=end && end-i+1 >= combo - index; i++) {
         data[index] = *it;

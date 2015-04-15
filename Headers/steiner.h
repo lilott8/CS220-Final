@@ -52,10 +52,11 @@ namespace FlowAlgorithms {
 
     private:
         vector<SteinerTriangle*> kTriangles;    // list of triangles
-        set<VNode*> kSteinerVertices;             // list of all candidate nodes generated
+        set<VNode*> kSteinerVertices;           // list of all candidate nodes generated
         set<VEdge*> kSteinerEdges;              // list of all edges that include Steiner points
-        set<MapRoute*> kRoutes;
-        Map* kMap;
+        set<MapRoute*> kRoutes;                 // list of routes to be routed
+        Map* kMap;                              // Map object
+        set<VNode*> kPins;                      // work around for getting iterators to work
         int kSteinerCalculator;                 // determines how to calculate steiner points
 
         // convert nodes to triangles, exponential time
@@ -65,6 +66,8 @@ namespace FlowAlgorithms {
         void generate_steiner_midpoint_linear();
         // Naive approach to generating steiner points, runs in exponential time
         void generate_steiner_midpoint_exponential();
+        // Build the Steiner points from the triangle objects generated in previous methods
+        void build_steiner_points();
 
         // Triangle approach to Steiner point generation
         void generate_steiner_point_from_triangle();

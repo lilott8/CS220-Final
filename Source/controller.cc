@@ -72,7 +72,8 @@ void Controller::start() {
     // step 2
     kSteiner = new Steiner(kMap, kSteinerCalculator);
     kSteiner->start();
-    if(kSteiner->get_routes().size() > 0) {
+
+    if(!kSteiner->get_routes().empty()) {
         add_to_all_routes(kSteiner->get_routes());
     }
 
@@ -85,9 +86,9 @@ void Controller::start() {
     // Step 3
     // kEdges will have all the routeable edges possible
     this->kSPC = new SPC(kHadlock->get_edges());
-    this->kSPC->start();
+    //this->kSPC->start();
 
-    //kMap->print_map();
+    kMap->print_map();
 }
 
 /**

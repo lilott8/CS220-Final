@@ -72,7 +72,9 @@ void Controller::start() {
     // step 2
     kSteiner = new Steiner(kMap, kSteinerCalculator);
     kSteiner->start();
-    add_to_all_routes(kSteiner->get_routes());
+    if(kSteiner->get_routes().size() > 0) {
+        add_to_all_routes(kSteiner->get_routes());
+    }
 
     // Route all the MapRoutes that need to be routed
     add_to_all_routes(kMap->get_routes());

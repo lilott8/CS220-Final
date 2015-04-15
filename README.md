@@ -37,8 +37,7 @@ This implementation works in several different phases.  Each phase is discrete a
  3. Naive, Geometric approach.  This level using the same combinatorial logic as step one, but instead of the manhattan midpoint it uses a complicated triangulation method to determine Steiner point placement\*
  4. Exhaustive, Geometric approach.  This level uses the combinatorial logic as step 2, but uses the same triangulation method as step 3 for Steiner point placement\*
  
- \* *Please note:* that these steps are extremely computationally expensive and can have inaccuracies caused by rounding. The geometric calculations are float based, while the problem space is defined in integers
- 
+ \* *Please note:* that these steps are extremely computationally expensive and can have inaccuracies caused by rounding. The geometric calculations are float based, while the problem space is defined in integers.  _There is also no guarantee that this returns any valid Steiner point candidates.  If the size of any angle of the triangle is >120 degrees, then a Steiner point will not help this cause._
  
  **Input:** Set of Vertices that need Steiner points generated
  

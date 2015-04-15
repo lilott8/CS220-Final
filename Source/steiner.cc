@@ -25,8 +25,7 @@ Steiner::~Steiner() {
 */
 void Steiner::start() {
     claim("S/start: Size of set of pins is: " + to_string(kMap->get_pins().size()), kDebug);
-    VNode* data[3];
-    kSteinerCalculator = 2;
+    kSteinerCalculator = 1;
     switch(kSteinerCalculator) {
         case 1:
             generate_steiner_midpoint_linear();
@@ -36,9 +35,7 @@ void Steiner::start() {
             generate_steiner_midpoint_exponential();
             break;
         case 3:
-            //generate_steiner_triangle_linear();
-            //generate_steiner_point_from_triangle();
-            claim("S/start: Disabled for now", kError);
+            generate_steiner_triangle_linear();
             break;
         case 4:
             //generate_steiner_triangle_exponential(data, 0, kMap->get_pins().size()-1, 0, 3);
@@ -77,12 +74,16 @@ void Steiner::generate_steiner_midpoint_linear() {
 
     std::set<VNode*>::iterator it;
     std::set<VNode*>::iterator it2;
-    for(it = kMap->get_pins().begin(); it != kMap->get_pins().end(); ++it) {
+    // I don't know why this is required, but it is.
+    std::set<VNode*> items = kMap->get_pins();
+
+    for(it = items.begin(); it != items.end(); ++it) {
         it2 = it;
-        if(it2++ != kMap->get_pins().end()) {
+        if(++it2 != items.end()) {
             outer = *it;
             inner = *it2;
         }
+        // prevents the final case from error-ing out , where o = i
         if(outer == inner) {
             continue;
         }
@@ -141,8 +142,6 @@ void Steiner::generate_steiner_midpoint_linear() {
 * this is a more exhaustive than the naive one, but it runs in O(n^2) time
 */
 void Steiner::generate_steiner_midpoint_exponential() {
-    //VNode *node1;
-    //VNode *node2;
 
     for(VNode* outer : kMap->get_pins()) {
         for(VNode* inner : kMap->get_pins()) {
@@ -200,6 +199,11 @@ void Steiner::generate_steiner_midpoint_exponential() {
     }
 }
 
+/************************************************************
+ *
+ * Triangle-based Steiner point calculations
+ *
+ ************************************************************/
 
 /**
 * http://stackoverflow.com/questions/12934213/how-to-find-out-geometric-median
@@ -215,38 +219,59 @@ void Steiner::generate_steiner_point_from_triangle() {
             claim(kTriangles.at(x)->triangle_to_string(), kDebug);
             kSteinerVertices.insert(manhattan_geometric_mean(kTriangles.at(x)));
             y++;
-        } else {
-            //claim("Angle is greater than 120!", kDebug);
-            //claim(st->triangle_to_string(), kDebug);
-            //claim("=======================================", kDebug);
         }
     }
-    claim("S/gneerate_steiner_points_from_triangle: here", kDebug);
-    claim("S/generate_steiner_points: " + to_string(y) + "/" + to_string(kTriangles.size()) + " of triangles have steiner points", kDebug);
-    claim("S/generate_steiner_points: Total number of Steiner Points: " + to_string(kSteinerVertices.size()), kDebug);
 }
 
+/**
+ * Calculates the Steiner points using a single pass combinatorial combined with a geometric calculation
+ * Runs in O(n) time
+ */
 void Steiner::generate_steiner_triangle_linear() {
-    vector<VNode*> temp(kMap->get_pins().size());
+    std::vector<VNode*> temp;
+    SteinerTriangle* st;
     // Add the nodes in the set to the vector
-    copy(kMap->get_pins().begin(), kMap->get_pins().end(), temp.begin());
+    for(auto node : kMap->get_pins()) {
+        temp.push_back(node);
+    }
+
     for(int x = 0; x < temp.size() -1; x++) {
         if(x+2 < temp.size()-1) {
-            kTriangles.push_back(new SteinerTriangle(temp.at(x), temp.at(x+1), temp.at(x+2)));
+            st = new SteinerTriangle(temp.at(x), temp.at(x+1), temp.at(x+2));
+            if(verify_triangle_angles(st)) {
+                kTriangles.push_back(st);
+            }
         } else {
             if(x + 1 < temp.size()-1) {
-                kTriangles.push_back(new SteinerTriangle(temp.at(x), temp.at(x+1), temp.at(0)));
+                st = new SteinerTriangle(temp.at(x), temp.at(x+1), temp.at(0));
+                if(verify_triangle_angles(st)) {
+                    kTriangles.push_back(st);
+                }
             } else {
-                kTriangles.push_back(new SteinerTriangle(temp.at(x), temp.at(0), temp.at(1)));
+                st = new SteinerTriangle(temp.at(x), temp.at(0), temp.at(1));
+                if(verify_triangle_angles(st)) {
+                    kTriangles.push_back(st);
+                }
             }
         }
+    }
+
+    for(auto triangle : kTriangles) {
+        // Calculate the steiner point between 3 points
+        VNode* node = manhattan_geometric_mean(triangle);
+        // Add the vertice to the set of Steiner points
+        kSteinerVertices.insert(node);
+        // add a needed route between the all the points
+        kRoutes.insert(new MapRoute(triangle->p1, node));
+        kRoutes.insert(new MapRoute(triangle->p2, node));
+        kRoutes.insert(new MapRoute(triangle->p3, node));
     }
 }
 
 
 /**
 * http://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
-* build the triangles during one pass of the list (O(n))
+* build the triangles (O(n^2))
 */
 void Steiner::generate_steiner_triangle_exponential(VNode* data[], int start, int end, int index, int combo) {
     // Base case, where we know we need to print create the triangle
@@ -267,7 +292,6 @@ void Steiner::generate_steiner_triangle_exponential(VNode* data[], int start, in
         advance(it, 1);
         generate_steiner_triangle_exponential(data, i+1, end, index+1, combo);
     }
-
 }
 
 /**
@@ -317,7 +341,9 @@ bool Steiner::verify_triangle_angles(SteinerTriangle* t) {
     }
     //claim("S/verify_triangle_angles: Size of angles: " + to_string(angle1) + "\t" + to_string(angle2) + "\t" + to_string(angle3), kDebug);
 
+    //return true;
     return (angle1 > 120 || angle2 > 120 || angle3 > 120);
+
 }
 
 /**
